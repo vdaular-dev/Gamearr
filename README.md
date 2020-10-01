@@ -6,7 +6,13 @@
 ![Github Downloads](https://img.shields.io/github/downloads/lidarr/lidarr/total.svg)
 [![Backers on Open Collective](https://opencollective.com/lidarr/backers/badge.svg)](#backers) [![Sponsors on Open Collective](https://opencollective.com/lidarr/sponsors/badge.svg)](#sponsors)
 
+<<<<<<< HEAD
 Lidarr is a music collection manager for Usenet and BitTorrent users. It can monitor multiple RSS feeds for new tracks from your favorite artists and will grab, sort and rename them. It can also be configured to automatically upgrade the quality of files already downloaded when a better quality format becomes available.
+=======
+## Getting Started
+
+Gamearr is a Game collection manager forked from lidarr for Usenet and BitTorrent users. It can monitor multiple RSS feeds for new games as there being released and when they have been cracked automatically download them. 
+>>>>>>> 09138732b9cb4b95eb1e14a7ffb322ee191cad04
 
 ## Major Features Include:
 
