@@ -61,7 +61,7 @@ namespace NzbDrone.Core.Notifications
 
         private string GetAlbumIncompleteImportMessage(string source)
         {
-            return string.Format("Lidarr failed to Import all tracks for {0}",
+            return string.Format("Gamearr failed to Import all tracks for {0}",
                 source);
         }
 

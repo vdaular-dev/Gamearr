@@ -62,7 +62,7 @@ function PageHeaderActionsMenu(props) {
           {
             formsAuth &&
               <MenuItem
-                to={`${window.Lidarr.urlBase}/logout`}
+                to={`${window.Gamearr.urlBase}/logout`}
                 noRouter={true}
               >
                 <Icon

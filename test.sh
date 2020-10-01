@@ -21,7 +21,7 @@ COVERAGE_RESULT_DIRECTORY="$TEST_DIR/CoverageResults/"
 rm -f "$TEST_LOG_FILE"
 
 # Uncomment to log test output to a file instead of the console
-export LIDARR_TESTS_LOG_OUTPUT="File"
+export GAMEARR_TESTS_LOG_OUTPUT="File"
 
 NUNIT="$TEST_DIR/NUnit.ConsoleRunner.3.10.0/tools/nunit3-console.exe"
 NUNIT_COMMAND="$NUNIT"
@@ -39,10 +39,10 @@ if [ "$PLATFORM" = "Mac" ]; then
 fi
 
 if [ "$PLATFORM" = "Windows" ]; then
-  mkdir -p "$ProgramData/Lidarr"
+  mkdir -p "$ProgramData/Gamearr"
   WHERE="$WHERE && cat != LINUX"
 elif [ "$PLATFORM" = "Linux" ] || [ "$PLATFORM" = "Mac" ] ; then
-  mkdir -p ~/.config/Lidarr
+  mkdir -p ~/.config/Gamearr
   WHERE="$WHERE && cat != WINDOWS"
   NUNIT_COMMAND="mono --debug --runtime=v4.0 $NUNIT"
 else
@@ -70,7 +70,7 @@ if [ "$COVERAGE" = "Coverage" ]; then
     dotnet tool install coverlet.console --tool-path="$TEST_DIR/coverlet/"
     mkdir $COVERAGE_RESULT_DIRECTORY
     OPEN_COVER="$TEST_DIR/coverlet/coverlet"
-    $OPEN_COVER "$TEST_DIR/" --verbosity "detailed" --format "cobertura" --format "opencover" --output "$COVERAGE_RESULT_DIRECTORY" --exclude "[Lidarr.*.Test]*" --exclude "[Lidarr.Test.*]*" --exclude "[Lidarr.Api.V1]*" --exclude "[Marr.Data]*" --exclude "[MonoTorrent]*" --exclude "[CurlSharp]*" --target "$NUNIT" --targetargs "$NUNIT_PARAMS --where=\"$WHERE\" $ASSEMBLIES";
+    $OPEN_COVER "$TEST_DIR/" --verbosity "detailed" --format "cobertura" --format "opencover" --output "$COVERAGE_RESULT_DIRECTORY" --exclude "[Gamearr.*.Test]*" --exclude "[Gamearr.Test.*]*" --exclude "[Gamearr.Api.V1]*" --exclude "[Marr.Data]*" --exclude "[MonoTorrent]*" --exclude "[CurlSharp]*" --target "$NUNIT" --targetargs "$NUNIT_PARAMS --where=\"$WHERE\" $ASSEMBLIES";
     EXIT_CODE=$?
   else
     echo "Coverage only supported on Windows and Linux"

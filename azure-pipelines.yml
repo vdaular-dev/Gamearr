@@ -11,11 +11,11 @@ variables:
   minorVersion: $[counter('minorVersion', 1076)]
   lidarrVersion: '$(majorVersion).$(minorVersion)'
   buildName: '$(Build.SourceBranchName).$(lidarrVersion)'
-  windowsInstaller: 'Lidarr.$(buildName).windows-installer.exe'
-  windowsZip: 'Lidarr.$(buildName).windows.zip'
-  macOsApp: 'Lidarr.$(buildName).osx-app.zip'
-  macOsTar: 'Lidarr.$(buildName).osx.tar.gz'
-  linuxTar: 'Lidarr.$(buildName).linux.tar.gz'
+  windowsInstaller: 'Gamearr.$(buildName).windows-installer.exe'
+  windowsZip: 'Gamearr.$(buildName).windows.zip'
+  macOsApp: 'Gamearr.$(buildName).osx-app.zip'
+  macOsTar: 'Gamearr.$(buildName).osx.tar.gz'
+  linuxTar: 'Gamearr.$(buildName).linux.tar.gz'
   sentryOrg: 'lidarr'
 
 trigger:
@@ -49,13 +49,13 @@ stages:
         vmImage: $(imageName)
       steps:
       # Set the build name properly.  The 'name' property won't recursively expand so hack here:
-      - powershell: Write-Host "##vso[build.updatebuildnumber]$($env:LIDARRVERSION)"
+      - powershell: Write-Host "##vso[build.updatebuildnumber]$($env:GAMEARRVERSION)"
         displayName: Set Build Name
       - checkout: self
         submodules: true
         fetchDepth: 1
       - bash: ./build.sh --backend
-        displayName: Build Lidarr Backend
+        displayName: Build Gamearr Backend
       - publish: $(outputFolder)
         artifact: '$(osName)Backend'
         displayName: Publish Backend
@@ -93,7 +93,7 @@ stages:
         submodules: true
         fetchDepth: 1
       - bash: ./build.sh --frontend
-        displayName: Build Lidarr Frontend
+        displayName: Build Gamearr Frontend
         env:
           FORCE_COLOR: 0
       - publish: $(outputFolder)
@@ -129,7 +129,7 @@ stages:
         displayName: Create Packages
       - bash: |
           ./setup/inno/ISCC.exe "./setup/lidarr.iss"
-          cp ./setup/output/Lidarr.*windows.exe ${BUILD_ARTIFACTSTAGINGDIRECTORY}/${WINDOWSINSTALLER}
+          cp ./setup/output/Gamearr.*windows.exe ${BUILD_ARTIFACTSTAGINGDIRECTORY}/${WINDOWSINSTALLER}
         displayName: Create Windows installer
       - publish: $(Build.ArtifactStagingDirectory)
         artifact: 'WindowsInstaller'
@@ -162,10 +162,10 @@ stages:
       - bash: ./build.sh --packages
         displayName: Create Packages
       - bash: |
-          chmod a+x $(artifactsFolder)/macos/Lidarr/fpcalc
-          chmod a+x $(artifactsFolder)/macos/Lidarr/Lidarr
-          chmod a+x $(artifactsFolder)/macos-app/Lidarr.app/Contents/MacOS/fpcalc
-          chmod a+x $(artifactsFolder)/macos-app/Lidarr.app/Contents/MacOS/Lidarr
+          chmod a+x $(artifactsFolder)/macos/Gamearr/fpcalc
+          chmod a+x $(artifactsFolder)/macos/Gamearr/Gamearr
+          chmod a+x $(artifactsFolder)/macos-app/Gamearr.app/Contents/MacOS/fpcalc
+          chmod a+x $(artifactsFolder)/macos-app/Gamearr.app/Contents/MacOS/Gamearr
         displayName: Set Mac executable bits
       - task: ArchiveFiles@2
         displayName: Create Windows zip
@@ -203,7 +203,7 @@ stages:
       - bash: |
           echo "Uploading source maps to sentry"
           curl -sL https://sentry.io/get-cli/ | bash
-          RELEASENAME="${LIDARRVERSION}-${BUILD_SOURCEBRANCHNAME}"
+          RELEASENAME="${GAMEARRVERSION}-${BUILD_SOURCEBRANCHNAME}"
           sentry-cli releases new --finalize -p lidarr -p lidarr-ui -p lidarr-update "${RELEASENAME}"
           sentry-cli releases -p lidarr-ui files "${RELEASENAME}" upload-sourcemaps _output/UI/ --rewrite
           sentry-cli releases set-commits --auto "${RELEASENAME}"
@@ -358,15 +358,15 @@ stages:
           Linux:
             osName: 'Linux'
             imageName: 'ubuntu-16.04'
-            pattern: 'Lidarr.**.linux.tar.gz'
+            pattern: 'Gamearr.**.linux.tar.gz'
           Mac:
             osName: 'Mac'
             imageName: 'macos-10.13'
-            pattern: 'Lidarr.**.osx.tar.gz'
+            pattern: 'Gamearr.**.osx.tar.gz'
           Windows:
             osName: 'Windows'
             imageName: 'vs2017-win2016'
-            pattern: 'Lidarr.**.windows.zip'
+            pattern: 'Gamearr.**.windows.zip'
 
       pool:
         vmImage: $(imageName)
@@ -406,7 +406,7 @@ stages:
         displayName: Extract Package
       - bash: |
           mkdir -p ./bin/
-          cp -r -v ${BUILD_ARTIFACTSTAGINGDIRECTORY}/bin/Lidarr/. ./bin/
+          cp -r -v ${BUILD_ARTIFACTSTAGINGDIRECTORY}/bin/Gamearr/. ./bin/
         displayName: Move Package Contents
       - task: Bash@3
         displayName: Run Integration Tests
@@ -449,7 +449,7 @@ stages:
             containerImage: mono:5.20
             
       variables:
-        pattern: 'Lidarr.**.linux.tar.gz'
+        pattern: 'Gamearr.**.linux.tar.gz'
 
       pool:
         vmImage: 'ubuntu-16.04'
@@ -482,7 +482,7 @@ stages:
         displayName: Extract Package
       - bash: |
           mkdir -p ./bin/
-          cp -r -v ${BUILD_ARTIFACTSTAGINGDIRECTORY}/bin/Lidarr/. ./bin/
+          cp -r -v ${BUILD_ARTIFACTSTAGINGDIRECTORY}/bin/Gamearr/. ./bin/
           ls -lR
         displayName: Move Package Contents
       - task: Bash@3
@@ -510,17 +510,17 @@ stages:
           Linux:
             osName: 'Linux'
             imageName: 'ubuntu-16.04'
-            pattern: 'Lidarr.**.linux.tar.gz'
+            pattern: 'Gamearr.**.linux.tar.gz'
             failBuild: true
           Mac:
             osName: 'Mac'
             imageName: 'macos-10.13' # Fails due to firefox not being installed on image
-            pattern: 'Lidarr.**.osx.tar.gz'
+            pattern: 'Gamearr.**.osx.tar.gz'
             failBuild: false
           Windows:
             osName: 'Windows'
             imageName: 'vs2017-win2016'
-            pattern: 'Lidarr.**.windows.zip'
+            pattern: 'Gamearr.**.windows.zip'
             failBuild: true
 
       pool:
@@ -548,7 +548,7 @@ stages:
         displayName: Extract Package
       - bash: |
           mkdir -p ./bin/
-          cp -r -v ${BUILD_ARTIFACTSTAGINGDIRECTORY}/bin/Lidarr/. ./bin/
+          cp -r -v ${BUILD_ARTIFACTSTAGINGDIRECTORY}/bin/Gamearr/. ./bin/
         displayName: Move Package Contents
       - bash: |
           if [[ $OSNAME == "Mac" ]]; then
@@ -606,7 +606,7 @@ stages:
         submodules: true
         fetchDepth: 1
       - bash: ./build.sh --lint
-        displayName: Lint Lidarr Frontend
+        displayName: Lint Gamearr Frontend
         env:
           FORCE_COLOR: 0
 
@@ -624,8 +624,8 @@ stages:
           organization: 'lidarr'
           scannerMode: 'CLI'
           configMode: 'manual'
-          cliProjectKey: 'lidarr_Lidarr.UI'
-          cliProjectName: 'LidarrUI'
+          cliProjectKey: 'lidarr_Gamearr.UI'
+          cliProjectName: 'GamearrUI'
           cliProjectVersion: '$(lidarrVersion)'
           cliSources: './frontend'
       - task: SonarCloudAnalyze@1
@@ -642,16 +642,16 @@ stages:
           SonarCloud: 'SonarCloud'
           organization: 'lidarr'
           scannerMode: 'MSBuild'
-          projectKey: 'lidarr_Lidarr'
-          projectName: 'Lidarr'
+          projectKey: 'lidarr_Gamearr'
+          projectName: 'Gamearr'
           projectVersion: '$(lidarrVersion)'
           extraProperties: |
             sonar.exclusions=**/obj/**,**/*.dll,**/NzbDrone.Core.Test/Files/**/*,./frontend/**,**/ExternalModules/**,./src/Libraries/**
-            sonar.coverage.exclusions=**/Lidarr.Api.V1/**/*,**/MonoTorrent/**/*,**/Marr.Data/**/*
+            sonar.coverage.exclusions=**/Gamearr.Api.V1/**/*,**/MonoTorrent/**/*,**/Marr.Data/**/*
             sonar.cs.opencover.reportsPaths=$(Build.SourcesDirectory)/_tests/CoverageResults/coverage.opencover.xml
             sonar.cs.nunit.reportsPaths=$(Build.SourcesDirectory)/TestResult.xml
       - bash: ./build.sh --backend
-        displayName: Build Lidarr Backend
+        displayName: Build Gamearr Backend
       - task: Bash@3
         displayName: Coverage Unit Tests
         inputs:

@@ -1,4 +1,4 @@
-using Lidarr.Api.V1.Indexers;
+using Gamearr.Api.V1.Indexers;
 using RestSharp;
 
 namespace NzbDrone.Integration.Test.Client

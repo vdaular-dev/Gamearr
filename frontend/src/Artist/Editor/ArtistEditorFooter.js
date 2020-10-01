@@ -289,7 +289,7 @@ class ArtistEditorFooter extends Component {
                   isDisabled={!selectedCount || isOrganizingArtist || isRetaggingArtist}
                   onPress={this.onTagsPress}
                 >
-                  Set Lidarr Tags
+                  Set Gamearr Tags
                 </SpinnerButton>
               </div>
 

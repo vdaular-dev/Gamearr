@@ -274,7 +274,7 @@ namespace NzbDrone.Core.Download.Clients.Deluge
                 {
                     return new NzbDroneValidationFailure("MusicCategory", "Configuration of label failed")
                     {
-                        DetailedDescription = "Lidarr as unable to add the label to Deluge."
+                        DetailedDescription = "Gamearr as unable to add the label to Deluge."
                     };
                 }
             }

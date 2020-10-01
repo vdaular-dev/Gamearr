@@ -102,7 +102,7 @@ namespace NzbDrone.Core.Music
             }
             catch (ArtistNotFoundException)
             {
-                _logger.Error("LidarrId {0} was not found, it may have been removed from Lidarr.", newArtist.Metadata.Value.ForeignArtistId);
+                _logger.Error("GamearrId {0} was not found, it may have been removed from Gamearr.", newArtist.Metadata.Value.ForeignArtistId);
 
                 throw new ValidationException(new List<ValidationFailure>
                                               {

@@ -36,7 +36,7 @@ namespace NzbDrone.Update
                 var startupContext = new StartupContext(args);
                 NzbDroneLogger.Register(startupContext, true, true);
 
-                Logger.Info("Starting Lidarr Update Client");
+                Logger.Info("Starting Gamearr Update Client");
 
                 _container = UpdateContainerBuilder.Build(startupContext);
                 _container.Resolve<InitializeLogger>().Initialize();
@@ -104,7 +104,7 @@ namespace NzbDrone.Update
                 throw new ArgumentOutOfRangeException(nameof(arg), "Invalid process ID");
             }
 
-            Logger.Debug("Lidarr process ID: {0}", id);
+            Logger.Debug("Gamearr process ID: {0}", id);
             return id;
         }
 

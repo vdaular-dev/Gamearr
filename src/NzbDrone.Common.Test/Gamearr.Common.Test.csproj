@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net462</TargetFramework>
+    <Platforms>x86</Platforms>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\NzbDrone.Host\Gamearr.Host.csproj" />
+    <ProjectReference Include="..\NzbDrone.Test.Common\Gamearr.Test.Common.csproj" />
+    <ProjectReference Include="..\NzbDrone.Test.Dummy\Gamearr.Test.Dummy.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System.ServiceProcess" />
+  </ItemGroup>
+</Project>

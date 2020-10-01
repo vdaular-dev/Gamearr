@@ -98,7 +98,7 @@ namespace NzbDrone.Core.MediaFiles
                 return ProcessFile(fileInfo, importMode, artist, downloadClientItem);
             }
 
-            _logger.Error("Import failed, path does not exist or is not accessible by Lidarr: {0}", path);
+            _logger.Error("Import failed, path does not exist or is not accessible by Gamearr: {0}", path);
             _eventAggregator.PublishEvent(new TrackImportFailedEvent(null, null, true, downloadClientItem));
             
             return new List<ImportResult>();

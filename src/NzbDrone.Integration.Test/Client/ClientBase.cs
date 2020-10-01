@@ -2,12 +2,12 @@ using System.Collections.Generic;
 using System.Net;
 using FluentAssertions;
 using NLog;
-using Lidarr.Api.V1;
-using Lidarr.Http.REST;
+using Gamearr.Api.V1;
+using Gamearr.Http.REST;
 using NzbDrone.Common.Serializer;
 using RestSharp;
 using System.Linq;
-using Lidarr.Http;
+using Gamearr.Http;
 
 namespace NzbDrone.Integration.Test.Client
 {

@@ -5,7 +5,7 @@ using System.Threading;
 using NUnit.Framework;
 using System.Linq;
 using System;
-using Lidarr.Http.REST;
+using Gamearr.Http.REST;
 using Newtonsoft.Json;
 
 namespace NzbDrone.Integration.Test.Client

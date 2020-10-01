@@ -181,11 +181,11 @@ namespace NzbDrone.Test.Common.AutoMoq
 
         private void RegisterPlatformLibrary(IUnityContainer container)
         {
-            var assemblyName = "Lidarr.Windows";
+            var assemblyName = "Gamearr.Windows";
 
             if (OsInfo.IsNotWindows)
             {
-                assemblyName = "Lidarr.Mono";
+                assemblyName = "Gamearr.Mono";
             }
 
             var assembly = Assembly.Load(assemblyName);

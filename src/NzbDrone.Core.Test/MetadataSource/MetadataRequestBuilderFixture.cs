@@ -18,7 +18,7 @@ namespace NzbDrone.Core.Test.MetadataSource
                 .Setup(s => s.MetadataSource)
                 .Returns("");
 
-            Mocker.GetMock<ILidarrCloudRequestBuilder>()
+            Mocker.GetMock<IGamearrCloudRequestBuilder>()
                 .Setup(s => s.Search)
                 .Returns(new HttpRequestBuilder("https://api.lidarr.audio/api/v0.4/{route}").CreateFactory());
         }

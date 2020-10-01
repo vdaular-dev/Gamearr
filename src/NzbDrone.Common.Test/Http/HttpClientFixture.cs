@@ -175,7 +175,7 @@ namespace NzbDrone.Common.Test.Http
             var response = Subject.Get(request);
 
             response.StatusCode.Should().Be(HttpStatusCode.OK);
-            response.Content.Should().Contain("Lidarr");
+            response.Content.Should().Contain("Gamearr");
 
             ExceptionVerification.ExpectedErrors(0);
         }
@@ -202,7 +202,7 @@ namespace NzbDrone.Common.Test.Http
 
             var userAgent = response.Resource.Headers["User-Agent"].ToString();
 
-            userAgent.Should().Contain("Lidarr");
+            userAgent.Should().Contain("Gamearr");
         }
 
         [TestCase("Accept", "text/xml, text/rss+xml, application/rss+xml")]

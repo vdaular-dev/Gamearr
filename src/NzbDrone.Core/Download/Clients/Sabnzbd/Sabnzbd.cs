@@ -356,7 +356,7 @@ namespace NzbDrone.Core.Download.Clients.Sabnzbd
                     return new NzbDroneValidationFailure("Version", "Sabnzbd develop version, assuming version 1.1.0 or higher.")
                     {
                         IsWarning = true,
-                        DetailedDescription = "Lidarr may not be able to support new features added to SABnzbd when running develop versions."
+                        DetailedDescription = "Gamearr may not be able to support new features added to SABnzbd when running develop versions."
                     };
                 }
 
@@ -409,7 +409,7 @@ namespace NzbDrone.Core.Download.Clients.Sabnzbd
                 return new NzbDroneValidationFailure("", "Disable 'Check before download' option in Sabnbzd")
                 {
                     InfoLink = _proxy.GetBaseUrl(Settings, "config/switches/"),
-                    DetailedDescription = "Using Check before download affects Lidarr ability to track new downloads. Also Sabnzbd recommends 'Abort jobs that cannot be completed' instead since it's more effective."
+                    DetailedDescription = "Using Check before download affects Gamearr ability to track new downloads. Also Sabnzbd recommends 'Abort jobs that cannot be completed' instead since it's more effective."
                 };
             }
 
@@ -428,7 +428,7 @@ namespace NzbDrone.Core.Download.Clients.Sabnzbd
                     return new NzbDroneValidationFailure("MusicCategory", "Enable Job folders")
                     {
                         InfoLink = _proxy.GetBaseUrl(Settings, "config/categories/"),
-                        DetailedDescription = "Lidarr prefers each download to have a separate folder. With * appended to the Folder/Path Sabnzbd will not create these job folders. Go to Sabnzbd to fix it."
+                        DetailedDescription = "Gamearr prefers each download to have a separate folder. With * appended to the Folder/Path Sabnzbd will not create these job folders. Go to Sabnzbd to fix it."
                     };
                 }
             }
@@ -448,7 +448,7 @@ namespace NzbDrone.Core.Download.Clients.Sabnzbd
                 return new NzbDroneValidationFailure("MusicCategory", "Disable TV Sorting")
                 {
                     InfoLink = _proxy.GetBaseUrl(Settings, "config/sorting/"),
-                    DetailedDescription = "You must disable Sabnzbd TV Sorting for the category Lidarr uses to prevent import issues. Go to Sabnzbd to fix it."
+                    DetailedDescription = "You must disable Sabnzbd TV Sorting for the category Gamearr uses to prevent import issues. Go to Sabnzbd to fix it."
                 };
             }
             if (config.Misc.enable_movie_sorting && ContainsCategory(config.Misc.movie_categories, Settings.MusicCategory))
@@ -456,7 +456,7 @@ namespace NzbDrone.Core.Download.Clients.Sabnzbd
                 return new NzbDroneValidationFailure("MusicCategory", "Disable Movie Sorting")
                 {
                     InfoLink = _proxy.GetBaseUrl(Settings, "config/sorting/"),
-                    DetailedDescription = "You must disable Sabnzbd Movie Sorting for the category Lidarr uses to prevent import issues. Go to Sabnzbd to fix it."
+                    DetailedDescription = "You must disable Sabnzbd Movie Sorting for the category Gamearr uses to prevent import issues. Go to Sabnzbd to fix it."
                 };
             }
             if (config.Misc.enable_date_sorting && ContainsCategory(config.Misc.date_categories, Settings.MusicCategory))
@@ -464,7 +464,7 @@ namespace NzbDrone.Core.Download.Clients.Sabnzbd
                 return new NzbDroneValidationFailure("MusicCategory", "Disable Date Sorting")
                 {
                     InfoLink = _proxy.GetBaseUrl(Settings, "config/sorting/"),
-                    DetailedDescription = "You must disable Sabnzbd Date Sorting for the category Lidarr uses to prevent import issues. Go to Sabnzbd to fix it."
+                    DetailedDescription = "You must disable Sabnzbd Date Sorting for the category Gamearr uses to prevent import issues. Go to Sabnzbd to fix it."
                 };
             }
 

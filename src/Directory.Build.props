@@ -1,35 +1,35 @@
 <Project>
-  <!-- Common to all Lidarr Projects -->
+  <!-- Common to all Gamearr Projects -->
   <PropertyGroup>
-    <LidarrRootDir>$(MSBuildThisFileDirectory)..\</LidarrRootDir>
+    <GamearrRootDir>$(MSBuildThisFileDirectory)..\</GamearrRootDir>
 
     <!-- Specifies the type of output -->
-    <LidarrOutputType>Library</LidarrOutputType>
-    <LidarrOutputType Condition="$(MSBuildProjectName.Contains('.Test'))">Test</LidarrOutputType>
-    <LidarrOutputType Condition="'$(MSBuildProjectName)'=='ServiceInstall'">Exe</LidarrOutputType>
-    <LidarrOutputType Condition="'$(MSBuildProjectName)'=='ServiceUninstall'">Exe</LidarrOutputType>
-    <LidarrOutputType Condition="'$(MSBuildProjectName)'=='Lidarr'">Exe</LidarrOutputType>
-    <LidarrOutputType Condition="'$(MSBuildProjectName)'=='Lidarr.Console'">Exe</LidarrOutputType>
-    <LidarrOutputType Condition="'$(MSBuildProjectName)'=='Lidarr.Update'">Update</LidarrOutputType>
+    <GamearrOutputType>Library</GamearrOutputType>
+    <GamearrOutputType Condition="$(MSBuildProjectName.Contains('.Test'))">Test</GamearrOutputType>
+    <GamearrOutputType Condition="'$(MSBuildProjectName)'=='ServiceInstall'">Exe</GamearrOutputType>
+    <GamearrOutputType Condition="'$(MSBuildProjectName)'=='ServiceUninstall'">Exe</GamearrOutputType>
+    <GamearrOutputType Condition="'$(MSBuildProjectName)'=='Gamearr'">Exe</GamearrOutputType>
+    <GamearrOutputType Condition="'$(MSBuildProjectName)'=='Gamearr.Console'">Exe</GamearrOutputType>
+    <GamearrOutputType Condition="'$(MSBuildProjectName)'=='Gamearr.Update'">Update</GamearrOutputType>
 
     <!-- Specifies whether it's one of our own libraries -->
-    <LidarrProject>false</LidarrProject>
-    <LidarrProject Condition="$(MSBuildProjectName.StartsWith('Lidarr'))">true</LidarrProject>
-    <LidarrProject Condition="$(MSBuildProjectName.StartsWith('ServiceInstall'))">true</LidarrProject>
-    <LidarrProject Condition="$(MSBuildProjectName.StartsWith('ServiceUninstall'))">true</LidarrProject>
+    <GamearrProject>false</GamearrProject>
+    <GamearrProject Condition="$(MSBuildProjectName.StartsWith('Gamearr'))">true</GamearrProject>
+    <GamearrProject Condition="$(MSBuildProjectName.StartsWith('ServiceInstall'))">true</GamearrProject>
+    <GamearrProject Condition="$(MSBuildProjectName.StartsWith('ServiceUninstall'))">true</GamearrProject>
   </PropertyGroup>
 
   <PropertyGroup>
     <Configuration Condition="'$(Configuration)'==''">Release</Configuration>
     <!-- Centralize intermediate and default outputs -->
-    <BaseIntermediateOutputPath>$(LidarrRootDir)_temp\obj\$(MSBuildProjectName)\</BaseIntermediateOutputPath>
-    <IntermediateOutputPath>$(LidarrRootDir)_temp\obj\$(MSBuildProjectName)\$(Configuration)\</IntermediateOutputPath>
-    <OutputPath>$(LidarrRootDir)_temp\bin\$(Configuration)\$(MSBuildProjectName)\</OutputPath>
+    <BaseIntermediateOutputPath>$(GamearrRootDir)_temp\obj\$(MSBuildProjectName)\</BaseIntermediateOutputPath>
+    <IntermediateOutputPath>$(GamearrRootDir)_temp\obj\$(MSBuildProjectName)\$(Configuration)\</IntermediateOutputPath>
+    <OutputPath>$(GamearrRootDir)_temp\bin\$(Configuration)\$(MSBuildProjectName)\</OutputPath>
 
     <!-- Output to _output and _tests respectively -->
-    <OutputPath Condition="'$(LidarrProject)'=='true'">$(LidarrRootDir)_output\</OutputPath>
-    <OutputPath Condition="'$(LidarrOutputType)'=='Test'">$(LidarrRootDir)_tests\</OutputPath>
-    <OutputPath Condition="'$(LidarrOutputType)'=='Update'">$(LidarrRootDir)_output\Lidarr.Update\</OutputPath>
+    <OutputPath Condition="'$(GamearrProject)'=='true'">$(GamearrRootDir)_output\</OutputPath>
+    <OutputPath Condition="'$(GamearrOutputType)'=='Test'">$(GamearrRootDir)_tests\</OutputPath>
+    <OutputPath Condition="'$(GamearrOutputType)'=='Update'">$(GamearrRootDir)_output\Gamearr.Update\</OutputPath>
 
     <!-- Paths relative to project file for better readability -->
     <BaseIntermediateOutputPath>$([MSBuild]::MakeRelative('$(MSBuildProjectDirectory)', '$(BaseIntermediateOutputPath)'))</BaseIntermediateOutputPath>
@@ -42,14 +42,14 @@
   </PropertyGroup>
   
   <!-- Test projects need bindingRedirects -->
-  <PropertyGroup Condition="'$(LidarrOutputType)'=='Test'">
+  <PropertyGroup Condition="'$(GamearrOutputType)'=='Test'">
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
   </PropertyGroup>
 
   <!-- Set the Product and Version info for our own projects -->
-  <PropertyGroup Condition="'$(LidarrProject)'=='true'">
-    <Product>Lidarr</Product>
+  <PropertyGroup Condition="'$(GamearrProject)'=='true'">
+    <Product>Gamearr</Product>
     <Company>lidarr.audio</Company>
     <Copyright>Copyright 2017-$([System.DateTime]::Now.ToString('yyyy')) lidarr.audio (GNU General Public v3)</Copyright>
     
@@ -64,7 +64,7 @@
     <Deterministic Condition="$(AssemblyVersion.EndsWith('*'))">False</Deterministic>
   </PropertyGroup>
   <!-- Set the AssemblyConfiguration attribute for projects -->
-  <ItemGroup Condition="'$(LidarrProject)'=='true'">
+  <ItemGroup Condition="'$(GamearrProject)'=='true'">
     <AssemblyAttribute Include="System.Reflection.AssemblyConfigurationAttribute">
       <_Parameter1>$(AssemblyConfiguration)</_Parameter1>
     </AssemblyAttribute>
@@ -75,6 +75,6 @@
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 
     <!-- For now keep the NzbDrone namespace -->
-    <RootNamespace Condition="'$(LidarrProject)'=='true'">$(MSBuildProjectName.Replace('Lidarr','NzbDrone'))</RootNamespace>
+    <RootNamespace Condition="'$(GamearrProject)'=='true'">$(MSBuildProjectName.Replace('Gamearr','NzbDrone'))</RootNamespace>
   </PropertyGroup>
 </Project>

@@ -1,7 +1,7 @@
 using System.Threading;
 using FluentAssertions;
 using NUnit.Framework;
-using Lidarr.Api.V1.Artist;
+using Gamearr.Api.V1.Artist;
 using System.Linq;
 
 namespace NzbDrone.Integration.Test.ApiTests

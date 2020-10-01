@@ -1,7 +1,7 @@
 using FluentAssertions;
 using NUnit.Framework;
-using Lidarr.Api.V1.Artist;
-using Lidarr.Api.V1.Blacklist;
+using Gamearr.Api.V1.Artist;
+using Gamearr.Api.V1.Blacklist;
 
 namespace NzbDrone.Integration.Test.ApiTests
 {

@@ -21,12 +21,12 @@ class MoreInfo extends Component {
 
           <DescriptionListItemTitle>Wiki</DescriptionListItemTitle>
           <DescriptionListItemDescription>
-            <Link to="https://github.com/lidarr/Lidarr/wiki">wiki.lidarr.audio</Link>
+            <Link to="https://github.com/lidarr/Gamearr/wiki">wiki.lidarr.audio</Link>
           </DescriptionListItemDescription>
 
           <DescriptionListItemTitle>Reddit</DescriptionListItemTitle>
           <DescriptionListItemDescription>
-            <Link to="https://www.reddit.com/r/Lidarr/">Lidarr</Link>
+            <Link to="https://www.reddit.com/r/Gamearr/">Gamearr</Link>
           </DescriptionListItemDescription>
 
           <DescriptionListItemTitle>Discord</DescriptionListItemTitle>
@@ -36,7 +36,7 @@ class MoreInfo extends Component {
 
           <DescriptionListItemTitle>Donations</DescriptionListItemTitle>
           <DescriptionListItemDescription>
-            <Link to="https://opencollective.com/lidarr">Donate to Lidarr</Link>
+            <Link to="https://opencollective.com/lidarr">Donate to Gamearr</Link>
           </DescriptionListItemDescription>
 
           <DescriptionListItemTitle>Sonarr Donations</DescriptionListItemTitle>
@@ -46,12 +46,12 @@ class MoreInfo extends Component {
 
           <DescriptionListItemTitle>Source</DescriptionListItemTitle>
           <DescriptionListItemDescription>
-            <Link to="https://github.com/lidarr/Lidarr/">github.com/Lidarr/Lidarr</Link>
+            <Link to="https://github.com/lidarr/Gamearr/">github.com/Gamearr/Gamearr</Link>
           </DescriptionListItemDescription>
 
           <DescriptionListItemTitle>Feature Requests</DescriptionListItemTitle>
           <DescriptionListItemDescription>
-            <Link to="https://github.com/lidarr/Lidarr/issues">github.com/Lidarr/Lidarr/issues</Link>
+            <Link to="https://github.com/lidarr/Gamearr/issues">github.com/Gamearr/Gamearr/issues</Link>
           </DescriptionListItemDescription>
 
         </DescriptionList>

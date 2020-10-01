@@ -18,7 +18,7 @@ Remove if not opening a bug report
 
 ### System Information/Logs
 
-**Lidarr Version:**
+**Gamearr Version:**
 
 **Operating System:**
 

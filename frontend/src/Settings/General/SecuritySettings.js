@@ -77,7 +77,7 @@ class SecuritySettings extends Component {
             type={inputTypes.SELECT}
             name="authenticationMethod"
             values={authenticationMethodOptions}
-            helpText="Require Username and Password to access Lidarr"
+            helpText="Require Username and Password to access Gamearr"
             helpTextWarning="Requires restart to take effect"
             onChange={onInputChange}
             {...authenticationMethod}

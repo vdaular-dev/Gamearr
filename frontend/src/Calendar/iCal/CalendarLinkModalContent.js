@@ -22,7 +22,7 @@ function getUrls(state) {
     tags
   } = state;
 
-  let icalUrl = `${window.location.host}${window.Lidarr.urlBase}/feed/v1/calendar/Lidarr.ics?`;
+  let icalUrl = `${window.location.host}${window.Gamearr.urlBase}/feed/v1/calendar/Gamearr.ics?`;
 
   if (unmonitored) {
     icalUrl += 'unmonitored=true&';
@@ -32,7 +32,7 @@ function getUrls(state) {
     icalUrl += `tags=${tags.toString()}&`;
   }
 
-  icalUrl += `pastDays=${pastDays}&futureDays=${futureDays}&apikey=${window.Lidarr.apiKey}`;
+  icalUrl += `pastDays=${pastDays}&futureDays=${futureDays}&apikey=${window.Gamearr.apiKey}`;
 
   const iCalHttpUrl = `${window.location.protocol}//${icalUrl}`;
   const iCalWebCalUrl = `webcal://${icalUrl}`;
@@ -107,7 +107,7 @@ class CalendarLinkModalContent extends Component {
     return (
       <ModalContent onModalClose={onModalClose}>
         <ModalHeader>
-          Lidarr Calendar Feed
+          Gamearr Calendar Feed
         </ModalHeader>
 
         <ModalBody>

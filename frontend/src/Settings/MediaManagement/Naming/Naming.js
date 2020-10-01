@@ -153,7 +153,7 @@ class Naming extends Component {
                 <FormInputGroup
                   type={inputTypes.CHECK}
                   name="renameTracks"
-                  helpText="Lidarr will use the existing file name if renaming is disabled"
+                  helpText="Gamearr will use the existing file name if renaming is disabled"
                   onChange={onInputChange}
                   {...settings.renameTracks}
                 />

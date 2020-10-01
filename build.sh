@@ -6,9 +6,9 @@ outputFolderMacOS='./_output_macos'
 outputFolderMacOSApp='./_output_macos_app'
 testPackageFolder='./_tests/'
 sourceFolder='./src'
-slnFile=$sourceFolder/Lidarr.sln
-updateFolder=$outputFolder/Lidarr.Update
-updateFolderMono=$outputFolderLinux/Lidarr.Update
+slnFile=$sourceFolder/Gamearr.sln
+updateFolder=$outputFolder/Gamearr.Update
+updateFolderMono=$outputFolderLinux/Gamearr.Update
 
 #Artifact variables
 artifactsFolder="./_artifacts";
@@ -43,11 +43,11 @@ ProgressEnd()
 
 UpdateVersionNumber()
 {
-    if [ "$LIDARRVERSION" != "" ]; then
+    if [ "$GAMEARRVERSION" != "" ]; then
         echo "Updating Version Info"
-        sed -i "s/<AssemblyVersion>[0-9.*]\+<\/AssemblyVersion>/<AssemblyVersion>$LIDARRVERSION<\/AssemblyVersion>/g" ./src/Directory.Build.props
+        sed -i "s/<AssemblyVersion>[0-9.*]\+<\/AssemblyVersion>/<AssemblyVersion>$GAMEARRVERSION<\/AssemblyVersion>/g" ./src/Directory.Build.props
         sed -i "s/<AssemblyConfiguration>[\$()A-Za-z-]\+<\/AssemblyConfiguration>/<AssemblyConfiguration>${BUILD_SOURCEBRANCHNAME}<\/AssemblyConfiguration>/g" ./src/Directory.Build.props
-        sed -i "s/<string>10.0.0.0<\/string>/<string>$LIDARRVERSION<\/string>/g" ./macOS/Lidarr.app/Contents/Info.plist
+        sed -i "s/<string>10.0.0.0<\/string>/<string>$GAMEARRVERSION<\/string>/g" ./macOS/Gamearr.app/Contents/Info.plist
     fi
 }
 
@@ -176,17 +176,17 @@ PackageMono()
     rm -f $outputFolderLinux/sqlite3.*
     rm -f $outputFolderLinux/fpcalc*
 
-    echo "Renaming Lidarr.Console.exe to Lidarr.exe"
-    rm $outputFolderLinux/Lidarr.exe*
-    for file in $outputFolderLinux/Lidarr.Console.exe*; do
+    echo "Renaming Gamearr.Console.exe to Gamearr.exe"
+    rm $outputFolderLinux/Gamearr.exe*
+    for file in $outputFolderLinux/Gamearr.Console.exe*; do
         mv "$file" "${file//.Console/}"
     done
 
-    echo "Removing Lidarr.Windows"
-    rm $outputFolderLinux/Lidarr.Windows.*
+    echo "Removing Gamearr.Windows"
+    rm $outputFolderLinux/Gamearr.Windows.*
 
-    echo "Adding Lidarr.Mono to UpdatePackage"
-    cp $outputFolderLinux/Lidarr.Mono.* $updateFolderMono
+    echo "Adding Gamearr.Mono to UpdatePackage"
+    cp $outputFolderLinux/Gamearr.Mono.* $updateFolderMono
 
     ProgressEnd 'Creating Mono Package'
 }
@@ -199,7 +199,7 @@ PackageMacOS()
     mkdir $outputFolderMacOS
 
     echo "Adding Startup script"
-    cp ./macOS/Lidarr $outputFolderMacOS
+    cp ./macOS/Gamearr $outputFolderMacOS
 
     echo "Copying Binaries"
     cp -r $outputFolderLinux/* $outputFolderMacOS
@@ -217,22 +217,22 @@ PackageMacOSApp()
 
     rm -rf $outputFolderMacOSApp
     mkdir $outputFolderMacOSApp
-    cp -r ./macOS/Lidarr.app $outputFolderMacOSApp
-    mkdir -p $outputFolderMacOSApp/Lidarr.app/Contents/MacOS
+    cp -r ./macOS/Gamearr.app $outputFolderMacOSApp
+    mkdir -p $outputFolderMacOSApp/Gamearr.app/Contents/MacOS
 
     echo "Adding Startup script"
-    cp ./macOS/Lidarr $outputFolderMacOSApp/Lidarr.app/Contents/MacOS
-    dos2unix $outputFolderMacOSApp/Lidarr.app/Contents/MacOS/Lidarr
+    cp ./macOS/Gamearr $outputFolderMacOSApp/Gamearr.app/Contents/MacOS
+    dos2unix $outputFolderMacOSApp/Gamearr.app/Contents/MacOS/Gamearr
 
     echo "Copying Binaries"
-    cp -r $outputFolderLinux/* $outputFolderMacOSApp/Lidarr.app/Contents/MacOS
-    cp $outputFolder/fpcalc $outputFolderMacOSApp/Lidarr.app/Contents/MacOS
+    cp -r $outputFolderLinux/* $outputFolderMacOSApp/Gamearr.app/Contents/MacOS
+    cp $outputFolder/fpcalc $outputFolderMacOSApp/Gamearr.app/Contents/MacOS
 
     echo "Adding sqlite dylibs"
-    cp $sourceFolder/Libraries/Sqlite/*.dylib $outputFolderMacOSApp/Lidarr.app/Contents/MacOS
+    cp $sourceFolder/Libraries/Sqlite/*.dylib $outputFolderMacOSApp/Gamearr.app/Contents/MacOS
 
     echo "Removing Update Folder"
-    rm -r $outputFolderMacOSApp/Lidarr.app/Contents/MacOS/Lidarr.Update
+    rm -r $outputFolderMacOSApp/Gamearr.app/Contents/MacOS/Gamearr.Update
 
     ProgressEnd 'Creating macOS App Package'
 }
@@ -263,11 +263,11 @@ CleanupWindowsPackage()
 {
     ProgressStart 'Cleaning Windows Package'
 
-    echo "Removing Lidarr.Mono"
-    rm -f $outputFolder/Lidarr.Mono.*
+    echo "Removing Gamearr.Mono"
+    rm -f $outputFolder/Gamearr.Mono.*
 
-    echo "Adding Lidarr.Windows to UpdatePackage"
-    cp $outputFolder/Lidarr.Windows.* $updateFolder
+    echo "Adding Gamearr.Windows to UpdatePackage"
+    cp $outputFolder/Gamearr.Windows.* $updateFolder
 
     echo "Removing MacOS fpcalc"
     rm $outputFolder/fpcalc
@@ -285,15 +285,15 @@ PackageArtifacts()
     mkdir $artifactsFolderWindows
     mkdir $artifactsFolderMacOS
     mkdir $artifactsFolderLinux
-    mkdir $artifactsFolderWindows/Lidarr
-    mkdir $artifactsFolderMacOS/Lidarr
-    mkdir $artifactsFolderLinux/Lidarr
+    mkdir $artifactsFolderWindows/Gamearr
+    mkdir $artifactsFolderMacOS/Gamearr
+    mkdir $artifactsFolderLinux/Gamearr
     mkdir $artifactsFolderMacOSApp
     
-    cp -r $outputFolder/* $artifactsFolderWindows/Lidarr
+    cp -r $outputFolder/* $artifactsFolderWindows/Gamearr
     cp -r $outputFolderMacOSApp/* $artifactsFolderMacOSApp
-    cp -r $outputFolderMacOS/* $artifactsFolderMacOS/Lidarr
-    cp -r $outputFolderLinux/* $artifactsFolderLinux/Lidarr
+    cp -r $outputFolderMacOS/* $artifactsFolderMacOS/Gamearr
+    cp -r $outputFolderLinux/* $artifactsFolderLinux/Gamearr
 }
 
 # Use mono or .net depending on OS

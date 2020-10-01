@@ -55,8 +55,8 @@ function UpdateSettings(props) {
         <FormInputGroup
           type={inputTypes.AUTO_COMPLETE}
           name="branch"
-          helpText="Branch to use to update Lidarr"
-          helpLink="https://github.com/Lidarr/Lidarr/wiki/Release-Branches"
+          helpText="Branch to use to update Gamearr"
+          helpLink="https://github.com/Gamearr/Gamearr/wiki/Release-Branches"
           {...branch}
           values={branchValues}
           onChange={onInputChange}
@@ -92,8 +92,8 @@ function UpdateSettings(props) {
               type={inputTypes.SELECT}
               name="updateMechanism"
               values={updateOptions}
-              helpText="Use Lidarr's built-in updater or a script"
-              helpLink="https://github.com/Lidarr/Lidarr/wiki/Updating"
+              helpText="Use Gamearr's built-in updater or a script"
+              helpLink="https://github.com/Gamearr/Gamearr/wiki/Updating"
               onChange={onInputChange}
               {...updateMechanism}
             />

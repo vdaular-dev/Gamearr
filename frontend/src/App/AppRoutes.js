@@ -55,7 +55,7 @@ function AppRoutes(props) {
       />
 
       {
-        window.Lidarr.urlBase &&
+        window.Gamearr.urlBase &&
           <Route
             exact={true}
             path="/"

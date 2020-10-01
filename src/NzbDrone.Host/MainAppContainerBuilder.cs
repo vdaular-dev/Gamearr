@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using Nancy.Bootstrapper;
-using Lidarr.Http;
+using Gamearr.Http;
 using NzbDrone.Common.Composition;
 using NzbDrone.Common.EnvironmentInfo;
 using NzbDrone.Common.Http.Dispatchers;
@@ -14,11 +14,11 @@ namespace NzbDrone.Host
         {
             var assemblies = new List<string>
                              {
-                                 "Lidarr.Host",
-                                 "Lidarr.Core",
-                                 "Lidarr.SignalR",
-                                 "Lidarr.Api.V1",
-                                 "Lidarr.Http"
+                                 "Gamearr.Host",
+                                 "Gamearr.Core",
+                                 "Gamearr.SignalR",
+                                 "Gamearr.Api.V1",
+                                 "Gamearr.Http"
                              };
 
             return new MainAppContainerBuilder(args, assemblies).Container;
@@ -29,7 +29,7 @@ namespace NzbDrone.Host
         {
             AutoRegisterImplementations<NzbDronePersistentConnection>();
 
-            Container.Register<INancyBootstrapper, LidarrBootstrapper>();
+            Container.Register<INancyBootstrapper, GamearrBootstrapper>();
         }
     }
 }

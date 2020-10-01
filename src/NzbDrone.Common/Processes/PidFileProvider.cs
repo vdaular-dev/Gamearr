@@ -39,7 +39,7 @@ namespace NzbDrone.Common.Processes
             catch (Exception ex)
             {
                 _logger.Error(ex, "Unable to write PID file {0}", filename);
-                throw new LidarrStartupException(ex, "Unable to write PID file {0}", filename);
+                throw new GamearrStartupException(ex, "Unable to write PID file {0}", filename);
             }
         }
     }

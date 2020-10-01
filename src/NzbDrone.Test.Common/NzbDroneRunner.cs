@@ -34,11 +34,11 @@ namespace NzbDrone.Test.Common
 
             GenerateConfigFile();
             
-            var lidarrConsoleExe = OsInfo.IsWindows ? "Lidarr.Console.exe" : "Lidarr.exe";
+            var lidarrConsoleExe = OsInfo.IsWindows ? "Gamearr.Console.exe" : "Gamearr.exe";
 
             if (BuildInfo.IsDebug)
             {
-                Start(Path.Combine(TestContext.CurrentContext.TestDirectory, "..", "_output", "Lidarr.Console.exe"));
+                Start(Path.Combine(TestContext.CurrentContext.TestDirectory, "..", "_output", "Gamearr.Console.exe"));
             }
             else
             {
@@ -51,7 +51,7 @@ namespace NzbDrone.Test.Common
 
                 if (_nzbDroneProcess.HasExited)
                 {
-                    TestContext.Progress.WriteLine("Lidarr has exited unexpectedly");
+                    TestContext.Progress.WriteLine("Gamearr has exited unexpectedly");
                     Thread.Sleep(2000);
                     Assert.Fail("Process has exited: ExitCode={0}", _nzbDroneProcess.ExitCode);
                 }
@@ -64,11 +64,11 @@ namespace NzbDrone.Test.Common
 
                 if (statusCall.ResponseStatus == ResponseStatus.Completed)
                 {
-                    TestContext.Progress.WriteLine("Lidarr is started. Running Tests");
+                    TestContext.Progress.WriteLine("Gamearr is started. Running Tests");
                     return;
                 }
 
-                TestContext.Progress.WriteLine("Waiting for Lidarr to start. Response Status : {0}  [{1}] {2}", statusCall.ResponseStatus, statusCall.StatusDescription, statusCall.ErrorException.Message);
+                TestContext.Progress.WriteLine("Waiting for Gamearr to start. Response Status : {0}  [{1}] {2}", statusCall.ResponseStatus, statusCall.StatusDescription, statusCall.ErrorException.Message);
 
                 Thread.Sleep(500);
             }
@@ -83,8 +83,8 @@ namespace NzbDrone.Test.Common
                     _processProvider.Kill(_nzbDroneProcess.Id);
                 }
 
-                _processProvider.KillAll(ProcessProvider.LIDARR_CONSOLE_PROCESS_NAME);
-                _processProvider.KillAll(ProcessProvider.LIDARR_PROCESS_NAME);
+                _processProvider.KillAll(ProcessProvider.GAMEARR_CONSOLE_PROCESS_NAME);
+                _processProvider.KillAll(ProcessProvider.GAMEARR_PROCESS_NAME);
             }
             catch (InvalidOperationException)
             {

@@ -35,8 +35,8 @@ namespace NzbDrone.Common.Processes
     {
         private readonly Logger _logger;
 
-        public const string LIDARR_PROCESS_NAME = "Lidarr";
-        public const string LIDARR_CONSOLE_PROCESS_NAME = "Lidarr.Console";
+        public const string GAMEARR_PROCESS_NAME = "Gamearr";
+        public const string GAMEARR_CONSOLE_PROCESS_NAME = "Gamearr.Console";
 
         public ProcessProvider(Logger logger)
         {

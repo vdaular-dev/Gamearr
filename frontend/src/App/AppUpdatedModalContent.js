@@ -25,12 +25,12 @@ function AppUpdatedModalContent(props) {
   return (
     <ModalContent onModalClose={onModalClose}>
       <ModalHeader>
-        Lidarr Updated
+        Gamearr Updated
       </ModalHeader>
 
       <ModalBody>
         <div>
-          Version <span className={styles.version}>{version}</span> of Lidarr has been installed, in order to get the latest changes you'll need to reload Lidarr.
+          Version <span className={styles.version}>{version}</span> of Gamearr has been installed, in order to get the latest changes you'll need to reload Gamearr.
         </div>
 
         {

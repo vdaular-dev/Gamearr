@@ -37,7 +37,7 @@ namespace NzbDrone.Console
                 }
                 Bootstrap.Start(startupArgs, new ConsoleAlerts());
             }
-            catch (LidarrStartupException ex)
+            catch (GamearrStartupException ex)
             {
                 System.Console.WriteLine("");
                 System.Console.WriteLine("");
@@ -48,7 +48,7 @@ namespace NzbDrone.Console
             {
                 System.Console.WriteLine("");
                 System.Console.WriteLine("");
-                Logger.Fatal(ex.Message + ". This can happen if another instance of Lidarr is already running another application is using the same port (default: 8686) or the user has insufficient permissions");
+                Logger.Fatal(ex.Message + ". This can happen if another instance of Gamearr is already running another application is using the same port (default: 8686) or the user has insufficient permissions");
                 Exit(ExitCodes.RecoverableFailure);
             }
             catch (RemoteAccessException ex)

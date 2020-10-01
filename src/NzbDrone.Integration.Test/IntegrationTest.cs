@@ -1,7 +1,7 @@
 using NLog;
 using NzbDrone.Core.Indexers.Newznab;
 using NzbDrone.Test.Common;
-using Lidarr.Http.ClientSchema;
+using Gamearr.Http.ClientSchema;
 
 namespace NzbDrone.Integration.Test
 {
@@ -25,7 +25,7 @@ namespace NzbDrone.Integration.Test
 
         protected override void InitializeTestTarget()
         {
-            Indexers.Post(new Lidarr.Api.V1.Indexers.IndexerResource
+            Indexers.Post(new Gamearr.Api.V1.Indexers.IndexerResource
             {
                 EnableRss = false,
                 EnableInteractiveSearch = false,

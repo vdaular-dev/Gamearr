@@ -1,7 +1,7 @@
 {
   "name": "lidarr",
   "version": "1.0.0",
-  "description": "Lidarr",
+  "description": "Gamearr",
   "scripts": {
     "build": "gulp build",
     "start": "gulp watch",
@@ -14,9 +14,9 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/Lidarr/Lidarr.git"
+    "url": "git://github.com/Gamearr/Gamearr.git"
   },
-  "author": "Team Lidarr",
+  "author": "Team Gamearr",
   "license": "GPL-3.0",
   "readmeFilename": "readme.md",
   "dependencies": {
