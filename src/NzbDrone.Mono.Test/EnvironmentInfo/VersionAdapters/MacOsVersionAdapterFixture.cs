@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using FluentAssertions;
 using Moq;
 using NUnit.Framework;
@@ -37,6 +38,7 @@ namespace NzbDrone.Mono.Test.EnvironmentInfo.VersionAdapters
             versionName.Name.Should().Be("macOS");
             versionName.FullName.Should().Be("macOS " + versionString);
         }
+
 
         [TestCase]
         public void should_detect_server()

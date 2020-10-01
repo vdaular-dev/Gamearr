@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
 using NzbDrone.Common.Cloud;
 using NzbDrone.Common.EnvironmentInfo;
 using NzbDrone.Common.Http;
-using NzbDrone.Core.Analytics;
 
 namespace NzbDrone.Core.Update
 {
@@ -17,16 +15,14 @@ namespace NzbDrone.Core.Update
     public class UpdatePackageProvider : IUpdatePackageProvider
     {
         private readonly IHttpClient _httpClient;
-        private readonly IHttpRequestBuilderFactory _requestBuilder;
         private readonly IPlatformInfo _platformInfo;
-        private readonly IAnalyticsService _analyticsService;
+        private readonly IHttpRequestBuilderFactory _requestBuilder;
 
-        public UpdatePackageProvider(IHttpClient httpClient, ILidarrCloudRequestBuilder requestBuilder, IAnalyticsService analyticsService, IPlatformInfo platformInfo)
+        public UpdatePackageProvider(IHttpClient httpClient, IGamearrCloudRequestBuilder requestBuilder, IPlatformInfo platformInfo)
         {
-            _platformInfo = platformInfo;
-            _analyticsService = analyticsService;
-            _requestBuilder = requestBuilder.Services;
             _httpClient = httpClient;
+            _platformInfo = platformInfo;
+            _requestBuilder = requestBuilder.Services;
         }
 
         public UpdatePackage GetLatestUpdate(string branch, Version currentVersion)
@@ -35,23 +31,13 @@ namespace NzbDrone.Core.Update
                                          .Resource("/update/{branch}")
                                          .AddQueryParam("version", currentVersion)
                                          .AddQueryParam("os", OsInfo.Os.ToString().ToLowerInvariant())
-                                         .AddQueryParam("arch", RuntimeInformation.OSArchitecture)
-                                         .AddQueryParam("runtime", PlatformInfo.Platform.ToString().ToLowerInvariant())
                                          .AddQueryParam("runtimeVer", _platformInfo.Version)
-                                         .SetSegment("branch", branch);
+                                         .SetSegment("branch", branch)
+                                         .Build();
 
-            if (_analyticsService.IsEnabled)
-            {
-                // Send if the system is active so we know which versions to deprecate/ignore
-                request.AddQueryParam("active", _analyticsService.InstallIsActive.ToString().ToLower());
-            }
+            var update = _httpClient.Get<UpdatePackageAvailable>(request).Resource;
 
-            var update = _httpClient.Get<UpdatePackageAvailable>(request.Build()).Resource;
-
-            if (!update.Available)
-            {
-                return null;
-            }
+            if (!update.Available) return null;
 
             return update.UpdatePackage;
         }
@@ -63,15 +49,10 @@ namespace NzbDrone.Core.Update
                                          .AddQueryParam("version", currentVersion)
                                          .AddQueryParam("os", OsInfo.Os.ToString().ToLowerInvariant())
                                          .AddQueryParam("runtimeVer", _platformInfo.Version)
-                                         .SetSegment("branch", branch);
+                                         .SetSegment("branch", branch)
+                                         .Build();
 
-            if (_analyticsService.IsEnabled)
-            {
-                // Send if the system is active so we know which versions to deprecate/ignore
-                request.AddQueryParam("active", _analyticsService.InstallIsActive.ToString().ToLower());
-            }
-
-            var updates = _httpClient.Get<List<UpdatePackage>>(request.Build());
+            var updates = _httpClient.Get<List<UpdatePackage>>(request);
 
             return updates.Resource;
         }

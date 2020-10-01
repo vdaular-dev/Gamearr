@@ -1,10 +1,10 @@
 using FluentAssertions;
 using NUnit.Framework;
-using NzbDrone.Common.Cloud;
-using NzbDrone.Common.Http;
-using NzbDrone.Core.Configuration;
 using NzbDrone.Core.MetadataSource;
 using NzbDrone.Core.Test.Framework;
+using NzbDrone.Core.Configuration;
+using NzbDrone.Common.Cloud;
+using NzbDrone.Common.Http;
 
 namespace NzbDrone.Core.Test.MetadataSource
 {
@@ -18,16 +18,16 @@ namespace NzbDrone.Core.Test.MetadataSource
                 .Setup(s => s.MetadataSource)
                 .Returns("");
 
-            Mocker.GetMock<ILidarrCloudRequestBuilder>()
+            Mocker.GetMock<IGamearrCloudRequestBuilder>()
                 .Setup(s => s.Search)
-                .Returns(new HttpRequestBuilder("https://api.lidarr.audio/api/v0.4/{route}").CreateFactory());
+                .Returns(new HttpRequestBuilder("https://api.gamearr.game/api/v0.4/{route}").CreateFactory());
         }
 
         private void WithCustomProvider()
         {
             Mocker.GetMock<IConfigService>()
                 .Setup(s => s.MetadataSource)
-                .Returns("http://api.lidarr.audio/api/testing/");
+                .Returns("http://api.gamearr.game/api/testing/");
         }
 
         [TestCase]

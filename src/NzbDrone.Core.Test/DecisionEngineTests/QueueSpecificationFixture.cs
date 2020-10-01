@@ -4,12 +4,11 @@ using FizzWare.NBuilder;
 using FluentAssertions;
 using NUnit.Framework;
 using NzbDrone.Core.DecisionEngine.Specifications;
-using NzbDrone.Core.Download.TrackedDownloads;
-using NzbDrone.Core.Music;
 using NzbDrone.Core.Parser.Model;
 using NzbDrone.Core.Profiles.Qualities;
 using NzbDrone.Core.Qualities;
 using NzbDrone.Core.Queue;
+using NzbDrone.Core.Music;
 using NzbDrone.Core.Test.Framework;
 
 namespace NzbDrone.Core.Test.DecisionEngineTests
@@ -70,12 +69,11 @@ namespace NzbDrone.Core.Test.DecisionEngineTests
                 .Returns(new List<Queue.Queue>());
         }
 
-        private void GivenQueue(IEnumerable<RemoteAlbum> remoteAlbums, TrackedDownloadState trackedDownloadState = TrackedDownloadState.Downloading)
+        private void GivenQueue(IEnumerable<RemoteAlbum> remoteAlbums)
         {
             var queue = remoteAlbums.Select(remoteAlbum => new Queue.Queue
             {
-                RemoteAlbum = remoteAlbum,
-                TrackedDownloadState = trackedDownloadState
+                RemoteAlbum = remoteAlbum
             });
 
             Mocker.GetMock<IQueueService>()
@@ -309,26 +307,6 @@ namespace NzbDrone.Core.Test.DecisionEngineTests
 
             GivenQueue(new List<RemoteAlbum> { remoteAlbum });
             Subject.IsSatisfiedBy(_remoteAlbum, null).Accepted.Should().BeFalse();
-        }
-
-        [Test]
-        public void should_return_true_if_everything_is_the_same_for_failed_pending()
-        {
-            _artist.QualityProfile.Value.Cutoff = Quality.FLAC.Id;
-
-            var remoteAlbum = Builder<RemoteAlbum>.CreateNew()
-                .With(r => r.Artist = _artist)
-                .With(r => r.Albums = new List<Album> { _album })
-                .With(r => r.ParsedAlbumInfo = new ParsedAlbumInfo
-                {
-                    Quality = new QualityModel(Quality.MP3_008)
-                })
-                .With(r => r.Release = _releaseInfo)
-                .Build();
-
-            GivenQueue(new List<RemoteAlbum> { remoteAlbum }, TrackedDownloadState.DownloadFailedPending);
-
-            Subject.IsSatisfiedBy(_remoteAlbum, null).Accepted.Should().BeTrue();
         }
     }
 }

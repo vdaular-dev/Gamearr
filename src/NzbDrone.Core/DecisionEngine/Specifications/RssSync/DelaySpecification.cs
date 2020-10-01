@@ -2,11 +2,11 @@ using System.Linq;
 using NLog;
 using NzbDrone.Core.Download.Pending;
 using NzbDrone.Core.IndexerSearch.Definitions;
-using NzbDrone.Core.MediaFiles;
 using NzbDrone.Core.Parser.Model;
 using NzbDrone.Core.Profiles.Delay;
-using NzbDrone.Core.Profiles.Releases;
 using NzbDrone.Core.Qualities;
+using NzbDrone.Core.MediaFiles;
+using NzbDrone.Core.Profiles.Releases;
 
 namespace NzbDrone.Core.DecisionEngine.Specifications.RssSync
 {
@@ -64,13 +64,16 @@ namespace NzbDrone.Core.DecisionEngine.Specifications.RssSync
                 {
                     var trackFiles = _mediaFileService.GetFilesByAlbum(album.Id);
 
-                    foreach (var file in trackFiles)
+                    if (trackFiles.Any())
                     {
-                        var currentQuality = file.Quality;
-                        var newQuality = subject.ParsedAlbumInfo.Quality;
-                        var qualityCompare = qualityComparer.Compare(newQuality?.Quality, currentQuality.Quality);
+                        var currentQualities = trackFiles.Select(c => c.Quality).Distinct().ToList();
 
-                        if (qualityCompare == 0 && newQuality?.Revision.CompareTo(currentQuality.Revision) > 0)
+                        var upgradable = _upgradableSpecification.IsUpgradable(qualityProfile,
+                                                                               currentQualities,
+                                                                               _preferredWordServiceCalculator.Calculate(subject.Artist, trackFiles[0].GetSceneOrFileName()),
+                                                                               subject.ParsedAlbumInfo.Quality,
+                                                                               subject.PreferredWordScore);
+                        if (upgradable)
                         {
                             _logger.Debug("New quality is a better revision for existing quality, skipping delay");
                             return Decision.Accept();

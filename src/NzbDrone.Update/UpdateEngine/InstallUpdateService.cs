@@ -57,14 +57,10 @@ namespace NzbDrone.Update.UpdateEngine
             _logger.Info("Verifying requirements before update...");
 
             if (string.IsNullOrWhiteSpace(targetFolder))
-            {
                 throw new ArgumentException("Target folder can not be null or empty");
-            }
 
             if (!_diskProvider.FolderExists(targetFolder))
-            {
                 throw new DirectoryNotFoundException("Target folder doesn't exist " + targetFolder);
-            }
 
             if (processId < 1)
             {
@@ -78,15 +74,13 @@ namespace NzbDrone.Update.UpdateEngine
 
             _logger.Info("Verifying Update Folder");
             if (!_diskProvider.FolderExists(_appFolderInfo.GetUpdatePackageFolder()))
-            {
                 throw new DirectoryNotFoundException("Update folder doesn't exist " + _appFolderInfo.GetUpdatePackageFolder());
-            }
         }
 
         public void Start(string installationFolder, int processId)
         {
             _logger.Info("Installation Folder: {0}", installationFolder);
-            _logger.Info("Updating Lidarr from version {0} to version {1}", _detectExistingVersion.GetExistingVersion(installationFolder), BuildInfo.Version);
+            _logger.Info("Updating Gamearr from version {0} to version {1}", _detectExistingVersion.GetExistingVersion(installationFolder), BuildInfo.Version);
 
             Verify(installationFolder, processId);
 
@@ -109,7 +103,7 @@ namespace NzbDrone.Update.UpdateEngine
                 {
                     if (_processProvider.Exists(ProcessProvider.LIDARR_CONSOLE_PROCESS_NAME) || _processProvider.Exists(ProcessProvider.LIDARR_PROCESS_NAME))
                     {
-                        _logger.Error("Lidarr was restarted prematurely by external process.");
+                        _logger.Error("Gamearr was restarted prematurely by external process.");
                         return;
                     }
                 }
@@ -119,10 +113,10 @@ namespace NzbDrone.Update.UpdateEngine
                     _logger.Info("Copying new files to target folder");
                     _diskTransferService.MirrorFolder(_appFolderInfo.GetUpdatePackageFolder(), installationFolder);
 
-                    // Set executable flag on Lidarr app
-                    if (OsInfo.IsOsx || (OsInfo.IsLinux && PlatformInfo.IsNetCore))
+                    // Set executable flag on Gamearr app
+                    if (OsInfo.IsOsx)
                     {
-                        _diskProvider.SetPermissions(Path.Combine(installationFolder, "Lidarr"), "0755", null, null);
+                        _diskProvider.SetPermissions(Path.Combine(installationFolder, "Gamearr"), "0755", null, null);
                     }
                 }
                 catch (Exception e)
@@ -149,7 +143,7 @@ namespace NzbDrone.Update.UpdateEngine
 
                         if (_processProvider.Exists(ProcessProvider.LIDARR_PROCESS_NAME))
                         {
-                            _logger.Info("Lidarr was restarted by external process.");
+                            _logger.Info("Gamearr was restarted by external process.");
                             break;
                         }
                     }
@@ -160,6 +154,7 @@ namespace NzbDrone.Update.UpdateEngine
                     }
                 }
             }
+
         }
     }
 }

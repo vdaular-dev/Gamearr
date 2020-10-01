@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using NzbDrone.Common.EnsureThat;
 using NzbDrone.Common.Extensions;
@@ -24,13 +25,7 @@ namespace NzbDrone.Core.IndexerSearch.Definitions
 
         public static string GetQueryTitle(string title)
         {
-            Ensure.That(title, () => title).IsNotNullOrWhiteSpace();
-
-            // Most VA albums are listed as VA, not Various Artists
-            if (title == "Various Artists")
-            {
-                title = "VA";
-            }
+            Ensure.That(title,() => title).IsNotNullOrWhiteSpace();
 
             var cleanTitle = BeginningThe.Replace(title, string.Empty);
 

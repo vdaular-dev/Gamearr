@@ -1,19 +1,19 @@
 import $ from 'jquery';
 import { createAction } from 'redux-actions';
 import { batchActions } from 'redux-batched-actions';
-import { set } from 'Store/Actions/baseActions';
-import { createThunk, handleThunks } from 'Store/thunks';
 import createAjaxRequest from 'Utilities/createAjaxRequest';
 import requestAction from 'Utilities/requestAction';
 import getSectionState from 'Utilities/State/getSectionState';
 import updateSectionState from 'Utilities/State/updateSectionState';
+import { createThunk, handleThunks } from 'Store/thunks';
+import { set } from 'Store/Actions/baseActions';
 import createHandleActions from './Creators/createHandleActions';
 
 //
 // Variables
 
 export const section = 'oAuth';
-const callbackUrl = `${window.location.origin}${window.Lidarr.urlBase}/oauth.html`;
+const callbackUrl = `${window.location.origin}${window.Gamearr.urlBase}/oauth.html`;
 
 //
 // State

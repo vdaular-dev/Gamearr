@@ -13,9 +13,10 @@ namespace NzbDrone.Core.Datastore.Migration
             Alter.Table("Tracks").AddColumn("AbsoluteTrackNumber").AsInt32().WithDefaultValue(0);
 
             Execute.Sql("UPDATE Tracks SET AbsoluteTrackNumber = TrackNumber");
-
+            
             Delete.Column("TrackNumber").FromTable("Tracks");
             Alter.Table("Tracks").AddColumn("TrackNumber").AsString().Nullable();
+            
         }
     }
 }

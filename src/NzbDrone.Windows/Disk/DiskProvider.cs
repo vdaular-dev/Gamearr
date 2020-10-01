@@ -15,14 +15,14 @@ namespace NzbDrone.Windows.Disk
 
         [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Auto)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        private static extern bool GetDiskFreeSpaceEx(string lpDirectoryName,
+        static extern bool GetDiskFreeSpaceEx(string lpDirectoryName,
         out ulong lpFreeBytesAvailable,
         out ulong lpTotalNumberOfBytes,
         out ulong lpTotalNumberOfFreeBytes);
 
         [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Auto)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        private static extern bool CreateHardLink(string lpFileName, string lpExistingFileName, IntPtr lpSecurityAttributes);
+        static extern bool CreateHardLink(string lpFileName, string lpExistingFileName, IntPtr lpSecurityAttributes);
 
         public DiskProvider()
         : this(new FileSystem())
@@ -41,9 +41,7 @@ namespace NzbDrone.Windows.Disk
             var root = GetPathRoot(path);
 
             if (!FolderExists(root))
-            {
                 throw new DirectoryNotFoundException(root);
-            }
 
             return DriveFreeSpaceEx(root);
         }
@@ -52,18 +50,14 @@ namespace NzbDrone.Windows.Disk
         {
             Ensure.That(filename, () => filename).IsValidPath();
 
-            var file = _fileSystem.FileInfo.FromFileName(filename);
-            var fs = file.GetAccessControl();
+            var fs = File.GetAccessControl(filename);
             fs.SetAccessRuleProtection(false, false);
-            file.SetAccessControl(fs);
+            File.SetAccessControl(filename, fs);
         }
 
         public override void SetPermissions(string path, string mask, string user, string group)
         {
-        }
-
-        public override void CopyPermissions(string sourcePath, string targetPath, bool includeOwner)
-        {
+            
         }
 
         public override long? GetTotalSize(string path)
@@ -73,9 +67,7 @@ namespace NzbDrone.Windows.Disk
             var root = GetPathRoot(path);
 
             if (!FolderExists(root))
-            {
                 throw new DirectoryNotFoundException(root);
-            }
 
             return DriveTotalSizeEx(root);
         }
@@ -122,6 +114,7 @@ namespace NzbDrone.Windows.Disk
             return 0;
         }
 
+        
         public override bool TryCreateHardLink(string source, string destination)
         {
             try

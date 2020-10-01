@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using NLog;
 using NLog.Config;
 using NLog.Targets;
@@ -12,14 +13,13 @@ namespace NzbDrone.Common.Instrumentation
 {
     public static class NzbDroneLogger
     {
-        private const string FILE_LOG_LAYOUT = @"${date:format=yy-M-d HH\:mm\:ss.f}|${level}|${logger}|${message}${onexception:inner=${newline}${newline}[v${assembly-version}] ${exception:format=ToString}${newline}${exception:format=Data}${newline}}";
-
         private static bool _isConfigured;
 
         static NzbDroneLogger()
         {
             LogManager.Configuration = new LoggingConfiguration();
         }
+
 
         public static void Register(IStartupContext startupContext, bool updateApp, bool inConsole)
         {
@@ -62,17 +62,19 @@ namespace NzbDrone.Common.Instrumentation
 
         private static void RegisterSentry(bool updateClient)
         {
+
             string dsn;
 
             if (updateClient)
             {
-                dsn = "https://f73eb750155b4636af91356e0ed756ea@sentry.servarr.com/20";
+                dsn = "https://2f3cc03453e4453bb3c1dd3ff77b15ab@sentry.io/1339335";
+
             }
             else
             {
                 dsn = RuntimeInfo.IsProduction
-                    ? "https://52ab4ed8003a42f383b6d24d66daf317@sentry.servarr.com/15"
-                    : "https://0522924d625c497f86fc2a1b22aaf21d@sentry.servarr.com/16";
+                    ? "https://f607fb34f89745f9bfe5ded0a97ab00a@sentry.io/209545"
+                    : "https://28faaa7023384031b29e38d3be74fa11@sentry.io/227247";
             }
 
             var target = new SentryTarget(dsn)
@@ -94,7 +96,7 @@ namespace NzbDrone.Common.Instrumentation
         {
             DebuggerTarget target = new DebuggerTarget();
             target.Name = "debuggerLogger";
-            target.Layout = "[${level}] [${threadid}] ${logger}: ${message} ${onexception:inner=${newline}${newline}[v${assembly-version}] ${exception:format=ToString}${newline}${exception:format=Data}${newline}}";
+            target.Layout = "[${level}] [${threadid}] ${logger}: ${message} ${onexception:inner=${newline}${newline}[v${assembly-version}] ${exception:format=ToString}${newline}}";
 
             var loggingRule = new LoggingRule("*", LogLevel.Trace, target);
             LogManager.Configuration.AddTarget("debugger", target);
@@ -108,7 +110,7 @@ namespace NzbDrone.Common.Instrumentation
             var coloredConsoleTarget = new ColoredConsoleTarget();
 
             coloredConsoleTarget.Name = "consoleLogger";
-            coloredConsoleTarget.Layout = "[${level}] ${logger}: ${message} ${onexception:inner=${newline}${newline}[v${assembly-version}] ${exception:format=ToString}${newline}${exception:format=Data}${newline}}";
+            coloredConsoleTarget.Layout = "[${level}] ${logger}: ${message} ${onexception:inner=${newline}${newline}[v${assembly-version}] ${exception:format=ToString}${newline}}";
 
             var loggingRule = new LoggingRule("*", level, coloredConsoleTarget);
 
@@ -116,11 +118,13 @@ namespace NzbDrone.Common.Instrumentation
             LogManager.Configuration.LoggingRules.Add(loggingRule);
         }
 
+        private const string FILE_LOG_LAYOUT = @"${date:format=yy-M-d HH\:mm\:ss.f}|${level}|${logger}|${message}${onexception:inner=${newline}${newline}[v${assembly-version}] ${exception:format=ToString}${newline}}";
+
         private static void RegisterAppFile(IAppFolderInfo appFolderInfo)
         {
-            RegisterAppFile(appFolderInfo, "appFileInfo", "Lidarr.txt", 5, LogLevel.Info);
-            RegisterAppFile(appFolderInfo, "appFileDebug", "Lidarr.debug.txt", 50, LogLevel.Off);
-            RegisterAppFile(appFolderInfo, "appFileTrace", "Lidarr.trace.txt", 50, LogLevel.Off);
+            RegisterAppFile(appFolderInfo, "appFileInfo", "Gamearr.txt", 5, LogLevel.Info);
+            RegisterAppFile(appFolderInfo, "appFileDebug", "Gamearr.debug.txt", 50, LogLevel.Off);
+            RegisterAppFile(appFolderInfo, "appFileTrace", "Gamearr.trace.txt", 50, LogLevel.Off);
         }
 
         private static void RegisterAppFile(IAppFolderInfo appFolderInfo, string name, string fileName, int maxArchiveFiles, LogLevel minLogLevel)
@@ -191,5 +195,6 @@ namespace NzbDrone.Common.Instrumentation
         {
             return GetLogger(obj.GetType());
         }
+
     }
 }

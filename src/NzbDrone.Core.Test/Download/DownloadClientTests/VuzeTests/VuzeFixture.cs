@@ -47,7 +47,7 @@ namespace NzbDrone.Core.Test.Download.DownloadClientTests.VuzeTests
         [Test]
         public void completed_download_should_have_required_properties()
         {
-            PrepareClientToReturnCompletedItem(true, ratioLimit: 0.5);
+            PrepareClientToReturnCompletedItem();
             var item = Subject.GetItems().Single();
             VerifyCompleted(item);
 
@@ -87,7 +87,7 @@ namespace NzbDrone.Core.Test.Download.DownloadClientTests.VuzeTests
             id.Should().NotBeNullOrEmpty();
 
             Mocker.GetMock<ITransmissionProxy>()
-                .Verify(v => v.AddTorrentFromData(It.IsAny<byte[]>(), @"C:/Downloads/Finished/Lidarr", It.IsAny<TransmissionSettings>()), Times.Once());
+                .Verify(v => v.AddTorrentFromData(It.IsAny<byte[]>(), @"C:/Downloads/Finished/Gamearr", It.IsAny<TransmissionSettings>()), Times.Once());
         }
 
         [Test]
@@ -103,7 +103,7 @@ namespace NzbDrone.Core.Test.Download.DownloadClientTests.VuzeTests
             id.Should().NotBeNullOrEmpty();
 
             Mocker.GetMock<ITransmissionProxy>()
-                  .Verify(v => v.AddTorrentFromData(It.IsAny<byte[]>(), @"C:/Downloads/Finished/transmission/Lidarr", It.IsAny<TransmissionSettings>()), Times.Once());
+                  .Verify(v => v.AddTorrentFromData(It.IsAny<byte[]>(), @"C:/Downloads/Finished/transmission/Gamearr", It.IsAny<TransmissionSettings>()), Times.Once());
         }
 
         [Test]
@@ -121,7 +121,7 @@ namespace NzbDrone.Core.Test.Download.DownloadClientTests.VuzeTests
             id.Should().NotBeNullOrEmpty();
 
             Mocker.GetMock<ITransmissionProxy>()
-                  .Verify(v => v.AddTorrentFromData(It.IsAny<byte[]>(), @"C:/Downloads/Finished/transmission/Lidarr", It.IsAny<TransmissionSettings>()), Times.Once());
+                  .Verify(v => v.AddTorrentFromData(It.IsAny<byte[]>(), @"C:/Downloads/Finished/transmission/Gamearr", It.IsAny<TransmissionSettings>()), Times.Once());
         }
 
         [Test]
@@ -184,7 +184,7 @@ namespace NzbDrone.Core.Test.Download.DownloadClientTests.VuzeTests
             item.Status.Should().Be(expectedItemStatus);
         }
 
-        [TestCase(TransmissionTorrentStatus.Stopped, DownloadItemStatus.Completed, false)]
+        [TestCase(TransmissionTorrentStatus.Stopped, DownloadItemStatus.Completed, true)]
         [TestCase(TransmissionTorrentStatus.CheckWait, DownloadItemStatus.Downloading, false)]
         [TestCase(TransmissionTorrentStatus.Check, DownloadItemStatus.Downloading, false)]
         [TestCase(TransmissionTorrentStatus.Queued, DownloadItemStatus.Queued, false)]
@@ -218,7 +218,7 @@ namespace NzbDrone.Core.Test.Download.DownloadClientTests.VuzeTests
         {
             GivenMusicCategory();
 
-            _downloading.DownloadDir = @"C:/Downloads/Finished/transmission/Lidarr";
+            _downloading.DownloadDir = @"C:/Downloads/Finished/transmission/Gamearr";
 
             GivenTorrents(new List<TransmissionTorrent>
                 {
@@ -237,7 +237,7 @@ namespace NzbDrone.Core.Test.Download.DownloadClientTests.VuzeTests
         {
             GivenTvDirectory();
 
-            _downloading.DownloadDir = @"C:/Downloads/Finished/Lidarr/subdir";
+            _downloading.DownloadDir = @"C:/Downloads/Finished/Gamearr/subdir";
 
             GivenTorrents(new List<TransmissionTorrent>
                 {
@@ -341,5 +341,6 @@ namespace NzbDrone.Core.Test.Download.DownloadClientTests.VuzeTests
             items.Should().HaveCount(1);
             items.First().OutputPath.Should().Be(@"C:\Downloads\" + fileName);
         }
+
     }
 }

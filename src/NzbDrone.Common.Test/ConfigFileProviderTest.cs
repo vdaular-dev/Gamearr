@@ -49,7 +49,7 @@ namespace NzbDrone.Common.Test
         public void GetValue_Success()
         {
             const string key = "Port";
-            const string value = "8686";
+            const string value = "8383";
 
             var result = Subject.GetValue(key, value);
 
@@ -60,9 +60,11 @@ namespace NzbDrone.Common.Test
         public void GetInt_Success()
         {
             const string key = "Port";
-            const int value = 8686;
+            const int value = 8383;
+
 
             var result = Subject.GetValueInt(key, value);
+
 
             result.Should().Be(value);
         }
@@ -73,7 +75,9 @@ namespace NzbDrone.Common.Test
             const string key = "LaunchBrowser";
             const bool value = true;
 
+
             var result = Subject.GetValueBoolean(key, value);
+
 
             result.Should().BeTrue();
         }
@@ -81,7 +85,9 @@ namespace NzbDrone.Common.Test
         [Test]
         public void GetLaunchBrowser_Success()
         {
+
             var result = Subject.LaunchBrowser;
+
 
             result.Should().Be(true);
         }
@@ -89,9 +95,11 @@ namespace NzbDrone.Common.Test
         [Test]
         public void GetPort_Success()
         {
-            const int value = 8686;
+            const int value = 8383;
+
 
             var result = Subject.Port;
+
 
             result.Should().Be(value);
         }
@@ -102,7 +110,9 @@ namespace NzbDrone.Common.Test
             const string key = "LaunchBrowser";
             const bool value = false;
 
+
             Subject.SetValue(key, value);
+
 
             var result = Subject.LaunchBrowser;
             result.Should().Be(value);
@@ -114,7 +124,9 @@ namespace NzbDrone.Common.Test
             const string key = "Port";
             const int value = 12345;
 
+
             Subject.SetValue(key, value);
+
 
             var result = Subject.Port;
             result.Should().Be(value);
@@ -126,7 +138,9 @@ namespace NzbDrone.Common.Test
             const string key = "Hello";
             const string value = "World";
 
+
             var result = Subject.GetValue(key, value);
+
 
             result.Should().Be(value);
         }
@@ -163,6 +177,7 @@ namespace NzbDrone.Common.Test
             dic["Port"] = port;
             dic["SslPort"] = origSslPort;
             Subject.SaveConfigDictionary(dic);
+
 
             dic = new Dictionary<string, object>();
             dic["SslPort"] = sslPort;

@@ -8,7 +8,7 @@ using NzbDrone.Common.Http;
 using NzbDrone.Core.Configuration;
 using NzbDrone.Core.Indexers.Newznab;
 using NzbDrone.Core.Parser;
-using NzbDrone.Core.Validation;
+using NzbDrone.Core.ThingiProvider;
 
 namespace NzbDrone.Core.Indexers.Torznab
 {
@@ -44,17 +44,17 @@ namespace NzbDrone.Core.Indexers.Torznab
         private IndexerDefinition GetDefinition(string name, TorznabSettings settings)
         {
             return new IndexerDefinition
-            {
-                EnableRss = false,
-                EnableAutomaticSearch = false,
-                EnableInteractiveSearch = false,
-                Name = name,
-                Implementation = GetType().Name,
-                Settings = settings,
-                Protocol = DownloadProtocol.Usenet,
-                SupportsRss = SupportsRss,
-                SupportsSearch = SupportsSearch
-            };
+                   {
+                       EnableRss = false,
+                       EnableAutomaticSearch = false,
+                       EnableInteractiveSearch = false,
+                       Name = name,
+                       Implementation = GetType().Name,
+                       Settings = settings,
+                       Protocol = DownloadProtocol.Usenet,
+                       SupportsRss = SupportsRss,
+                       SupportsSearch = SupportsSearch
+                   };
         }
 
         private TorznabSettings GetSettings(string url, params int[] categories)
@@ -72,11 +72,8 @@ namespace NzbDrone.Core.Indexers.Torznab
         protected override void Test(List<ValidationFailure> failures)
         {
             base.Test(failures);
-            if (failures.HasErrors())
-            {
-                return;
-            }
 
+            if (failures.Any()) return;
             failures.AddIfNotNull(TestCapabilities());
         }
 

@@ -22,7 +22,6 @@ namespace NzbDrone.Core.MediaFiles
 
     public class MediaFileDeletionService : IDeleteMediaFiles,
                                             IHandleAsync<ArtistDeletedEvent>,
-                                            IHandleAsync<AlbumDeletedEvent>,
                                             IHandle<TrackFileDeletedEvent>
     {
         private readonly IDiskProvider _diskProvider;
@@ -108,10 +107,7 @@ namespace NzbDrone.Core.MediaFiles
 
                 foreach (var s in allArtists)
                 {
-                    if (s.Id == artist.Id)
-                    {
-                        continue;
-                    }
+                    if (s.Id == artist.Id) continue;
 
                     if (artist.Path.IsParentPath(s.Path))
                     {
@@ -125,22 +121,9 @@ namespace NzbDrone.Core.MediaFiles
                         return;
                     }
                 }
-
                 if (_diskProvider.FolderExists(message.Artist.Path))
                 {
                     _recycleBinProvider.DeleteFolder(message.Artist.Path);
-                }
-            }
-        }
-
-        public void HandleAsync(AlbumDeletedEvent message)
-        {
-            if (message.DeleteFiles)
-            {
-                var files = _mediaFileService.GetFilesByAlbum(message.Album.Id);
-                foreach (var file in files)
-                {
-                    _recycleBinProvider.DeleteFile(file.Path);
                 }
             }
         }

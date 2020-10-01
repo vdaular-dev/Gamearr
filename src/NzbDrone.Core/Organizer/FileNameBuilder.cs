@@ -9,9 +9,9 @@ using NzbDrone.Common.Cache;
 using NzbDrone.Common.EnsureThat;
 using NzbDrone.Common.Extensions;
 using NzbDrone.Core.MediaFiles;
-using NzbDrone.Core.Music;
 using NzbDrone.Core.Profiles.Releases;
 using NzbDrone.Core.Qualities;
+using NzbDrone.Core.Music;
 
 namespace NzbDrone.Core.Organizer
 {
@@ -109,7 +109,7 @@ namespace NzbDrone.Core.Organizer
             }
 
             var subFolders = pattern.Split(new[] { '/', '\\' }, StringSplitOptions.RemoveEmptyEntries);
-            var safePattern = subFolders.Aggregate("", (current, folderLevel) => Path.Combine(current, folderLevel));
+            var safePattern = subFolders.Aggregate("", (current, folderLevel) => Path.Combine(current, (folderLevel)));
 
             var tokenHandlers = new Dictionary<string, Func<TokenMatch, string>>(FileNameBuilderTokenEqualityComparer.Instance);
 
@@ -149,11 +149,13 @@ namespace NzbDrone.Core.Organizer
 
             if (artist.AlbumFolder)
             {
+
                 var albumFolder = GetAlbumFolder(artist, album);
 
                 albumFolder = CleanFileName(albumFolder);
 
                 path = Path.Combine(path, albumFolder);
+
             }
 
             return path;
@@ -290,7 +292,7 @@ namespace NzbDrone.Core.Organizer
             {
                 tokenHandlers["{Album Disambiguation}"] = m => album.Disambiguation;
             }
-
+            
             if (album.ReleaseDate.HasValue)
             {
                 tokenHandlers["{Release Year}"] = m => album.ReleaseDate.Value.Year.ToString();
@@ -316,19 +318,18 @@ namespace NzbDrone.Core.Organizer
         {
             tokenHandlers["{Original Title}"] = m => GetOriginalTitle(trackFile);
             tokenHandlers["{Original Filename}"] = m => GetOriginalFileName(trackFile);
-            tokenHandlers["{Release Group}"] = m => trackFile.ReleaseGroup ?? m.DefaultValue("Lidarr");
+            tokenHandlers["{Release Group}"] = m => trackFile.ReleaseGroup ?? m.DefaultValue("Gamearr");
         }
 
         private void AddQualityTokens(Dictionary<string, Func<TokenMatch, string>> tokenHandlers, Artist artist, TrackFile trackFile)
         {
             var qualityTitle = _qualityDefinitionService.Get(trackFile.Quality.Quality).Title;
             var qualityProper = GetQualityProper(trackFile.Quality);
-
             //var qualityReal = GetQualityReal(artist, trackFile.Quality);
-            tokenHandlers["{Quality Full}"] = m => string.Format("{0}", qualityTitle);
+
+            tokenHandlers["{Quality Full}"] = m => String.Format("{0}", qualityTitle);
             tokenHandlers["{Quality Title}"] = m => qualityTitle;
             tokenHandlers["{Quality Proper}"] = m => qualityProper;
-
             //tokenHandlers["{Quality Real}"] = m => qualityReal;
         }
 
@@ -445,10 +446,7 @@ namespace NzbDrone.Core.Organizer
         private string ReplaceNumberToken(string token, int value)
         {
             var split = token.Trim('{', '}').Split(':');
-            if (split.Length == 1)
-            {
-                return value.ToString("0");
-            }
+            if (split.Length == 1) return value.ToString("0");
 
             return value.ToString(split[1]);
         }
@@ -506,7 +504,7 @@ namespace NzbDrone.Core.Organizer
                 return "Proper";
             }
 
-            return string.Empty;
+            return String.Empty;
         }
 
         //private string GetQualityReal(Series series, QualityModel quality)
@@ -518,6 +516,7 @@ namespace NzbDrone.Core.Organizer
 
         //    return string.Empty;
         //}
+
         private string GetOriginalTitle(TrackFile trackFile)
         {
             if (trackFile.SceneName.IsNullOrWhiteSpace())
@@ -532,6 +531,7 @@ namespace NzbDrone.Core.Organizer
         {
             return Path.GetFileNameWithoutExtension(trackFile.Path);
         }
+
     }
 
     internal sealed class TokenMatch

@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Net;
@@ -10,6 +9,7 @@ using NzbDrone.Common.EnvironmentInfo;
 using NzbDrone.Common.Extensions;
 using NzbDrone.Common.Http.Proxy;
 using NzbDrone.Common.Instrumentation.Extensions;
+using NzbDrone.Common.Security;
 
 namespace NzbDrone.Common.Http.Dispatchers
 {
@@ -59,7 +59,7 @@ namespace NzbDrone.Common.Http.Dispatchers
                 webRequest.Timeout = (int)Math.Ceiling(request.RequestTimeout.TotalMilliseconds);
             }
 
-            webRequest.Proxy = GetProxy(request.Url);
+            AddProxy(webRequest, request);
 
             if (request.Headers != null)
             {
@@ -83,6 +83,11 @@ namespace NzbDrone.Common.Http.Dispatchers
             }
             catch (WebException e)
             {
+                if (e.Status == WebExceptionStatus.SecureChannelFailure && OsInfo.IsWindows)
+                {
+                    SecurityProtocolPolicy.DisableTls12();
+                }
+
                 httpWebResponse = (HttpWebResponse)e.Response;
 
                 if (httpWebResponse == null)
@@ -110,7 +115,7 @@ namespace NzbDrone.Common.Http.Dispatchers
                     else
                     {
                         throw;
-                    }
+                    };
                 }
             }
 
@@ -123,10 +128,17 @@ namespace NzbDrone.Common.Http.Dispatchers
                     try
                     {
                         data = responseStream.ToBytes();
-
+                        
                         if (PlatformInfo.IsMono && httpWebResponse.ContentEncoding == "gzip")
                         {
-                            data = data.Decompress();
+                            using (var compressedStream = new MemoryStream(data))
+                            using (var gzip = new GZipStream(compressedStream, CompressionMode.Decompress))
+                            using (var decompressedStream = new MemoryStream())
+                            {
+                                gzip.CopyTo(decompressedStream);
+                                data = decompressedStream.ToArray();
+                            }
+
                             httpWebResponse.Headers.Remove("Content-Encoding");
                         }
                     }
@@ -140,54 +152,13 @@ namespace NzbDrone.Common.Http.Dispatchers
             return new HttpResponse(request, new HttpHeader(httpWebResponse.Headers), data, httpWebResponse.StatusCode);
         }
 
-        public void DownloadFile(string url, string fileName)
+        protected virtual void AddProxy(HttpWebRequest webRequest, HttpRequest request)
         {
-            try
-            {
-                var fileInfo = new FileInfo(fileName);
-                if (fileInfo.Directory != null && !fileInfo.Directory.Exists)
-                {
-                    fileInfo.Directory.Create();
-                }
-
-                _logger.Debug("Downloading [{0}] to [{1}]", url, fileName);
-
-                var stopWatch = Stopwatch.StartNew();
-                var uri = new HttpUri(url);
-
-                using (var webClient = new GZipWebClient())
-                {
-                    webClient.Headers.Add(HttpRequestHeader.UserAgent, _userAgentBuilder.GetUserAgent());
-                    webClient.Proxy = GetProxy(uri);
-                    webClient.DownloadFile(uri.FullUri, fileName);
-                    stopWatch.Stop();
-                    _logger.Debug("Downloading Completed. took {0:0}s", stopWatch.Elapsed.Seconds);
-                }
-            }
-            catch (WebException e)
-            {
-                _logger.Warn("Failed to get response from: {0} {1}", url, e.Message);
-                throw;
-            }
-            catch (Exception e)
-            {
-                _logger.Warn(e, "Failed to get response from: " + url);
-                throw;
-            }
-        }
-
-        protected virtual IWebProxy GetProxy(HttpUri uri)
-        {
-            IWebProxy proxy = null;
-
-            var proxySettings = _proxySettingsProvider.GetProxySettings(uri);
-
+            var proxySettings = _proxySettingsProvider.GetProxySettings(request);
             if (proxySettings != null)
             {
-                proxy = _createManagedWebProxy.GetWebProxy(proxySettings);
+                webRequest.Proxy = _createManagedWebProxy.GetWebProxy(proxySettings);
             }
-
-            return proxy;
         }
 
         protected virtual void AddRequestHeaders(HttpWebRequest webRequest, HttpHeader headers)
@@ -229,7 +200,7 @@ namespace NzbDrone.Common.Http.Dispatchers
                         webRequest.TransferEncoding = header.Value;
                         break;
                     case "User-Agent":
-                        throw new NotSupportedException("User-Agent other than Lidarr not allowed.");
+                        throw new NotSupportedException("User-Agent other than Gamearr not allowed.");
                     case "Proxy-Connection":
                         throw new NotImplementedException();
                     default:
@@ -254,7 +225,6 @@ namespace NzbDrone.Common.Http.Dispatchers
                     {
                         var responseStreamInfo = currentOperation.GetType().GetField("responseStream", BindingFlags.NonPublic | BindingFlags.Instance);
                         var responseStream = responseStreamInfo.GetValue(currentOperation) as Stream;
-
                         // Note that responseStream will likely be null once mono fixes it.
                         responseStream?.Dispose();
                     }

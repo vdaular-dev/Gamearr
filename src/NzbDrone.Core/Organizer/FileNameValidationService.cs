@@ -1,4 +1,7 @@
+using System.Collections.Generic;
+using System.Linq;
 using FluentValidation.Results;
+using NzbDrone.Core.Parser.Model;
 
 namespace NzbDrone.Core.Organizer
 {
@@ -18,6 +21,7 @@ namespace NzbDrone.Core.Organizer
             //TODO Add Validation for TrackFilename
             //var parsedEpisodeInfo = Parser.Parser.ParseTitle(sampleResult.FileName);
 
+
             //if (parsedEpisodeInfo == null)
             //{
             //    return validationFailure;
@@ -27,7 +31,9 @@ namespace NzbDrone.Core.Organizer
             //{
             //    return validationFailure;
             //}
+
             return null;
         }
+
     }
 }

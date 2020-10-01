@@ -1,14 +1,14 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import DescriptionList from 'Components/DescriptionList/DescriptionList';
-import DescriptionListItem from 'Components/DescriptionList/DescriptionListItem';
-import DescriptionListItemDescription from 'Components/DescriptionList/DescriptionListItemDescription';
-import DescriptionListItemTitle from 'Components/DescriptionList/DescriptionListItemTitle';
-import Icon from 'Components/Icon';
-import Link from 'Components/Link/Link';
-import { icons } from 'Helpers/Props';
 import formatDateTime from 'Utilities/Date/formatDateTime';
 import formatAge from 'Utilities/Number/formatAge';
+import Link from 'Components/Link/Link';
+import DescriptionList from 'Components/DescriptionList/DescriptionList';
+import DescriptionListItem from 'Components/DescriptionList/DescriptionListItem';
+import DescriptionListItemTitle from 'Components/DescriptionList/DescriptionListItemTitle';
+import DescriptionListItemDescription from 'Components/DescriptionList/DescriptionListItemDescription';
+import { icons } from 'Helpers/Props';
+import Icon from 'Components/Icon';
 import styles from './HistoryDetails.css';
 
 function getDetailedList(statusMessages) {
@@ -217,7 +217,7 @@ function HistoryDetails(props) {
         reasonMessage = 'File was deleted by via UI';
         break;
       case 'MissingFromDisk':
-        reasonMessage = 'Lidarr was unable to find the file on disk so it was removed';
+        reasonMessage = 'Gamearr was unable to find the file on disk so it was removed';
         break;
       case 'Upgrade':
         reasonMessage = 'File was deleted to import an upgrade';
@@ -244,7 +244,9 @@ function HistoryDetails(props) {
   if (eventType === 'trackFileRenamed') {
     const {
       sourcePath,
-      path
+      sourceRelativePath,
+      path,
+      relativePath
     } = data;
 
     return (
@@ -255,8 +257,18 @@ function HistoryDetails(props) {
         />
 
         <DescriptionListItem
+          title="Source Relative Path"
+          data={sourceRelativePath}
+        />
+
+        <DescriptionListItem
           title="Destination Path"
           data={path}
+        />
+
+        <DescriptionListItem
+          title="Destination Relative Path"
+          data={relativePath}
         />
       </DescriptionList>
     );
@@ -394,30 +406,6 @@ function HistoryDetails(props) {
             <DescriptionListItem
               title="Published Date"
               data={formatDateTime(publishedDate, shortDateFormat, timeFormat, { includeSeconds: true })}
-            />
-        }
-      </DescriptionList>
-    );
-  }
-
-  if (eventType === 'downloadIgnored') {
-    const {
-      message
-    } = data;
-
-    return (
-      <DescriptionList>
-        <DescriptionListItem
-          descriptionClassName={styles.description}
-          title="Name"
-          data={sourceTitle}
-        />
-
-        {
-          !!message &&
-            <DescriptionListItem
-              title="Message"
-              data={message}
             />
         }
       </DescriptionList>

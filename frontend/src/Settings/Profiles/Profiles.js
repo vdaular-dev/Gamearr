@@ -2,11 +2,11 @@ import React, { Component } from 'react';
 import { DndProvider } from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
 import PageContent from 'Components/Page/PageContent';
-import PageContentBody from 'Components/Page/PageContentBody';
+import PageContentBodyConnector from 'Components/Page/PageContentBodyConnector';
 import SettingsToolbarConnector from 'Settings/SettingsToolbarConnector';
-import DelayProfilesConnector from './Delay/DelayProfilesConnector';
-import MetadataProfilesConnector from './Metadata/MetadataProfilesConnector';
 import QualityProfilesConnector from './Quality/QualityProfilesConnector';
+import MetadataProfilesConnector from './Metadata/MetadataProfilesConnector';
+import DelayProfilesConnector from './Delay/DelayProfilesConnector';
 import ReleaseProfilesConnector from './Release/ReleaseProfilesConnector';
 
 // Only a single DragDrop Context can exist so it's done here to allow editing
@@ -24,14 +24,14 @@ class Profiles extends Component {
           showSave={false}
         />
 
-        <PageContentBody>
+        <PageContentBodyConnector>
           <DndProvider backend={HTML5Backend}>
             <QualityProfilesConnector />
             <MetadataProfilesConnector />
             <DelayProfilesConnector />
             <ReleaseProfilesConnector />
           </DndProvider>
-        </PageContentBody>
+        </PageContentBodyConnector>
       </PageContent>
     );
   }

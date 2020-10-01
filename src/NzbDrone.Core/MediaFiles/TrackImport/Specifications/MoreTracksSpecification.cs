@@ -1,7 +1,6 @@
 using System.Linq;
 using NLog;
 using NzbDrone.Core.DecisionEngine;
-using NzbDrone.Core.Download;
 using NzbDrone.Core.Parser.Model;
 
 namespace NzbDrone.Core.MediaFiles.TrackImport.Specifications
@@ -15,18 +14,18 @@ namespace NzbDrone.Core.MediaFiles.TrackImport.Specifications
             _logger = logger;
         }
 
-        public Decision IsSatisfiedBy(LocalAlbumRelease item, DownloadClientItem downloadClientItem)
+        public Decision IsSatisfiedBy(LocalAlbumRelease localAlbumRelease)
         {
-            var existingRelease = item.AlbumRelease.Album.Value.AlbumReleases.Value.Single(x => x.Monitored);
+            var existingRelease = localAlbumRelease.AlbumRelease.Album.Value.AlbumReleases.Value.Single(x => x.Monitored);
             var existingTrackCount = existingRelease.Tracks.Value.Count(x => x.HasFile);
-            if (item.AlbumRelease.Id != existingRelease.Id &&
-                item.TrackCount < existingTrackCount)
+            if (localAlbumRelease.AlbumRelease.Id != existingRelease.Id &&
+                localAlbumRelease.TrackCount < existingTrackCount)
             {
-                _logger.Debug($"This release has fewer tracks ({item.TrackCount}) than existing {existingRelease} ({existingTrackCount}). Skipping {item}");
+                _logger.Debug($"This release has fewer tracks ({localAlbumRelease.TrackCount}) than existing {existingRelease} ({existingTrackCount}). Skipping {localAlbumRelease}");
                 return Decision.Reject("Has fewer tracks than existing release");
             }
 
-            _logger.Trace("Accepting release {0}", item);
+            _logger.Trace("Accepting release {0}", localAlbumRelease);
             return Decision.Accept();
         }
     }

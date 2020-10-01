@@ -15,7 +15,7 @@ namespace NzbDrone.Core.MediaFiles.TrackImport.Specifications
             _logger = logger;
         }
 
-        public Decision IsSatisfiedBy(LocalTrack localTrack, DownloadClientItem downloadClientItem)
+        public Decision IsSatisfiedBy(LocalTrack localTrack)
         {
             var trackFiles = localTrack.Tracks.Where(e => e.TrackFileId != 0).Select(e => e.TrackFile).ToList();
 
@@ -28,16 +28,6 @@ namespace NzbDrone.Core.MediaFiles.TrackImport.Specifications
             if (trackFiles.Count > 1)
             {
                 _logger.Debug("More than one existing track file, skipping.");
-                return Decision.Accept();
-            }
-
-            var trackFile = trackFiles.First().Value;
-
-            if (trackFile == null)
-            {
-                var track = localTrack.Tracks.First();
-                _logger.Trace("Unable to get track file details from the DB. TrackId: {0} TrackFileId: {1}", track.Id, track.TrackFileId);
-
                 return Decision.Accept();
             }
 

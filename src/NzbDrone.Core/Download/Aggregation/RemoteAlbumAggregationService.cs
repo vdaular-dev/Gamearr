@@ -37,6 +37,7 @@ namespace NzbDrone.Core.Download.Aggregation
                 }
             }
 
+
             return remoteAlbum;
         }
     }

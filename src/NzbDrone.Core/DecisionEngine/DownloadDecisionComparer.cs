@@ -30,7 +30,6 @@ namespace NzbDrone.Core.DecisionEngine
                 CompareQuality,
                 ComparePreferredWordScore,
                 CompareProtocol,
-                CompareIndexerPriority,
                 ComparePeersIfTorrent,
                 CompareAlbumCount,
                 CompareAgeIfUsenet,
@@ -60,20 +59,17 @@ namespace NzbDrone.Core.DecisionEngine
             return comparers.Select(comparer => comparer).FirstOrDefault(result => result != 0);
         }
 
-        private int CompareIndexerPriority(DownloadDecision x, DownloadDecision y)
-        {
-            return CompareByReverse(x.RemoteAlbum.Release, y.RemoteAlbum.Release, release => release.IndexerPriority);
-        }
-
         private int CompareQuality(DownloadDecision x, DownloadDecision y)
         {
             if (_configService.DownloadPropersAndRepacks == ProperDownloadTypes.DoNotPrefer)
             {
-                return CompareBy(x.RemoteAlbum, y.RemoteAlbum, remoteAlbum => remoteAlbum.Artist.QualityProfile.Value.GetIndex(remoteAlbum.ParsedAlbumInfo.Quality.Quality));
+                return CompareAll(CompareBy(x.RemoteAlbum, y.RemoteAlbum, remoteAlbum => remoteAlbum.Artist.QualityProfile.Value.GetIndex(remoteAlbum.ParsedAlbumInfo.Quality.Quality)),
+                    CompareBy(x.RemoteAlbum, y.RemoteAlbum, remoteAlbum => remoteAlbum.ParsedAlbumInfo.Quality.Revision.Real));
             }
 
             return CompareAll(CompareBy(x.RemoteAlbum, y.RemoteAlbum, remoteAlbum => remoteAlbum.Artist.QualityProfile.Value.GetIndex(remoteAlbum.ParsedAlbumInfo.Quality.Quality)),
-                           CompareBy(x.RemoteAlbum, y.RemoteAlbum, remoteAlbum => remoteAlbum.ParsedAlbumInfo.Quality.Revision));
+                           CompareBy(x.RemoteAlbum, y.RemoteAlbum, remoteAlbum => remoteAlbum.ParsedAlbumInfo.Quality.Revision.Real),
+                           CompareBy(x.RemoteAlbum, y.RemoteAlbum, remoteAlbum => remoteAlbum.ParsedAlbumInfo.Quality.Revision.Version));
         }
 
         private int ComparePreferredWordScore(DownloadDecision x, DownloadDecision y)
@@ -95,8 +91,7 @@ namespace NzbDrone.Core.DecisionEngine
 
         private int CompareAlbumCount(DownloadDecision x, DownloadDecision y)
         {
-            var discographyCompare = CompareBy(x.RemoteAlbum,
-                y.RemoteAlbum,
+            var discographyCompare = CompareBy(x.RemoteAlbum, y.RemoteAlbum,
                 remoteAlbum => remoteAlbum.ParsedAlbumInfo.Discography);
 
             if (discographyCompare != 0)
@@ -167,6 +162,7 @@ namespace NzbDrone.Core.DecisionEngine
         private int CompareSize(DownloadDecision x, DownloadDecision y)
         {
             // TODO: Is smaller better? Smaller for usenet could mean no par2 files.
+
             return CompareBy(x.RemoteAlbum, y.RemoteAlbum, remoteAlbum => remoteAlbum.Release.Size.Round(200.Megabytes()));
         }
     }

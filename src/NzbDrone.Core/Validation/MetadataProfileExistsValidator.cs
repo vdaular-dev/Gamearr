@@ -15,15 +15,7 @@ namespace NzbDrone.Core.Validation
 
         protected override bool IsValid(PropertyValidatorContext context)
         {
-            if (context.PropertyValue == null)
-            {
-                return true;
-            }
-
-            if ((int)context.PropertyValue == 0)
-            {
-                return true;
-            }
+            if (context.PropertyValue == null) return true;
 
             return _profileService.Exists((int)context.PropertyValue);
         }

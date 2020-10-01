@@ -7,19 +7,17 @@ using NLog;
 using NzbDrone.Common;
 using NzbDrone.Common.EnsureThat;
 using NzbDrone.Common.Serializer;
-using NzbDrone.Core.Exceptions;
 using NzbDrone.Core.Lifecycle;
+using NzbDrone.Core.Exceptions;
 using NzbDrone.Core.Messaging.Events;
 
 namespace NzbDrone.Core.Messaging.Commands
 {
     public interface IManageCommandQueue
     {
-        List<CommandModel> PushMany<TCommand>(List<TCommand> commands)
-            where TCommand : Command;
-        CommandModel Push<TCommand>(TCommand command, CommandPriority priority = CommandPriority.Normal, CommandTrigger trigger = CommandTrigger.Unspecified)
-            where TCommand : Command;
-        CommandModel Push(string commandName, DateTime? lastExecutionTime, DateTime? lastStartTime, CommandPriority priority = CommandPriority.Normal, CommandTrigger trigger = CommandTrigger.Unspecified);
+        List<CommandModel> PushMany<TCommand>(List<TCommand> commands) where TCommand : Command;
+        CommandModel Push<TCommand>(TCommand command, CommandPriority priority = CommandPriority.Normal, CommandTrigger trigger = CommandTrigger.Unspecified) where TCommand : Command;
+        CommandModel Push(string commandName, DateTime? lastExecutionTime, CommandPriority priority = CommandPriority.Normal, CommandTrigger trigger = CommandTrigger.Unspecified);
         IEnumerable<CommandModel> Queue(CancellationToken cancellationToken);
         List<CommandModel> All();
         CommandModel Get(int id);
@@ -52,93 +50,86 @@ namespace NzbDrone.Core.Messaging.Commands
             _commandQueue = new CommandQueue();
         }
 
-        public List<CommandModel> PushMany<TCommand>(List<TCommand> commands)
-            where TCommand : Command
+        public List<CommandModel> PushMany<TCommand>(List<TCommand> commands) where TCommand : Command
         {
             _logger.Trace("Publishing {0} commands", commands.Count);
 
-            lock (_commandQueue)
+            var commandModels = new List<CommandModel>();
+            var existingCommands = _commandQueue.QueuedOrStarted();
+
+            foreach (var command in commands)
             {
-                var commandModels = new List<CommandModel>();
-                var existingCommands = _commandQueue.QueuedOrStarted();
+                var existing = existingCommands.SingleOrDefault(c => c.Name == command.Name && CommandEqualityComparer.Instance.Equals(c.Body, command));
 
-                foreach (var command in commands)
+                if (existing != null)
                 {
-                    var existing = existingCommands.FirstOrDefault(c => c.Name == command.Name && CommandEqualityComparer.Instance.Equals(c.Body, command));
-
-                    if (existing != null)
-                    {
-                        continue;
-                    }
-
-                    var commandModel = new CommandModel
-                    {
-                        Name = command.Name,
-                        Body = command,
-                        QueuedAt = DateTime.UtcNow,
-                        Trigger = CommandTrigger.Unspecified,
-                        Priority = CommandPriority.Normal,
-                        Status = CommandStatus.Queued
-                    };
-
-                    commandModels.Add(commandModel);
+                    continue;
                 }
 
-                _repo.InsertMany(commandModels);
+                var commandModel = new CommandModel
 
-                foreach (var commandModel in commandModels)
                 {
-                    _commandQueue.Add(commandModel);
-                }
+                    Name = command.Name,
+                    Body = command,
+                    QueuedAt = DateTime.UtcNow,
+                    Trigger = CommandTrigger.Unspecified,
+                    Priority = CommandPriority.Normal,
+                    Status = CommandStatus.Queued
+                };
 
-                return commandModels;
+                commandModels.Add(commandModel);
             }
+
+            _repo.InsertMany(commandModels);
+
+            foreach (var commandModel in commandModels)
+            {
+                _commandQueue.Add(commandModel);
+            }
+
+            return commandModels;
         }
 
-        public CommandModel Push<TCommand>(TCommand command, CommandPriority priority = CommandPriority.Normal, CommandTrigger trigger = CommandTrigger.Unspecified)
-            where TCommand : Command
+
+        public CommandModel Push<TCommand>(TCommand command, CommandPriority priority = CommandPriority.Normal, CommandTrigger trigger = CommandTrigger.Unspecified) where TCommand : Command
         {
             Ensure.That(command, () => command).IsNotNull();
 
             _logger.Trace("Publishing {0}", command.Name);
             _logger.Trace("Checking if command is queued or started: {0}", command.Name);
 
-            lock (_commandQueue)
+            var existingCommands = QueuedOrStarted(command.Name);
+            var existing = existingCommands.SingleOrDefault(c => CommandEqualityComparer.Instance.Equals(c.Body, command));
+
+            if (existing != null)
             {
-                var existingCommands = QueuedOrStarted(command.Name);
-                var existing = existingCommands.FirstOrDefault(c => CommandEqualityComparer.Instance.Equals(c.Body, command));
+                _logger.Trace("Command is already in progress: {0}", command.Name);
 
-                if (existing != null)
-                {
-                    _logger.Trace("Command is already in progress: {0}", command.Name);
-
-                    return existing;
-                }
-
-                var commandModel = new CommandModel
-                {
-                    Name = command.Name,
-                    Body = command,
-                    QueuedAt = DateTime.UtcNow,
-                    Trigger = trigger,
-                    Priority = priority,
-                    Status = CommandStatus.Queued
-                };
-
-                _logger.Trace("Inserting new command: {0}", commandModel.Name);
-
-                _repo.Insert(commandModel);
-                _commandQueue.Add(commandModel);
-
-                return commandModel;
+                return existing;
             }
+
+            var commandModel = new CommandModel
+            {
+                Name = command.Name,
+                Body = command,
+                QueuedAt = DateTime.UtcNow,
+                Trigger = trigger,
+                Priority = priority,
+                Status = CommandStatus.Queued
+            };
+
+            _logger.Trace("Inserting new command: {0}", commandModel.Name);
+
+            _repo.Insert(commandModel);
+            _commandQueue.Add(commandModel);
+
+            return commandModel;
         }
 
-        public CommandModel Push(string commandName, DateTime? lastExecutionTime, DateTime? lastStartTime, CommandPriority priority = CommandPriority.Normal, CommandTrigger trigger = CommandTrigger.Unspecified)
+        public CommandModel Push(string commandName, DateTime? lastExecutionTime, CommandPriority priority = CommandPriority.Normal, CommandTrigger trigger = CommandTrigger.Unspecified)
         {
             dynamic command = GetCommand(commandName);
             command.LastExecutionTime = lastExecutionTime;
-            command.LastStartTime = lastStartTime;
             command.Trigger = trigger;
 
             return Push(command, priority, trigger);

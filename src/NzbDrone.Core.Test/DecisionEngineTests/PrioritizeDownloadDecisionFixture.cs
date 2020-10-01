@@ -1,20 +1,20 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using FizzWare.NBuilder;
-using FluentAssertions;
 using Moq;
-using NUnit.Framework;
-using NzbDrone.Common.Extensions;
-using NzbDrone.Core.Configuration;
-using NzbDrone.Core.DecisionEngine;
 using NzbDrone.Core.Indexers;
-using NzbDrone.Core.Music;
-using NzbDrone.Core.Parser.Model;
 using NzbDrone.Core.Profiles.Delay;
+using NzbDrone.Core.Music;
 using NzbDrone.Core.Profiles.Qualities;
 using NzbDrone.Core.Qualities;
+using NzbDrone.Core.Parser.Model;
+using NzbDrone.Core.DecisionEngine;
+using NUnit.Framework;
+using FluentAssertions;
+using FizzWare.NBuilder;
+using NzbDrone.Common.Extensions;
 using NzbDrone.Core.Test.Framework;
+using NzbDrone.Core.Configuration;
 
 namespace NzbDrone.Core.Test.DecisionEngineTests
 {
@@ -34,7 +34,7 @@ namespace NzbDrone.Core.Test.DecisionEngineTests
                             .Build();
         }
 
-        private RemoteAlbum GivenRemoteAlbum(List<Album> albums, QualityModel quality, int age = 0, long size = 0, DownloadProtocol downloadProtocol = DownloadProtocol.Usenet, int indexerPriority = 25)
+        private RemoteAlbum GivenRemoteAlbum(List<Album> albums, QualityModel quality, int age = 0, long size = 0, DownloadProtocol downloadProtocol = DownloadProtocol.Usenet)
         {
             var remoteAlbum = new RemoteAlbum();
             remoteAlbum.ParsedAlbumInfo = new ParsedAlbumInfo();
@@ -47,7 +47,6 @@ namespace NzbDrone.Core.Test.DecisionEngineTests
             remoteAlbum.Release.PublishDate = DateTime.Now.AddDays(-age);
             remoteAlbum.Release.Size = size;
             remoteAlbum.Release.DownloadProtocol = downloadProtocol;
-            remoteAlbum.Release.IndexerPriority = indexerPriority;
 
             remoteAlbum.Artist = Builder<Artist>.CreateNew()
                                                 .With(e => e.QualityProfile = new QualityProfile
@@ -68,20 +67,6 @@ namespace NzbDrone.Core.Test.DecisionEngineTests
                   {
                       PreferredProtocol = downloadProtocol
                   });
-        }
-
-        [Test]
-        public void should_put_reals_before_non_reals()
-        {
-            var remoteAlbum1 = GivenRemoteAlbum(new List<Album> { GivenAlbum(1) }, new QualityModel(Quality.MP3_256, new Revision(version: 1, real: 0)));
-            var remoteAlbum2 = GivenRemoteAlbum(new List<Album> { GivenAlbum(1) }, new QualityModel(Quality.MP3_256, new Revision(version: 1, real: 1)));
-
-            var decisions = new List<DownloadDecision>();
-            decisions.Add(new DownloadDecision(remoteAlbum1));
-            decisions.Add(new DownloadDecision(remoteAlbum2));
-
-            var qualifiedReports = Subject.PrioritizeDecisions(decisions);
-            qualifiedReports.First().RemoteAlbum.ParsedAlbumInfo.Quality.Revision.Real.Should().Be(1);
         }
 
         [Test]
@@ -135,6 +120,7 @@ namespace NzbDrone.Core.Test.DecisionEngineTests
         {
             var remoteAlbum1 = GivenRemoteAlbum(new List<Album> { GivenAlbum(1) }, new QualityModel(Quality.MP3_256), age: 10);
             var remoteAlbum2 = GivenRemoteAlbum(new List<Album> { GivenAlbum(1) }, new QualityModel(Quality.MP3_256), age: 5);
+
 
             var decisions = new List<DownloadDecision>();
             decisions.Add(new DownloadDecision(remoteAlbum1));
@@ -276,6 +262,7 @@ namespace NzbDrone.Core.Test.DecisionEngineTests
             torrentInfo1.Seeders = 10;
             torrentInfo1.Peers = 10;
 
+
             var torrentInfo2 = torrentInfo1.JsonClone();
             torrentInfo2.Peers = 100;
 
@@ -302,6 +289,7 @@ namespace NzbDrone.Core.Test.DecisionEngineTests
             torrentInfo1.DownloadProtocol = DownloadProtocol.Torrent;
             torrentInfo1.Seeders = 0;
             torrentInfo1.Peers = 10;
+
 
             var torrentInfo2 = torrentInfo1.JsonClone();
             torrentInfo2.Seeders = 0;
@@ -410,6 +398,7 @@ namespace NzbDrone.Core.Test.DecisionEngineTests
             qualifiedReports.First().RemoteAlbum.ParsedAlbumInfo.Quality.Quality.Should().Be(Quality.MP3_320);
         }
 
+
         [Test]
         public void should_prefer_higher_score_over_lower_score()
         {
@@ -490,64 +479,6 @@ namespace NzbDrone.Core.Test.DecisionEngineTests
             qualifiedReports.First().RemoteAlbum.ParsedAlbumInfo.Quality.Quality.Should().Be(Quality.FLAC);
             qualifiedReports.First().RemoteAlbum.ParsedAlbumInfo.Quality.Revision.Version.Should().Be(1);
             qualifiedReports.First().RemoteAlbum.PreferredWordScore.Should().Be(10);
-        }
-
-        [Test]
-        public void should_prefer_score_over_real_when_download_propers_is_do_not_prefer()
-        {
-            Mocker.GetMock<IConfigService>()
-                  .Setup(s => s.DownloadPropersAndRepacks)
-                  .Returns(ProperDownloadTypes.DoNotPrefer);
-
-            var remoteAlbum1 = GivenRemoteAlbum(new List<Album> { GivenAlbum(1) }, new QualityModel(Quality.FLAC, new Revision(1, 0)));
-            var remoteAlbum2 = GivenRemoteAlbum(new List<Album> { GivenAlbum(1) }, new QualityModel(Quality.FLAC, new Revision(1, 1)));
-
-            remoteAlbum1.PreferredWordScore = 10;
-            remoteAlbum2.PreferredWordScore = 0;
-
-            var decisions = new List<DownloadDecision>();
-            decisions.Add(new DownloadDecision(remoteAlbum1));
-            decisions.Add(new DownloadDecision(remoteAlbum2));
-
-            var qualifiedReports = Subject.PrioritizeDecisions(decisions);
-            qualifiedReports.First().RemoteAlbum.ParsedAlbumInfo.Quality.Quality.Should().Be(Quality.FLAC);
-            qualifiedReports.First().RemoteAlbum.ParsedAlbumInfo.Quality.Revision.Version.Should().Be(1);
-            qualifiedReports.First().RemoteAlbum.ParsedAlbumInfo.Quality.Revision.Real.Should().Be(0);
-            qualifiedReports.First().RemoteAlbum.PreferredWordScore.Should().Be(10);
-        }
-
-        [Test]
-        public void sort_download_decisions_based_on_indexer_priority()
-        {
-            var remoteAlbum1 = GivenRemoteAlbum(new List<Album> { GivenAlbum(1) }, new QualityModel(Quality.FLAC, new Revision(1)), indexerPriority: 25);
-            var remoteAlbum2 = GivenRemoteAlbum(new List<Album> { GivenAlbum(1) }, new QualityModel(Quality.FLAC, new Revision(1)), indexerPriority: 50);
-            var remoteAlbum3 = GivenRemoteAlbum(new List<Album> { GivenAlbum(1) }, new QualityModel(Quality.FLAC, new Revision(1)), indexerPriority: 1);
-
-            var decisions = new List<DownloadDecision>();
-            decisions.AddRange(new[] { new DownloadDecision(remoteAlbum1), new DownloadDecision(remoteAlbum2), new DownloadDecision(remoteAlbum3) });
-
-            var qualifiedReports = Subject.PrioritizeDecisions(decisions);
-            qualifiedReports.First().RemoteAlbum.Should().Be(remoteAlbum3);
-            qualifiedReports.Skip(1).First().RemoteAlbum.Should().Be(remoteAlbum1);
-            qualifiedReports.Last().RemoteAlbum.Should().Be(remoteAlbum2);
-        }
-
-        [Test]
-        public void ensure_download_decisions_indexer_priority_is_not_perfered_over_quality()
-        {
-            var remoteAlbum1 = GivenRemoteAlbum(new List<Album> { GivenAlbum(1) }, new QualityModel(Quality.MP3_320, new Revision(1)), indexerPriority: 25);
-            var remoteAlbum2 = GivenRemoteAlbum(new List<Album> { GivenAlbum(1) }, new QualityModel(Quality.FLAC, new Revision(1)), indexerPriority: 50);
-            var remoteAlbum3 = GivenRemoteAlbum(new List<Album> { GivenAlbum(1) }, new QualityModel(Quality.MP3_128, new Revision(1)), indexerPriority: 1);
-            var remoteAlbum4 = GivenRemoteAlbum(new List<Album> { GivenAlbum(1) }, new QualityModel(Quality.FLAC, new Revision(1)), indexerPriority: 25);
-
-            var decisions = new List<DownloadDecision>();
-            decisions.AddRange(new[] { new DownloadDecision(remoteAlbum1), new DownloadDecision(remoteAlbum2), new DownloadDecision(remoteAlbum3), new DownloadDecision(remoteAlbum4) });
-
-            var qualifiedReports = Subject.PrioritizeDecisions(decisions);
-            qualifiedReports.First().RemoteAlbum.Should().Be(remoteAlbum4);
-            qualifiedReports.Skip(1).First().RemoteAlbum.Should().Be(remoteAlbum2);
-            qualifiedReports.Skip(2).First().RemoteAlbum.Should().Be(remoteAlbum1);
-            qualifiedReports.Last().RemoteAlbum.Should().Be(remoteAlbum3);
         }
     }
 }

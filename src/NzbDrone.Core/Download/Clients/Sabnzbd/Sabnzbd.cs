@@ -10,8 +10,8 @@ using NzbDrone.Common.Http;
 using NzbDrone.Core.Configuration;
 using NzbDrone.Core.Exceptions;
 using NzbDrone.Core.Parser.Model;
-using NzbDrone.Core.RemotePathMappings;
 using NzbDrone.Core.Validation;
+using NzbDrone.Core.RemotePathMappings;
 
 namespace NzbDrone.Core.Download.Clients.Sabnzbd
 {
@@ -148,9 +148,8 @@ namespace NzbDrone.Core.Download.Clients.Sabnzbd
                 {
                     historyItem.Status = DownloadItemStatus.Completed;
                 }
-                else
+                else // Verifying/Moving etc
                 {
-                    // Verifying/Moving etc
                     historyItem.Status = DownloadItemStatus.Downloading;
                 }
 
@@ -167,7 +166,6 @@ namespace NzbDrone.Core.Download.Clients.Sabnzbd
                         {
                             historyItem.OutputPath = parent;
                         }
-
                         parent = parent.Directory;
                     }
                 }
@@ -184,7 +182,7 @@ namespace NzbDrone.Core.Download.Clients.Sabnzbd
         {
             foreach (var downloadClientItem in GetQueue().Concat(GetHistory()))
             {
-                if (downloadClientItem.Category == Settings.MusicCategory || (downloadClientItem.Category == "*" && Settings.MusicCategory.IsNullOrWhiteSpace()))
+                if (downloadClientItem.Category == Settings.MusicCategory || downloadClientItem.Category == "*" && Settings.MusicCategory.IsNullOrWhiteSpace())
                 {
                     yield return downloadClientItem;
                 }
@@ -325,6 +323,7 @@ namespace NzbDrone.Core.Download.Clients.Sabnzbd
                 minor = Convert.ToInt32(parsed.Groups["minor"].Value);
                 patch = Convert.ToInt32(parsed.Groups["patch"].Value.Replace("x", "0"));
             }
+
             else
             {
                 if (!version.Equals("develop", StringComparison.InvariantCultureIgnoreCase))
@@ -357,7 +356,7 @@ namespace NzbDrone.Core.Download.Clients.Sabnzbd
                     return new NzbDroneValidationFailure("Version", "Sabnzbd develop version, assuming version 1.1.0 or higher.")
                     {
                         IsWarning = true,
-                        DetailedDescription = "Lidarr may not be able to support new features added to SABnzbd when running develop versions."
+                        DetailedDescription = "Gamearr may not be able to support new features added to SABnzbd when running develop versions."
                     };
                 }
 
@@ -392,12 +391,10 @@ namespace NzbDrone.Core.Download.Clients.Sabnzbd
                 {
                     return new ValidationFailure("APIKey", "API Key Incorrect");
                 }
-
                 if (ex.Message.ContainsIgnoreCase("API Key Required"))
                 {
                     return new ValidationFailure("APIKey", "API Key Required");
                 }
-
                 throw;
             }
 
@@ -412,7 +409,7 @@ namespace NzbDrone.Core.Download.Clients.Sabnzbd
                 return new NzbDroneValidationFailure("", "Disable 'Check before download' option in Sabnbzd")
                 {
                     InfoLink = _proxy.GetBaseUrl(Settings, "config/switches/"),
-                    DetailedDescription = "Using Check before download affects Lidarr ability to track new downloads. Also Sabnzbd recommends 'Abort jobs that cannot be completed' instead since it's more effective."
+                    DetailedDescription = "Using Check before download affects Gamearr ability to track new downloads. Also Sabnzbd recommends 'Abort jobs that cannot be completed' instead since it's more effective."
                 };
             }
 
@@ -431,7 +428,7 @@ namespace NzbDrone.Core.Download.Clients.Sabnzbd
                     return new NzbDroneValidationFailure("MusicCategory", "Enable Job folders")
                     {
                         InfoLink = _proxy.GetBaseUrl(Settings, "config/categories/"),
-                        DetailedDescription = "Lidarr prefers each download to have a separate folder. With * appended to the Folder/Path Sabnzbd will not create these job folders. Go to Sabnzbd to fix it."
+                        DetailedDescription = "Gamearr prefers each download to have a separate folder. With * appended to the Folder/Path Sabnzbd will not create these job folders. Go to Sabnzbd to fix it."
                     };
                 }
             }
@@ -446,31 +443,28 @@ namespace NzbDrone.Core.Download.Clients.Sabnzbd
                     };
                 }
             }
-
             if (config.Misc.enable_tv_sorting && ContainsCategory(config.Misc.tv_categories, Settings.MusicCategory))
             {
                 return new NzbDroneValidationFailure("MusicCategory", "Disable TV Sorting")
                 {
                     InfoLink = _proxy.GetBaseUrl(Settings, "config/sorting/"),
-                    DetailedDescription = "You must disable Sabnzbd TV Sorting for the category Lidarr uses to prevent import issues. Go to Sabnzbd to fix it."
+                    DetailedDescription = "You must disable Sabnzbd TV Sorting for the category Gamearr uses to prevent import issues. Go to Sabnzbd to fix it."
                 };
             }
-
             if (config.Misc.enable_movie_sorting && ContainsCategory(config.Misc.movie_categories, Settings.MusicCategory))
             {
                 return new NzbDroneValidationFailure("MusicCategory", "Disable Movie Sorting")
                 {
                     InfoLink = _proxy.GetBaseUrl(Settings, "config/sorting/"),
-                    DetailedDescription = "You must disable Sabnzbd Movie Sorting for the category Lidarr uses to prevent import issues. Go to Sabnzbd to fix it."
+                    DetailedDescription = "You must disable Sabnzbd Movie Sorting for the category Gamearr uses to prevent import issues. Go to Sabnzbd to fix it."
                 };
             }
-
             if (config.Misc.enable_date_sorting && ContainsCategory(config.Misc.date_categories, Settings.MusicCategory))
             {
                 return new NzbDroneValidationFailure("MusicCategory", "Disable Date Sorting")
                 {
                     InfoLink = _proxy.GetBaseUrl(Settings, "config/sorting/"),
-                    DetailedDescription = "You must disable Sabnzbd Date Sorting for the category Lidarr uses to prevent import issues. Go to Sabnzbd to fix it."
+                    DetailedDescription = "You must disable Sabnzbd Date Sorting for the category Gamearr uses to prevent import issues. Go to Sabnzbd to fix it."
                 };
             }
 

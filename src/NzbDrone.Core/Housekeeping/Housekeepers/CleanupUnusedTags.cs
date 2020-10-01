@@ -1,7 +1,7 @@
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
-using Dapper;
+using Marr.Data;
+using NzbDrone.Common.Serializer;
 using NzbDrone.Core.Datastore;
 
 namespace NzbDrone.Core.Housekeeping.Housekeepers
@@ -17,25 +17,24 @@ namespace NzbDrone.Core.Housekeeping.Housekeepers
 
         public void Clean()
         {
-            using (var mapper = _database.OpenConnection())
-            {
-                var usedTags = new[] { "Artists", "Notifications", "DelayProfiles", "ReleaseProfiles" }
+            var mapper = _database.GetDataMapper();
+
+            var usedTags = new[] { "Artists", "Notifications", "DelayProfiles", "ReleaseProfiles" }
                 .SelectMany(v => GetUsedTags(v, mapper))
-                     .Distinct()
-                     .ToArray();
-
-                var usedTagsList = string.Join(",", usedTags.Select(d => d.ToString()).ToArray());
-
-                mapper.Execute($"DELETE FROM Tags WHERE NOT Id IN ({usedTagsList})");
-            }
-        }
-
-        private int[] GetUsedTags(string table, IDbConnection mapper)
-        {
-            return mapper.Query<List<int>>($"SELECT DISTINCT Tags FROM {table} WHERE NOT Tags = '[]'")
-                .SelectMany(x => x)
                 .Distinct()
                 .ToArray();
+
+            var usedTagsList = string.Join(",", usedTags.Select(d => d.ToString()).ToArray());
+
+            mapper.ExecuteNonQuery($"DELETE FROM Tags WHERE NOT Id IN ({usedTagsList})");
+        }
+
+        private int[] GetUsedTags(string table, IDataMapper mapper)
+        {
+            return mapper.ExecuteReader($"SELECT DISTINCT Tags FROM {table} WHERE NOT Tags = '[]'", reader => reader.GetString(0))
+                         .SelectMany(Json.Deserialize<List<int>>)
+                         .Distinct()
+                         .ToArray();
         }
     }
 }

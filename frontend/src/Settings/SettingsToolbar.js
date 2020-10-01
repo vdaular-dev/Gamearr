@@ -1,12 +1,12 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
+import { icons } from 'Helpers/Props';
 import keyboardShortcuts, { shortcuts } from 'Components/keyboardShortcuts';
 import PageToolbar from 'Components/Page/Toolbar/PageToolbar';
-import PageToolbarButton from 'Components/Page/Toolbar/PageToolbarButton';
 import PageToolbarSection from 'Components/Page/Toolbar/PageToolbarSection';
-import { icons } from 'Helpers/Props';
-import AdvancedSettingsButton from './AdvancedSettingsButton';
+import PageToolbarButton from 'Components/Page/Toolbar/PageToolbarButton';
 import PendingChangesModal from './PendingChangesModal';
+import AdvancedSettingsButton from './AdvancedSettingsButton';
 
 class SettingsToolbar extends Component {
 

@@ -29,5 +29,6 @@ namespace NzbDrone.Core.ImportLists.LastFm
         {
             yield return new ImportListRequest(string.Format("{0}&user={1}&limit={2}&api_key={3}&format=json", Settings.BaseUrl.TrimEnd('/'), Settings.UserId, Settings.Count, Settings.ApiKey), HttpAccept.Json);
         }
+
     }
 }

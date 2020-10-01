@@ -1,9 +1,10 @@
-using System.Collections.Generic;
-using System.Net;
 using Newtonsoft.Json;
-using NzbDrone.Common.Extensions;
 using NzbDrone.Core.ImportLists.Exceptions;
 using NzbDrone.Core.Parser.Model;
+using System.Collections.Generic;
+using System.Net;
+using NLog;
+using NzbDrone.Common.Extensions;
 
 namespace NzbDrone.Core.ImportLists.HeadphonesImport
 {
@@ -22,7 +23,7 @@ namespace NzbDrone.Core.ImportLists.HeadphonesImport
                 return items;
             }
 
-            var jsonResponse = JsonConvert.DeserializeObject<List<HeadphonesImportArtist>>(_importListResponse.Content);
+            var jsonResponse = JsonConvert.DeserializeObject<List<HeadphonesImportGame>>(_importListResponse.Content);
 
             // no albums were return
             if (jsonResponse == null)
@@ -57,5 +58,6 @@ namespace NzbDrone.Core.ImportLists.HeadphonesImport
 
             return true;
         }
+
     }
 }

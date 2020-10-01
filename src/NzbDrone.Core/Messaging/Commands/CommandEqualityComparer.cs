@@ -10,14 +10,12 @@ namespace NzbDrone.Core.Messaging.Commands
 
         private CommandEqualityComparer()
         {
+
         }
 
         public bool Equals(Command x, Command y)
         {
-            if (x.GetType() != y.GetType())
-            {
-                return false;
-            }
+            if(x.GetType() != y.GetType()) return false;
 
             var xProperties = x.GetType().GetProperties();
             var yProperties = y.GetType().GetProperties();
@@ -29,7 +27,7 @@ namespace NzbDrone.Core.Messaging.Commands
                     continue;
                 }
 
-                if (xProperty.DeclaringType == typeof(Command))
+                if (xProperty.DeclaringType == typeof (Command))
                 {
                     continue;
                 }
@@ -62,6 +60,7 @@ namespace NzbDrone.Core.Messaging.Commands
                         return false;
                     }
                 }
+
                 else if (!xValue.Equals(yValue))
                 {
                     return false;

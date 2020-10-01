@@ -2,14 +2,14 @@ using System.IO;
 using System.Linq;
 using FizzWare.NBuilder;
 using FluentAssertions;
+using Marr.Data;
 using Moq;
 using NUnit.Framework;
 using NzbDrone.Common.Disk;
-using NzbDrone.Core.Datastore;
 using NzbDrone.Core.MediaFiles;
-using NzbDrone.Core.Music;
 using NzbDrone.Core.Parser.Model;
 using NzbDrone.Core.Test.Framework;
+using NzbDrone.Core.Music;
 using NzbDrone.Test.Common;
 
 namespace NzbDrone.Core.Test.MediaFiles
@@ -18,20 +18,21 @@ namespace NzbDrone.Core.Test.MediaFiles
     {
         private TrackFile _trackFile;
         private LocalTrack _localTrack;
-        private string _rootPath = @"C:\Test\Music\Artist".AsOsAgnostic();
+        private string rootPath = @"C:\Test\Music\Artist".AsOsAgnostic();
 
         [SetUp]
         public void Setup()
         {
             _localTrack = new LocalTrack();
             _localTrack.Artist = new Artist
-            {
-                Path = _rootPath
-            };
+                                   {
+                                       Path = rootPath
+                                   };
 
             _trackFile = Builder<TrackFile>
                 .CreateNew()
                 .Build();
+
 
             Mocker.GetMock<IDiskProvider>()
                 .Setup(c => c.FileExists(It.IsAny<string>()))
@@ -55,7 +56,7 @@ namespace NzbDrone.Core.Test.MediaFiles
                                                                                 new TrackFile
                                                                                 {
                                                                                     Id = 1,
-                                                                                    Path = Path.Combine(_rootPath, @"Season 01\30.rock.s01e01.avi"),
+                                                                                    Path = Path.Combine(rootPath, @"Season 01\30.rock.s01e01.avi"),
                                                                                 }))
                                                      .Build()
                                                      .ToList();
@@ -70,7 +71,7 @@ namespace NzbDrone.Core.Test.MediaFiles
                                                                                 new TrackFile
                                                                                 {
                                                                                     Id = 1,
-                                                                                    Path = Path.Combine(_rootPath, @"Season 01\30.rock.s01e01.avi"),
+                                                                                    Path = Path.Combine(rootPath, @"Season 01\30.rock.s01e01.avi"),
                                                                                 }))
                                                      .Build()
                                                      .ToList();
@@ -84,14 +85,14 @@ namespace NzbDrone.Core.Test.MediaFiles
                                                                                 new TrackFile
                                                                                 {
                                                                                     Id = 1,
-                                                                                    Path = Path.Combine(_rootPath, @"Season 01\30.rock.s01e01.avi"),
+                                                                                    Path = Path.Combine(rootPath, @"Season 01\30.rock.s01e01.avi"),
                                                                                 }))
                                                      .TheNext(1)
                                                      .With(e => e.TrackFile = new LazyLoaded<TrackFile>(
                                                                                 new TrackFile
                                                                                 {
                                                                                     Id = 2,
-                                                                                    Path = Path.Combine(_rootPath, @"Season 01\30.rock.s01e02.avi"),
+                                                                                    Path = Path.Combine(rootPath, @"Season 01\30.rock.s01e02.avi"),
                                                                                 }))
                                                      .Build()
                                                      .ToList();
@@ -179,21 +180,6 @@ namespace NzbDrone.Core.Test.MediaFiles
             GivenMultipleTracksWithMultipleTrackFiles();
 
             Subject.UpgradeTrackFile(_trackFile, _localTrack).OldFiles.Count.Should().Be(2);
-        }
-
-        [Test]
-        public void should_import_if_existing_file_doesnt_exist_in_db()
-        {
-            _localTrack.Tracks = Builder<Track>.CreateListOfSize(1)
-                                                     .All()
-                                                     .With(e => e.TrackFileId = 1)
-                                                     .With(e => e.TrackFile = new LazyLoaded<TrackFile>(null))
-                                                     .Build()
-                                                     .ToList();
-
-            Subject.UpgradeTrackFile(_trackFile, _localTrack);
-
-            Mocker.GetMock<IMediaFileService>().Verify(v => v.Delete(_localTrack.Tracks.Single().TrackFile.Value, It.IsAny<DeleteMediaFileReason>()), Times.Never());
         }
     }
 }

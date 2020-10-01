@@ -5,7 +5,7 @@ namespace NzbDrone.Core.Extras.Metadata
         Unknown = 0,
         ArtistMetadata = 1,
         TrackMetadata = 2,
-        ArtistImage = 3,
+        GameImage = 3,
         AlbumImage = 4,
         TrackImage = 5,
         AlbumMetadata = 6

@@ -1,5 +1,5 @@
-import { push } from 'connected-react-router';
 import { connect } from 'react-redux';
+import { push } from 'connected-react-router';
 import { createSelector } from 'reselect';
 import createAllArtistSelector from 'Store/Selectors/createAllArtistSelector';
 import createDeepEqualSelector from 'Store/Selectors/createDeepEqualSelector';
@@ -54,11 +54,11 @@ function createMapStateToProps() {
 function createMapDispatchToProps(dispatch, props) {
   return {
     onGoToArtist(foreignArtistId) {
-      dispatch(push(`${window.Lidarr.urlBase}/artist/${foreignArtistId}`));
+      dispatch(push(`${window.Gamearr.urlBase}/artist/${foreignArtistId}`));
     },
 
-    onGoToAddNewArtist(query) {
-      dispatch(push(`${window.Lidarr.urlBase}/add/search?term=${encodeURIComponent(query)}`));
+    onGoToAddNewGame(query) {
+      dispatch(push(`${window.Gamearr.urlBase}/add/new?term=${encodeURIComponent(query)}`));
     }
   };
 }

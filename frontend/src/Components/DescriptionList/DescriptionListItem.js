@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import DescriptionListItemDescription from './DescriptionListItemDescription';
 import DescriptionListItemTitle from './DescriptionListItemTitle';
+import DescriptionListItemDescription from './DescriptionListItemDescription';
 
 class DescriptionListItem extends Component {
 

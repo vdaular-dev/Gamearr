@@ -4,8 +4,8 @@ using FluentAssertions;
 using NUnit.Framework;
 using NzbDrone.Core.Extras.Metadata;
 using NzbDrone.Core.Extras.Metadata.Consumers.Roksbox;
-using NzbDrone.Core.Music;
 using NzbDrone.Core.Test.Framework;
+using NzbDrone.Core.Music;
 using NzbDrone.Test.Common;
 
 namespace NzbDrone.Core.Test.Extras.Metadata.Consumers.Roksbox
@@ -72,7 +72,7 @@ namespace NzbDrone.Core.Test.Extras.Metadata.Consumers.Roksbox
         {
             var path = Path.Combine(_artist.Path, new DirectoryInfo(_artist.Path).Name + ".jpg");
 
-            Subject.FindMetadataFile(_artist, path).Type.Should().Be(MetadataType.ArtistImage);
+            Subject.FindMetadataFile(_artist, path).Type.Should().Be(MetadataType.GameImage);
         }
     }
 }

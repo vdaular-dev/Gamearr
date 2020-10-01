@@ -1,14 +1,14 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import Alert from 'Components/Alert';
-import FieldSet from 'Components/FieldSet';
-import Button from 'Components/Link/Button';
-import LoadingIndicator from 'Components/Loading/LoadingIndicator';
-import ModalBody from 'Components/Modal/ModalBody';
-import ModalContent from 'Components/Modal/ModalContent';
-import ModalFooter from 'Components/Modal/ModalFooter';
-import ModalHeader from 'Components/Modal/ModalHeader';
 import { kinds } from 'Helpers/Props';
+import Alert from 'Components/Alert';
+import Button from 'Components/Link/Button';
+import FieldSet from 'Components/FieldSet';
+import LoadingIndicator from 'Components/Loading/LoadingIndicator';
+import ModalContent from 'Components/Modal/ModalContent';
+import ModalHeader from 'Components/Modal/ModalHeader';
+import ModalBody from 'Components/Modal/ModalBody';
+import ModalFooter from 'Components/Modal/ModalFooter';
 import AddDownloadClientItem from './AddDownloadClientItem';
 import styles from './AddDownloadClientModalContent.css';
 
@@ -50,7 +50,7 @@ class AddDownloadClientModalContent extends Component {
               <div>
 
                 <Alert kind={kinds.INFO}>
-                  <div>Lidarr supports any downloadClient that uses the Newznab standard, as well as other downloadClients listed below.</div>
+                  <div>Gamearr supports any downloadClient that uses the Newznab standard, as well as other downloadClients listed below.</div>
                   <div>For more information on the individual downloadClients, click on the info buttons.</div>
                 </Alert>
 

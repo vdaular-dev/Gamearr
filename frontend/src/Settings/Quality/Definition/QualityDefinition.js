@@ -1,13 +1,13 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import ReactSlider from 'react-slider';
-import NumberInput from 'Components/Form/NumberInput';
-import TextInput from 'Components/Form/TextInput';
-import Label from 'Components/Label';
-import Popover from 'Components/Tooltip/Popover';
-import { kinds, tooltipPositions } from 'Helpers/Props';
 import formatBytes from 'Utilities/Number/formatBytes';
 import roundNumber from 'Utilities/Number/roundNumber';
+import { kinds, tooltipPositions } from 'Helpers/Props';
+import Label from 'Components/Label';
+import NumberInput from 'Components/Form/NumberInput';
+import TextInput from 'Components/Form/TextInput';
+import Popover from 'Components/Tooltip/Popover';
 import QualityDefinitionLimits from './QualityDefinitionLimits';
 import styles from './QualityDefinition.css';
 
@@ -46,10 +46,26 @@ class QualityDefinition extends Component {
   constructor(props, context) {
     super(props, context);
 
+    this._forceUpdateTimeout = null;
+
     this.state = {
       sliderMinSize: getSliderValue(props.minSize, slider.min),
       sliderMaxSize: getSliderValue(props.maxSize, slider.max)
     };
+  }
+
+  componentDidMount() {
+    // A hack to deal with a bug in the slider component until a fix for it
+    // lands and an updated version is available.
+    // See: https://github.com/mpowaga/react-slider/issues/115
+
+    this._forceUpdateTimeout = setTimeout(() => this.forceUpdate(), 1);
+  }
+
+  componentWillUnmount() {
+    if (this._forceUpdateTimeout) {
+      clearTimeout(this._forceUpdateTimeout);
+    }
   }
 
   //
@@ -151,11 +167,11 @@ class QualityDefinition extends Component {
             step={slider.step}
             minDistance={10}
             value={[sliderMinSize, sliderMaxSize]}
-            withTracks={true}
+            withBars={true}
             snapDragDisabled={true}
             className={styles.slider}
-            trackClassName={styles.bar}
-            thumbClassName={styles.handle}
+            barClassName={styles.bar}
+            handleClassName={styles.handle}
             onChange={this.onSliderChange}
             onAfterChange={this.onAfterSliderChange}
           />

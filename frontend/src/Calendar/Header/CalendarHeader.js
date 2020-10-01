@@ -2,15 +2,15 @@
 import moment from 'moment';
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import * as calendarViews from 'Calendar/calendarViews';
-import Icon from 'Components/Icon';
+import { align, icons } from 'Helpers/Props';
 import Button from 'Components/Link/Button';
+import Icon from 'Components/Icon';
 import LoadingIndicator from 'Components/Loading/LoadingIndicator';
 import Menu from 'Components/Menu/Menu';
 import MenuButton from 'Components/Menu/MenuButton';
 import MenuContent from 'Components/Menu/MenuContent';
 import ViewMenuItem from 'Components/Menu/ViewMenuItem';
-import { align, icons } from 'Helpers/Props';
+import * as calendarViews from 'Calendar/calendarViews';
 import CalendarHeaderViewButton from './CalendarHeaderViewButton';
 import styles from './CalendarHeader.css';
 

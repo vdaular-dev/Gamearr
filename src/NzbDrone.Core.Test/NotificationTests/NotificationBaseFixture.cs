@@ -2,9 +2,9 @@ using System;
 using FluentAssertions;
 using FluentValidation.Results;
 using NUnit.Framework;
-using NzbDrone.Core.Music;
 using NzbDrone.Core.Notifications;
 using NzbDrone.Core.ThingiProvider;
+using NzbDrone.Core.Music;
 using NzbDrone.Core.Validation;
 using NzbDrone.Test.Common;
 
@@ -13,7 +13,7 @@ namespace NzbDrone.Core.Test.NotificationTests
     [TestFixture]
     public class NotificationBaseFixture : TestBase
     {
-        private class TestSetting : IProviderConfig
+        class TestSetting : IProviderConfig
         {
             public NzbDroneValidationResult Validate()
             {
@@ -21,10 +21,11 @@ namespace NzbDrone.Core.Test.NotificationTests
             }
         }
 
-        private class TestNotificationWithOnReleaseImport : NotificationBase<TestSetting>
+        class TestNotificationWithOnReleaseImport : NotificationBase<TestSetting>
         {
             public override string Name => "TestNotification";
             public override string Link => "";
+
 
             public override ValidationResult Test()
             {
@@ -35,12 +36,14 @@ namespace NzbDrone.Core.Test.NotificationTests
             {
                 TestLogger.Info("OnDownload was called");
             }
+
         }
 
-        private class TestNotificationWithAllEvents : NotificationBase<TestSetting>
+        class TestNotificationWithAllEvents : NotificationBase<TestSetting>
         {
             public override string Name => "TestNotification";
             public override string Link => "";
+
 
             public override ValidationResult Test()
             {
@@ -83,15 +86,18 @@ namespace NzbDrone.Core.Test.NotificationTests
             }
         }
 
-        private class TestNotificationWithNoEvents : NotificationBase<TestSetting>
+        class TestNotificationWithNoEvents : NotificationBase<TestSetting>
         {
             public override string Name => "TestNotification";
             public override string Link => "";
+
 
             public override ValidationResult Test()
             {
                 throw new NotImplementedException();
             }
+
+          
         }
 
         [Test]
@@ -121,6 +127,7 @@ namespace NzbDrone.Core.Test.NotificationTests
             notification.SupportsOnTrackRetag.Should().BeTrue();
         }
 
+
         [Test]
         public void should_support_none_if_none_are_implemented()
         {
@@ -136,4 +143,5 @@ namespace NzbDrone.Core.Test.NotificationTests
             notification.SupportsOnTrackRetag.Should().BeFalse();
         }
     }
+
 }

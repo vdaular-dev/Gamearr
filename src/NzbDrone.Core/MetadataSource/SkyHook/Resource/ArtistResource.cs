@@ -24,5 +24,6 @@ namespace NzbDrone.Core.MetadataSource.SkyHook.Resource
         public List<AlbumResource> Albums { get; set; }
         public string Status { get; set; }
         public RatingResource Rating { get; set; }
+
     }
 }

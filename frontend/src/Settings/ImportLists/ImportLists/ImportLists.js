@@ -1,13 +1,14 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import Card from 'Components/Card';
+import sortByName from 'Utilities/Array/sortByName';
+import { icons } from 'Helpers/Props';
 import FieldSet from 'Components/FieldSet';
+import Card from 'Components/Card';
 import Icon from 'Components/Icon';
 import PageSectionContent from 'Components/Page/PageSectionContent';
-import { icons } from 'Helpers/Props';
+import ImportList from './ImportList';
 import AddImportListModal from './AddImportListModal';
 import EditImportListModalConnector from './EditImportListModalConnector';
-import ImportList from './ImportList';
 import styles from './ImportLists.css';
 
 class ImportLists extends Component {
@@ -67,7 +68,7 @@ class ImportLists extends Component {
         >
           <div className={styles.lists}>
             {
-              items.map((item) => {
+              items.sort(sortByName).map((item) => {
                 return (
                   <ImportList
                     key={item.id}

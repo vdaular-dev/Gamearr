@@ -36,7 +36,7 @@ namespace NzbDrone.Core.Test.IndexerTests.GazelleTests
 
             Mocker.GetMock<IHttpClient>()
                 .Setup(o => o.Execute(It.Is<HttpRequest>(v => v.Method == HttpMethod.GET && v.Url.FullUri.Contains("ajax.php?action=browse"))))
-                .Returns<HttpRequest>(r => new HttpResponse(r, new HttpHeader { ContentType = "application/json" }, recentFeed));
+                .Returns<HttpRequest>(r => new HttpResponse(r, new HttpHeader{ContentType = "application/json" }, recentFeed));
 
             Mocker.GetMock<IHttpClient>()
                 .Setup(o => o.Execute(It.Is<HttpRequest>(v => v.Method == HttpMethod.POST && v.Url.FullUri.Contains("ajax.php?action=index"))))
@@ -52,7 +52,7 @@ namespace NzbDrone.Core.Test.IndexerTests.GazelleTests
 
             var releaseInfo = releases.First();
 
-            releaseInfo.Title.Should().Be("Shania Twain - Shania Twain (1993) [FLAC 24bit Lossless] [WEB]");
+            releaseInfo.Title.Should().Be("Shania Twain - Shania Twain (1993) [FLAC 24bit Lossless]");
             releaseInfo.DownloadProtocol.Should().Be(DownloadProtocol.Torrent);
             releaseInfo.DownloadUrl.Should()
                 .Be("http://someurl.ch/torrents.php?action=download&id=1541452&authkey=redacted&torrent_pass=redacted");

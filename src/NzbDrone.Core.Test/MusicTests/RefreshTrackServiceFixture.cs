@@ -5,9 +5,9 @@ using FizzWare.NBuilder;
 using Moq;
 using NUnit.Framework;
 using NzbDrone.Common.Extensions;
-using NzbDrone.Core.MediaFiles;
-using NzbDrone.Core.Music;
 using NzbDrone.Core.Test.Framework;
+using NzbDrone.Core.Music;
+using NzbDrone.Core.MediaFiles;
 
 namespace NzbDrone.Core.Test.MusicTests
 {
@@ -49,6 +49,7 @@ namespace NzbDrone.Core.Test.MusicTests
                 .Verify(v => v.SyncTags(It.Is<List<Track>>(x => x.Count == 1 &&
                                                            x[0].AlbumRelease != null &&
                                                            x[0].AlbumRelease.IsLoaded == true)));
+
         }
     }
 }

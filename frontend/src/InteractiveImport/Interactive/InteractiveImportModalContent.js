@@ -1,37 +1,37 @@
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import SelectInput from 'Components/Form/SelectInput';
-import Icon from 'Components/Icon';
-import Button from 'Components/Link/Button';
-import LoadingIndicator from 'Components/Loading/LoadingIndicator';
-import Menu from 'Components/Menu/Menu';
-import MenuButton from 'Components/Menu/MenuButton';
-import MenuContent from 'Components/Menu/MenuContent';
-import SelectedMenuItem from 'Components/Menu/SelectedMenuItem';
-import ModalBody from 'Components/Modal/ModalBody';
-import ModalContent from 'Components/Modal/ModalContent';
-import ModalFooter from 'Components/Modal/ModalFooter';
-import ModalHeader from 'Components/Modal/ModalHeader';
-import Table from 'Components/Table/Table';
-import TableBody from 'Components/Table/TableBody';
-import { align, icons, kinds, scrollDirections } from 'Helpers/Props';
-import SelectAlbumModal from 'InteractiveImport/Album/SelectAlbumModal';
-import SelectAlbumReleaseModal from 'InteractiveImport/AlbumRelease/SelectAlbumReleaseModal';
-import SelectArtistModal from 'InteractiveImport/Artist/SelectArtistModal';
-import ConfirmImportModal from 'InteractiveImport/Confirmation/ConfirmImportModal';
-import SelectQualityModal from 'InteractiveImport/Quality/SelectQualityModal';
 import getErrorMessage from 'Utilities/Object/getErrorMessage';
 import getSelectedIds from 'Utilities/Table/getSelectedIds';
 import selectAll from 'Utilities/Table/selectAll';
 import toggleSelected from 'Utilities/Table/toggleSelected';
+import { align, icons, kinds, scrollDirections } from 'Helpers/Props';
+import Button from 'Components/Link/Button';
+import Icon from 'Components/Icon';
+import LoadingIndicator from 'Components/Loading/LoadingIndicator';
+import SelectInput from 'Components/Form/SelectInput';
+import Menu from 'Components/Menu/Menu';
+import MenuButton from 'Components/Menu/MenuButton';
+import MenuContent from 'Components/Menu/MenuContent';
+import SelectedMenuItem from 'Components/Menu/SelectedMenuItem';
+import ModalContent from 'Components/Modal/ModalContent';
+import ModalHeader from 'Components/Modal/ModalHeader';
+import ModalBody from 'Components/Modal/ModalBody';
+import ModalFooter from 'Components/Modal/ModalFooter';
+import Table from 'Components/Table/Table';
+import TableBody from 'Components/Table/TableBody';
+import SelectQualityModal from 'InteractiveImport/Quality/SelectQualityModal';
+import SelectGameModal from 'InteractiveImport/Game/SelectGameModal';
+import SelectAlbumModal from 'InteractiveImport/Album/SelectAlbumModal';
+import SelectAlbumReleaseModal from 'InteractiveImport/AlbumRelease/SelectAlbumReleaseModal';
+import ConfirmImportModal from 'InteractiveImport/Confirmation/ConfirmImportModal';
 import InteractiveImportRow from './InteractiveImportRow';
 import styles from './InteractiveImportModalContent.css';
 
 const columns = [
   {
-    name: 'path',
-    label: 'Path',
+    name: 'relativePath',
+    label: 'Relative Path',
     isSortable: true,
     isVisible: true
   },
@@ -60,7 +60,6 @@ const columns = [
   {
     name: 'size',
     label: 'Size',
-    isSortable: true,
     isVisible: true
   },
   {
@@ -491,7 +490,7 @@ class InteractiveImportModalContent extends Component {
           </div>
         </ModalFooter>
 
-        <SelectArtistModal
+        <SelectGameModal
           isOpen={selectModalOpen === ARTIST}
           ids={selectedIds}
           onModalClose={this.onSelectModalClose}

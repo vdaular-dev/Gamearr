@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using NLog;
-using NzbDrone.Core.Download.TrackedDownloads;
 using NzbDrone.Core.IndexerSearch.Definitions;
 using NzbDrone.Core.Parser.Model;
 using NzbDrone.Core.Profiles.Releases;
@@ -34,33 +33,27 @@ namespace NzbDrone.Core.DecisionEngine.Specifications
         public Decision IsSatisfiedBy(RemoteAlbum subject, SearchCriteriaBase searchCriteria)
         {
             var queue = _queueService.GetQueue();
-            var matchingAlbum = queue.Where(q => q.RemoteAlbum?.Artist != null &&
-                                                 q.RemoteAlbum.Artist.Id == subject.Artist.Id &&
-                                                 q.RemoteAlbum.Albums.Select(e => e.Id).Intersect(subject.Albums.Select(e => e.Id)).Any())
+            var matchingAlbum = queue.Where(q => q.RemoteAlbum != null &&
+                                       q.RemoteAlbum.Artist != null &&
+                                       q.RemoteAlbum.Artist.Id == subject.Artist.Id &&
+                                       q.RemoteAlbum.Albums.Select(e => e.Id).Intersect(subject.Albums.Select(e => e.Id)).Any())
                            .ToList();
+
 
             foreach (var queueItem in matchingAlbum)
             {
                 var remoteAlbum = queueItem.RemoteAlbum;
                 var qualityProfile = subject.Artist.QualityProfile.Value;
 
-                // To avoid a race make sure it's not FailedPending (failed awaiting removal/search).
-                // Failed items (already searching for a replacement) won't be part of the queue since
-                // it's a copy, of the tracked download, not a reference.
-                if (queueItem.TrackedDownloadState == TrackedDownloadState.DownloadFailedPending)
-                {
-                    continue;
-                }
-
                 _logger.Debug("Checking if existing release in queue meets cutoff. Queued quality is: {0}", remoteAlbum.ParsedAlbumInfo.Quality);
-
-                var queuedItemPreferredWordScore = _preferredWordServiceCalculator.Calculate(subject.Artist, queueItem.Title, subject.Release?.IndexerId ?? 0);
+                var queuedItemPreferredWordScore = _preferredWordServiceCalculator.Calculate(subject.Artist, queueItem.Title);
 
                 if (!_upgradableSpecification.CutoffNotMet(qualityProfile,
                                                            new List<QualityModel> { remoteAlbum.ParsedAlbumInfo.Quality },
                                                            queuedItemPreferredWordScore,
                                                            subject.ParsedAlbumInfo.Quality,
                                                            subject.PreferredWordScore))
+
                 {
                     return Decision.Reject("Release in queue already meets cutoff: {0}", remoteAlbum.ParsedAlbumInfo.Quality);
                 }
@@ -87,6 +80,7 @@ namespace NzbDrone.Core.DecisionEngine.Specifications
             }
 
             return Decision.Accept();
+
         }
     }
 }

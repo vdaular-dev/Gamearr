@@ -4,5 +4,6 @@ namespace NzbDrone.Core.Lifecycle
 {
     public class ApplicationStartedEvent : IEvent
     {
+
     }
 }

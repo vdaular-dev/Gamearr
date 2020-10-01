@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Net;
 using NzbDrone.Common.Http;
 using NzbDrone.Common.Http.Proxy;
@@ -15,15 +15,22 @@ namespace NzbDrone.Core.Http
             _configService = configService;
         }
 
-        public HttpProxySettings GetProxySettings(HttpUri uri)
+        public HttpProxySettings GetProxySettings(HttpRequest request)
         {
-            var proxySettings = GetProxySettings();
-            if (proxySettings == null)
+            if (!_configService.ProxyEnabled)
             {
                 return null;
             }
+            
+            var proxySettings = new HttpProxySettings(_configService.ProxyType,
+                                _configService.ProxyHostname,
+                                _configService.ProxyPort,
+                                _configService.ProxyBypassFilter,
+                                _configService.ProxyBypassLocalAddresses,
+                                _configService.ProxyUsername,
+                                _configService.ProxyPassword);
 
-            if (ShouldProxyBeBypassed(proxySettings, uri))
+            if (ShouldProxyBeBypassed(proxySettings, request.Url))
             {
                 return null;
             }
@@ -31,25 +38,9 @@ namespace NzbDrone.Core.Http
             return proxySettings;
         }
 
-        public HttpProxySettings GetProxySettings()
-        {
-            if (!_configService.ProxyEnabled)
-            {
-                return null;
-            }
-
-            return new HttpProxySettings(_configService.ProxyType,
-                                _configService.ProxyHostname,
-                                _configService.ProxyPort,
-                                _configService.ProxyBypassFilter,
-                                _configService.ProxyBypassLocalAddresses,
-                                _configService.ProxyUsername,
-                                _configService.ProxyPassword);
-        }
-
         public bool ShouldProxyBeBypassed(HttpProxySettings proxySettings, HttpUri url)
         {
-            //We are utilizing the WebProxy implementation here to save us having to re-implement it. This way we use Microsofts implementation
+            //We are utilising the WebProxy implementation here to save us having to reimplement it. This way we use Microsofts implementation
             var proxy = new WebProxy(proxySettings.Host + ":" + proxySettings.Port, proxySettings.BypassLocalAddress, proxySettings.BypassListAsArray);
 
             return proxy.IsBypassed((Uri)url);

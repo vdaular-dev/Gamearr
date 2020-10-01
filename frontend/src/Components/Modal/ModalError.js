@@ -2,10 +2,10 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import ErrorBoundaryError from 'Components/Error/ErrorBoundaryError';
 import Button from 'Components/Link/Button';
-import ModalBody from 'Components/Modal/ModalBody';
 import ModalContent from 'Components/Modal/ModalContent';
-import ModalFooter from 'Components/Modal/ModalFooter';
 import ModalHeader from 'Components/Modal/ModalHeader';
+import ModalBody from 'Components/Modal/ModalBody';
+import ModalFooter from 'Components/Modal/ModalFooter';
 import styles from './ModalError.css';
 
 function ModalError(props) {

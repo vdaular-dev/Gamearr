@@ -3,7 +3,7 @@ using NzbDrone.Core.Datastore.Migration.Framework;
 
 namespace NzbDrone.Core.Datastore.Migration
 {
-    [Migration(24)]
+    [Migration(024)]
     public class NewMediaInfoFormat : NzbDroneMigrationBase
     {
         protected override void MainDbUpgrade()

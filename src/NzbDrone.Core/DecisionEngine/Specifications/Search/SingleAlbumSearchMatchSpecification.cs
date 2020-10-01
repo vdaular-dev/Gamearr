@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using NLog;
 using NzbDrone.Core.IndexerSearch.Definitions;
@@ -29,7 +30,7 @@ namespace NzbDrone.Core.DecisionEngine.Specifications.Search
             {
                 return Decision.Accept();
             }
-
+                
             if (Parser.Parser.CleanArtistName(singleAlbumSpec.AlbumTitle) != Parser.Parser.CleanArtistName(remoteAlbum.ParsedAlbumInfo.AlbumTitle))
             {
                 _logger.Debug("Album does not match searched album title, skipping.");

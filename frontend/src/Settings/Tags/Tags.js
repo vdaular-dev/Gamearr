@@ -1,9 +1,9 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import FieldSet from 'Components/FieldSet';
-import Link from 'Components/Link/Link';
 import PageSectionContent from 'Components/Page/PageSectionContent';
 import TagConnector from './TagConnector';
+import Link from 'Components/Link/Link';
 import styles from './Tags.css';
 
 function Tags(props) {
@@ -14,7 +14,7 @@ function Tags(props) {
 
   if (!items.length) {
     return (
-      <div>No tags have been added yet. Add tags to link artists with delay profiles, restrictions, or notifications. Click <Link to='https://github.com/lidarr/Lidarr/wiki/Tags'>here</Link> to find out more about tags in Lidarr.</div>
+      <div>No tags have been added yet. Add tags to link artists with delay profiles, restrictions, or notifications. Click <Link to='https://github.com/gamearr/Gamearr/wiki/Tags'>here</Link> to find out more about tags in Gamearr.</div>
     );
   }
 

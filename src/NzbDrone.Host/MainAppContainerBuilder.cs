@@ -1,8 +1,9 @@
 using System.Collections.Generic;
-using Lidarr.Http;
 using Nancy.Bootstrapper;
+using Gamearr.Http;
 using NzbDrone.Common.Composition;
 using NzbDrone.Common.EnvironmentInfo;
+using NzbDrone.Common.Http.Dispatchers;
 using NzbDrone.SignalR;
 
 namespace NzbDrone.Host
@@ -13,11 +14,11 @@ namespace NzbDrone.Host
         {
             var assemblies = new List<string>
                              {
-                                 "Lidarr.Host",
-                                 "Lidarr.Core",
-                                 "Lidarr.SignalR",
-                                 "Lidarr.Api.V1",
-                                 "Lidarr.Http"
+                                 "Gamearr.Host",
+                                 "Gamearr.Core",
+                                 "Gamearr.SignalR",
+                                 "Gamearr.Api.V1",
+                                 "Gamearr.Http"
                              };
 
             return new MainAppContainerBuilder(args, assemblies).Container;
@@ -26,18 +27,9 @@ namespace NzbDrone.Host
         private MainAppContainerBuilder(StartupContext args, List<string> assemblies)
             : base(args, assemblies)
         {
-            AutoRegisterImplementations<MessageHub>();
+            AutoRegisterImplementations<NzbDronePersistentConnection>();
 
-            Container.Register<INancyBootstrapper, LidarrBootstrapper>();
-
-            if (OsInfo.IsWindows)
-            {
-                Container.Register<INzbDroneServiceFactory, NzbDroneServiceFactory>();
-            }
-            else
-            {
-                Container.Register<INzbDroneServiceFactory, DummyNzbDroneServiceFactory>();
-            }
+            Container.Register<INancyBootstrapper, GamearrBootstrapper>();
         }
     }
 }

@@ -1,7 +1,5 @@
 using System.Collections.Generic;
-using System.IO;
 using System.IO.Abstractions;
-using System.IO.Abstractions.TestingHelpers;
 using System.Linq;
 using FizzWare.NBuilder;
 using FluentAssertions;
@@ -12,11 +10,13 @@ using NzbDrone.Core.Download;
 using NzbDrone.Core.Download.TrackedDownloads;
 using NzbDrone.Core.MediaFiles;
 using NzbDrone.Core.MediaFiles.TrackImport;
-using NzbDrone.Core.Music;
 using NzbDrone.Core.Parser;
 using NzbDrone.Core.Parser.Model;
 using NzbDrone.Core.Test.Framework;
+using NzbDrone.Core.Music;
 using NzbDrone.Test.Common;
+using System.IO.Abstractions.TestingHelpers;
+using System.IO;
 
 namespace NzbDrone.Core.Test.MediaFiles
 {
@@ -33,7 +33,7 @@ namespace NzbDrone.Core.Test.MediaFiles
         public void Setup()
         {
             GivenAudioFiles(_audioFiles, 10);
-
+            
             Mocker.GetMock<IDiskScanService>().Setup(c => c.GetAudioFiles(It.IsAny<string>(), It.IsAny<bool>()))
                 .Returns(_audioFiles.Select(x => DiskProvider.GetFileInfo(x)).ToArray());
 
@@ -54,11 +54,12 @@ namespace NzbDrone.Core.Test.MediaFiles
                 .Build();
 
             _trackedDownload = new TrackedDownload
+           
             {
                 DownloadItem = downloadItem,
                 RemoteAlbum = remoteAlbum,
-                State = TrackedDownloadState.Downloading
-            };
+                State = TrackedDownloadStage.Downloading
+             };
         }
 
         private void GivenAudioFiles(string[] files, long filesize)
@@ -84,7 +85,7 @@ namespace NzbDrone.Core.Test.MediaFiles
             imported.Add(new ImportDecision<LocalTrack>(localTrack));
 
             Mocker.GetMock<IMakeImportDecision>()
-                  .Setup(v => v.GetImportDecisions(It.IsAny<List<IFileInfo>>(), It.IsAny<IdentificationOverrides>(), It.IsAny<ImportDecisionMakerInfo>(), It.IsAny<ImportDecisionMakerConfig>()))
+                  .Setup(s => s.GetImportDecisions(It.IsAny<List<IFileInfo>>(), It.IsAny<Artist>(), null))
                   .Returns(imported);
 
             Mocker.GetMock<IImportApprovedTracks>()
@@ -130,8 +131,8 @@ namespace NzbDrone.Core.Test.MediaFiles
             Subject.ProcessRootFolder(DiskProvider.GetDirectoryInfo(_droneFactory));
 
             Mocker.GetMock<IMakeImportDecision>()
-                  .Verify(c => c.GetImportDecisions(It.IsAny<List<IFileInfo>>(), It.IsAny<IdentificationOverrides>(), It.IsAny<ImportDecisionMakerInfo>(), It.IsAny<ImportDecisionMakerConfig>()),
-                          Times.Never());
+                .Verify(c => c.GetImportDecisions(It.IsAny<List<IFileInfo>>(), It.IsAny<Artist>(), It.IsAny<ParsedTrackInfo>()),
+                    Times.Never());
 
             VerifyNoImport();
         }
@@ -181,7 +182,7 @@ namespace NzbDrone.Core.Test.MediaFiles
             imported.Add(new ImportDecision<LocalTrack>(localTrack));
 
             Mocker.GetMock<IMakeImportDecision>()
-                  .Setup(v => v.GetImportDecisions(It.IsAny<List<IFileInfo>>(), It.IsAny<IdentificationOverrides>(), It.IsAny<ImportDecisionMakerInfo>(), It.IsAny<ImportDecisionMakerConfig>()))
+                  .Setup(s => s.GetImportDecisions(It.IsAny<List<IFileInfo>>(), It.IsAny<Artist>(), null))
                   .Returns(imported);
 
             Mocker.GetMock<IImportApprovedTracks>()
@@ -238,14 +239,14 @@ namespace NzbDrone.Core.Test.MediaFiles
             imported.Add(new ImportDecision<LocalTrack>(localTrack));
 
             Mocker.GetMock<IMakeImportDecision>()
-                  .Setup(v => v.GetImportDecisions(It.IsAny<List<IFileInfo>>(), It.IsAny<IdentificationOverrides>(), It.IsAny<ImportDecisionMakerInfo>(), It.IsAny<ImportDecisionMakerConfig>()))
+                  .Setup(s => s.GetImportDecisions(It.IsAny<List<IFileInfo>>(), It.IsAny<Artist>(), null))
                   .Returns(imported);
 
             Mocker.GetMock<IImportApprovedTracks>()
                   .Setup(s => s.Import(It.IsAny<List<ImportDecision<LocalTrack>>>(), true, null, ImportMode.Auto))
                   .Returns(imported.Select(i => new ImportResult(i)).ToList());
 
-            GivenAudioFiles(new[] { _audioFiles.First().Replace(".ext", ".rar") }, 15.Megabytes());
+            GivenAudioFiles(new []{ _audioFiles.First().Replace(".ext", ".rar") }, 15.Megabytes());
 
             Subject.ProcessRootFolder(DiskProvider.GetDirectoryInfo(_droneFactory));
 
@@ -278,7 +279,7 @@ namespace NzbDrone.Core.Test.MediaFiles
             imported.Add(new ImportDecision<LocalTrack>(localTrack));
 
             Mocker.GetMock<IMakeImportDecision>()
-                  .Setup(v => v.GetImportDecisions(It.IsAny<List<IFileInfo>>(), It.IsAny<IdentificationOverrides>(), It.IsAny<ImportDecisionMakerInfo>(), It.IsAny<ImportDecisionMakerConfig>()))
+                  .Setup(s => s.GetImportDecisions(It.IsAny<List<IFileInfo>>(), It.IsAny<Artist>(), null))
                   .Returns(imported);
 
             Mocker.GetMock<IImportApprovedTracks>()
@@ -287,7 +288,7 @@ namespace NzbDrone.Core.Test.MediaFiles
 
             Subject.ProcessRootFolder(DiskProvider.GetDirectoryInfo(_droneFactory));
 
-            DiskProvider.FolderExists(_subFolders[0]).Should().BeTrue();
+            DiskProvider.FolderExists(_subFolders[0]).Should().BeTrue();            
 
             Mocker.GetMock<IDiskProvider>()
                   .Verify(v => v.DeleteFolder(It.IsAny<string>(), true), Times.Never());

@@ -1,18 +1,17 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import ProtocolLabel from 'Activity/Queue/ProtocolLabel';
-import TrackQuality from 'Album/TrackQuality';
-import Icon from 'Components/Icon';
-import Link from 'Components/Link/Link';
-import SpinnerIconButton from 'Components/Link/SpinnerIconButton';
-import ConfirmModal from 'Components/Modal/ConfirmModal';
-import TableRowCell from 'Components/Table/Cells/TableRowCell';
-import TableRow from 'Components/Table/TableRow';
-import Popover from 'Components/Tooltip/Popover';
-import { icons, kinds, tooltipPositions } from 'Helpers/Props';
 import formatDateTime from 'Utilities/Date/formatDateTime';
 import formatAge from 'Utilities/Number/formatAge';
 import formatBytes from 'Utilities/Number/formatBytes';
+import { icons, kinds, tooltipPositions } from 'Helpers/Props';
+import Icon from 'Components/Icon';
+import SpinnerIconButton from 'Components/Link/SpinnerIconButton';
+import Link from 'Components/Link/Link';
+import ConfirmModal from 'Components/Modal/ConfirmModal';
+import TableRow from 'Components/Table/TableRow';
+import TableRowCell from 'Components/Table/Cells/TableRowCell';
+import Popover from 'Components/Tooltip/Popover';
+import ProtocolLabel from 'Activity/Queue/ProtocolLabel';
 import Peers from './Peers';
 import styles from './InteractiveSearchRow.css';
 
@@ -214,7 +213,7 @@ class InteractiveSearchRow extends Component {
           isOpen={this.state.isConfirmGrabModalOpen}
           kind={kinds.WARNING}
           title="Grab Release"
-          message={`Lidarr was unable to determine which artist and album this release was for. Lidarr may be unable to automatically import this release. Do you want to grab '${title}'?`}
+          message={`Gamearr was unable to determine which artist and album this release was for. Gamearr may be unable to automatically import this release. Do you want to grab '${title}'?`}
           confirmLabel="Grab"
           onConfirm={this.onGrabConfirm}
           onCancel={this.onGrabCancel}

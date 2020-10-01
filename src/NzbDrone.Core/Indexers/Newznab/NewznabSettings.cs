@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using FluentValidation;
+using FluentValidation.Results;
 using NzbDrone.Common.Extensions;
 using NzbDrone.Core.Annotations;
 using NzbDrone.Core.Validation;
@@ -35,12 +36,14 @@ namespace NzbDrone.Core.Indexers.Newznab
 
         public NewznabSettingsValidator()
         {
-            RuleFor(c => c).Custom((c, context) =>
+            Custom(newznab =>
             {
-                if (c.Categories.Empty())
+                if (newznab.Categories.Empty())
                 {
-                    context.AddFailure("'Categories' must be provided");
+                    return new ValidationFailure("", "'Categories' must be provided");
                 }
+
+                return null;
             });
 
             RuleFor(c => c.BaseUrl).ValidRootUrl();
@@ -73,7 +76,7 @@ namespace NzbDrone.Core.Indexers.Newznab
         [FieldDefinition(3, Label = "Categories", HelpText = "Comma Separated list, leave blank to disable standard/daily shows", Advanced = true)]
         public IEnumerable<int> Categories { get; set; }
 
-        [FieldDefinition(4, Type = FieldType.Number, Label = "Early Download Limit", HelpText = "Time before release date Lidarr will download from this indexer, empty is no limit", Unit = "days", Advanced = true)]
+        [FieldDefinition(4, Type = FieldType.Number, Label = "Early Download Limit", HelpText = "Time before release date Gamearr will download from this indexer, empty is no limit", Unit = "days", Advanced = true)]
         public int? EarlyReleaseLimit { get; set; }
 
         [FieldDefinition(5, Label = "Additional Parameters", HelpText = "Additional Newznab parameters", Advanced = true)]
@@ -81,6 +84,7 @@ namespace NzbDrone.Core.Indexers.Newznab
 
         // Field 6 is used by TorznabSettings MinimumSeeders
         // If you need to add another field here, update TorznabSettings as well and this comment
+
         public virtual NzbDroneValidationResult Validate()
         {
             return new NzbDroneValidationResult(Validator.Validate(this));

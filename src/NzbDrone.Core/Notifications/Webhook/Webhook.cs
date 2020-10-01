@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using FluentValidation.Results;
-using NzbDrone.Common.Extensions;
 using NzbDrone.Core.Music;
+using NzbDrone.Common.Extensions;
 using NzbDrone.Core.Validation;
 
 namespace NzbDrone.Core.Notifications.Webhook
@@ -16,7 +16,7 @@ namespace NzbDrone.Core.Notifications.Webhook
             _proxy = proxy;
         }
 
-        public override string Link => "https://github.com/Lidarr/Lidarr/wiki/Webhook";
+        public override string Link => "https://github.com/Gamearr/Gamearr/wiki/Webhook";
 
         public override void OnGrab(GrabMessage message)
         {
@@ -24,6 +24,7 @@ namespace NzbDrone.Core.Notifications.Webhook
             var quality = message.Quality;
 
             var payload = new WebhookGrabPayload
+
             {
                 EventType = "Grab",
                 Artist = new WebhookArtist(message.Artist),
@@ -45,6 +46,7 @@ namespace NzbDrone.Core.Notifications.Webhook
             var trackFiles = message.TrackFiles;
 
             var payload = new WebhookImportPayload
+
             {
                 EventType = "Download",
                 Artist = new WebhookArtist(message.Artist),
@@ -100,24 +102,23 @@ namespace NzbDrone.Core.Notifications.Webhook
             try
             {
                 var payload = new WebhookGrabPayload
-                {
-                    EventType = "Test",
-                    Artist = new WebhookArtist()
                     {
-                        Id = 1,
-                        Name = "Test Name",
-                        Path = "C:\\testpath",
-                        MBId = "aaaaa-aaa-aaaa-aaaaaa"
-                    },
-                    Albums = new List<WebhookAlbum>()
-                    {
+                        EventType = "Test",
+                        Artist = new WebhookArtist()
+                        {
+                            Id = 1,
+                            Name = "Test Name",
+                            Path = "C:\\testpath",
+                            MBId = "aaaaa-aaa-aaaa-aaaaaa"
+                        },
+                        Albums = new List<WebhookAlbum>() {
                             new WebhookAlbum()
                             {
                                 Id = 123,
                                 Title = "Test title"
                             }
-                    }
-                };
+                        }
+                    };
 
                 _proxy.SendWebhook(payload, Settings);
             }

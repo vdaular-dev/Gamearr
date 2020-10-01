@@ -2,6 +2,7 @@
 using NzbDrone.Core.Datastore;
 using NzbDrone.Core.Messaging.Events;
 
+
 namespace NzbDrone.Core.Instrumentation
 {
     public interface ILogRepository : IBasicRepository<Log>

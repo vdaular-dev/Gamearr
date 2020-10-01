@@ -14,12 +14,9 @@ namespace NzbDrone.Core.ImportLists.Exclusions
 
         protected override bool IsValid(PropertyValidatorContext context)
         {
-            if (context.PropertyValue == null)
-            {
-                return true;
-            }
+            if (context.PropertyValue == null) return true;
 
-            return !_importListExclusionService.All().Exists(s => s.ForeignId == context.PropertyValue.ToString());
+            return (!_importListExclusionService.All().Exists(s => s.ForeignId == context.PropertyValue.ToString()));
         }
     }
 }

@@ -1,13 +1,14 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import Card from 'Components/Card';
+import sortByName from 'Utilities/Array/sortByName';
+import { icons } from 'Helpers/Props';
 import FieldSet from 'Components/FieldSet';
+import Card from 'Components/Card';
 import Icon from 'Components/Icon';
 import PageSectionContent from 'Components/Page/PageSectionContent';
-import { icons } from 'Helpers/Props';
+import Notification from './Notification';
 import AddNotificationModal from './AddNotificationModal';
 import EditNotificationModalConnector from './EditNotificationModalConnector';
-import Notification from './Notification';
 import styles from './Notifications.css';
 
 class Notifications extends Component {
@@ -65,7 +66,7 @@ class Notifications extends Component {
         >
           <div className={styles.notifications}>
             {
-              items.map((item) => {
+              items.sort(sortByName).map((item) => {
                 return (
                   <Notification
                     key={item.id}

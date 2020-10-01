@@ -2,14 +2,14 @@ using System.Collections.Generic;
 using System.Linq;
 using FizzWare.NBuilder;
 using FluentAssertions;
-using Moq;
 using NUnit.Framework;
+using NzbDrone.Core.Qualities;
 using NzbDrone.Core.DecisionEngine.Specifications;
 using NzbDrone.Core.MediaFiles;
-using NzbDrone.Core.Music;
-using NzbDrone.Core.Parser.Model;
-using NzbDrone.Core.Qualities;
 using NzbDrone.Core.Test.Framework;
+using NzbDrone.Core.Parser.Model;
+using NzbDrone.Core.Music;
+using Moq;
 
 namespace NzbDrone.Core.Test.DecisionEngineTests
 {
@@ -28,7 +28,7 @@ namespace NzbDrone.Core.Test.DecisionEngineTests
             _parsedAlbumInfo = Builder<ParsedAlbumInfo>.CreateNew()
                                                            .With(p => p.Quality = new QualityModel(Quality.FLAC,
                                                                new Revision(2, 0, false)))
-                                                           .With(p => p.ReleaseGroup = "Lidarr")
+                                                           .With(p => p.ReleaseGroup = "Gamearr")
                                                            .Build();
 
             _albums = Builder<Album>.CreateListOfSize(1)
@@ -84,16 +84,8 @@ namespace NzbDrone.Core.Test.DecisionEngineTests
         {
             _parsedAlbumInfo.Quality.Revision.IsRepack = true;
 
-            _trackFiles.Select(c =>
-            {
-                c.ReleaseGroup = "Lidarr";
-                return c;
-            }).ToList();
-            _trackFiles.Select(c =>
-            {
-                c.Quality = new QualityModel(Quality.MP3_256);
-                return c;
-            }).ToList();
+            _trackFiles.Select(c => { c.ReleaseGroup = "Gamearr"; return c; }).ToList();
+            _trackFiles.Select(c => { c.Quality = new QualityModel(Quality.MP3_256); return c; }).ToList();
 
             var remoteAlbum = Builder<RemoteAlbum>.CreateNew()
                                                       .With(e => e.ParsedAlbumInfo = _parsedAlbumInfo)
@@ -111,16 +103,8 @@ namespace NzbDrone.Core.Test.DecisionEngineTests
         {
             _parsedAlbumInfo.Quality.Revision.IsRepack = true;
 
-            _trackFiles.Select(c =>
-            {
-                c.ReleaseGroup = "Lidarr";
-                return c;
-            }).ToList();
-            _trackFiles.Select(c =>
-            {
-                c.Quality = new QualityModel(Quality.FLAC);
-                return c;
-            }).ToList();
+            _trackFiles.Select(c => { c.ReleaseGroup = "Gamearr"; return c; }).ToList();
+            _trackFiles.Select(c => { c.Quality = new QualityModel(Quality.FLAC); return c; }).ToList();
 
             var remoteAlbum = Builder<RemoteAlbum>.CreateNew()
                                                       .With(e => e.ParsedAlbumInfo = _parsedAlbumInfo)
@@ -138,18 +122,10 @@ namespace NzbDrone.Core.Test.DecisionEngineTests
         {
             _parsedAlbumInfo.Quality.Revision.IsRepack = true;
 
-            _trackFiles.Select(c =>
-            {
-                c.ReleaseGroup = "Lidarr";
-                return c;
-            }).ToList();
-            _trackFiles.Select(c =>
-            {
-                c.Quality = new QualityModel(Quality.FLAC);
-                return c;
-            }).ToList();
+            _trackFiles.Select(c => { c.ReleaseGroup = "Gamearr"; return c; }).ToList();
+            _trackFiles.Select(c => { c.Quality = new QualityModel(Quality.FLAC); return c; }).ToList();
 
-            _trackFiles.First().ReleaseGroup = "NotLidarr";
+            _trackFiles.First().ReleaseGroup = "NotGamearr";
 
             var remoteAlbum = Builder<RemoteAlbum>.CreateNew()
                                                       .With(e => e.ParsedAlbumInfo = _parsedAlbumInfo)
@@ -161,22 +137,15 @@ namespace NzbDrone.Core.Test.DecisionEngineTests
                    .Should()
                    .BeFalse();
         }
+
 
         [Test]
         public void should_return_false_if_is_a_repack_for_different_group()
         {
             _parsedAlbumInfo.Quality.Revision.IsRepack = true;
 
-            _trackFiles.Select(c =>
-            {
-                c.ReleaseGroup = "NotLidarr";
-                return c;
-            }).ToList();
-            _trackFiles.Select(c =>
-            {
-                c.Quality = new QualityModel(Quality.FLAC);
-                return c;
-            }).ToList();
+            _trackFiles.Select(c => { c.ReleaseGroup = "NotGamearr"; return c; }).ToList();
+            _trackFiles.Select(c => { c.Quality = new QualityModel(Quality.FLAC); return c; }).ToList();
 
             var remoteAlbum = Builder<RemoteAlbum>.CreateNew()
                                                       .With(e => e.ParsedAlbumInfo = _parsedAlbumInfo)
@@ -189,21 +158,15 @@ namespace NzbDrone.Core.Test.DecisionEngineTests
                    .BeFalse();
         }
 
+
         [Test]
         public void should_return_false_if_release_group_for_existing_file_is_unknown()
         {
             _parsedAlbumInfo.Quality.Revision.IsRepack = true;
 
-            _trackFiles.Select(c =>
-            {
-                c.ReleaseGroup = "";
-                return c;
-            }).ToList();
-            _trackFiles.Select(c =>
-            {
-                c.Quality = new QualityModel(Quality.FLAC);
-                return c;
-            }).ToList();
+            _trackFiles.Select(c => { c.ReleaseGroup = ""; return c; }).ToList();
+            _trackFiles.Select(c => { c.Quality = new QualityModel(Quality.FLAC); return c; }).ToList();
+
 
             var remoteAlbum = Builder<RemoteAlbum>.CreateNew()
                                                       .With(e => e.ParsedAlbumInfo = _parsedAlbumInfo)
@@ -222,17 +185,9 @@ namespace NzbDrone.Core.Test.DecisionEngineTests
             _parsedAlbumInfo.Quality.Revision.IsRepack = true;
             _parsedAlbumInfo.ReleaseGroup = null;
 
-            _trackFiles.Select(c =>
-            {
-                c.ReleaseGroup = "Lidarr";
-                return c;
-            }).ToList();
+            _trackFiles.Select(c => { c.ReleaseGroup = "Gamearr"; return c; }).ToList();
+            _trackFiles.Select(c => { c.Quality = new QualityModel(Quality.FLAC); return c; }).ToList();
 
-            _trackFiles.Select(c =>
-            {
-                c.Quality = new QualityModel(Quality.FLAC);
-                return c;
-            }).ToList();
 
             var remoteAlbum = Builder<RemoteAlbum>.CreateNew()
                                                       .With(e => e.ParsedAlbumInfo = _parsedAlbumInfo)

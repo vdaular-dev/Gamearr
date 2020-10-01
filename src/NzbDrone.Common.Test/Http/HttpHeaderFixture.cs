@@ -1,11 +1,11 @@
-﻿using System;
+﻿using NUnit.Framework;
+using FluentAssertions;
+using NzbDrone.Test.Common;
+using System;
+using System.Text;
+using NzbDrone.Common.Http;
 using System.Collections.Specialized;
 using System.Linq;
-using System.Text;
-using FluentAssertions;
-using NUnit.Framework;
-using NzbDrone.Common.Http;
-using NzbDrone.Test.Common;
 
 namespace NzbDrone.Common.Test.Http
 {
@@ -35,7 +35,7 @@ namespace NzbDrone.Common.Test.Http
             var httpheader = new HttpHeader(headers);
 
             Action action = () => httpheader.GetEncodingFromContentType();
-            action.Should().Throw<ArgumentException>();
+            action.ShouldThrow<ArgumentException>();
         }
 
         [Test]

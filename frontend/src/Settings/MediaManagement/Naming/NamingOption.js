@@ -1,8 +1,8 @@
-import classNames from 'classnames';
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import Link from 'Components/Link/Link';
+import classNames from 'classnames';
 import { sizes } from 'Helpers/Props';
+import Link from 'Components/Link/Link';
 import styles from './NamingOption.css';
 
 class NamingOption extends Component {

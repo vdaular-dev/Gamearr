@@ -1,7 +1,6 @@
 ﻿namespace NzbDrone.Core.Download.Clients.DownloadStation.Responses
 {
-    public class DiskStationResponse<T>
-        where T : new()
+    public class DiskStationResponse<T> where T:new()
     {
         public bool Success { get; set; }
 

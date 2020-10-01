@@ -8,6 +8,7 @@ using NzbDrone.Common.Extensions;
 using NzbDrone.Core.Configuration;
 using NzbDrone.Core.Extras.Files;
 using NzbDrone.Core.MediaFiles;
+using NzbDrone.Core.Parser;
 using NzbDrone.Core.Music;
 
 namespace NzbDrone.Core.Extras.Lyrics
@@ -15,19 +16,16 @@ namespace NzbDrone.Core.Extras.Lyrics
     public class LyricService : ExtraFileManager<LyricFile>
     {
         private readonly ILyricFileService _lyricFileService;
-        private readonly IMediaFileAttributeService _mediaFileAttributeService;
         private readonly Logger _logger;
 
         public LyricService(IConfigService configService,
                                IDiskProvider diskProvider,
                                IDiskTransferService diskTransferService,
                                ILyricFileService lyricFileService,
-                               IMediaFileAttributeService mediaFileAttributeService,
                                Logger logger)
             : base(configService, diskProvider, diskTransferService, logger)
         {
             _lyricFileService = lyricFileService;
-            _mediaFileAttributeService = mediaFileAttributeService;
             _logger = logger;
         }
 
@@ -91,7 +89,6 @@ namespace NzbDrone.Core.Extras.Lyrics
                 var suffix = GetSuffix(1, false);
                 var subtitleFile = ImportFile(artist, trackFile, path, readOnly, extension, suffix);
 
-                _mediaFileAttributeService.SetFilePermissions(path);
                 _lyricFileService.Upsert(subtitleFile);
 
                 return subtitleFile;

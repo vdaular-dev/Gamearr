@@ -1,22 +1,12 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
+import { isLocked } from 'Utilities/scrollLock';
+import { scrollDirections } from 'Helpers/Props';
 import OverlayScroller from 'Components/Scroller/OverlayScroller';
 import Scroller from 'Components/Scroller/Scroller';
-import { scrollDirections } from 'Helpers/Props';
-import { isMobile as isMobileUtil } from 'Utilities/mobile';
-import { isLocked } from 'Utilities/scrollLock';
 import styles from './PageContentBody.css';
 
 class PageContentBody extends Component {
-
-  //
-  // Lifecycle
-
-  constructor(props, context) {
-    super(props, context);
-
-    this._isMobile = isMobileUtil();
-  }
 
   //
   // Listeners
@@ -36,12 +26,13 @@ class PageContentBody extends Component {
     const {
       className,
       innerClassName,
+      isSmallScreen,
       children,
       dispatch,
       ...otherProps
     } = this.props;
 
-    const ScrollerComponent = this._isMobile ? Scroller : OverlayScroller;
+    const ScrollerComponent = isSmallScreen ? Scroller : OverlayScroller;
 
     return (
       <ScrollerComponent
@@ -61,6 +52,7 @@ class PageContentBody extends Component {
 PageContentBody.propTypes = {
   className: PropTypes.string,
   innerClassName: PropTypes.string,
+  isSmallScreen: PropTypes.bool.isRequired,
   children: PropTypes.node.isRequired,
   onScroll: PropTypes.func,
   dispatch: PropTypes.func

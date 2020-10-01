@@ -23,14 +23,14 @@ namespace NzbDrone.Core.Notifications.Xbmc
 
         public override void OnGrab(GrabMessage grabMessage)
         {
-            const string header = "Lidarr - Grabbed";
+            const string header = "Gamearr - Grabbed";
 
             Notify(Settings, header, grabMessage.Message);
         }
 
         public override void OnReleaseImport(AlbumDownloadMessage message)
         {
-            const string header = "Lidarr - Downloaded";
+            const string header = "Gamearr - Downloaded";
 
             Notify(Settings, header, message.Message);
             UpdateAndClean(message.Artist, message.OldFiles.Any());
@@ -51,7 +51,7 @@ namespace NzbDrone.Core.Notifications.Xbmc
             UpdateAndClean(message.Artist);
         }
 
-        public override string Name => "Kodi";
+        public override string Name => "Kodi (XBMC)";
 
         public override ValidationResult Test()
         {

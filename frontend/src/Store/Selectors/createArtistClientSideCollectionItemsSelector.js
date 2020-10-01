@@ -1,5 +1,5 @@
-import { createSelector, createSelectorCreator, defaultMemoize } from 'reselect';
-import hasDifferentItemsOrOrder from 'Utilities/Object/hasDifferentItemsOrOrder';
+import { createSelector } from 'reselect';
+import createDeepEqualSelector from './createDeepEqualSelector';
 import createClientSideCollectionSelector from './createClientSideCollectionSelector';
 
 function createUnoptimizedSelector(uiSection) {
@@ -26,17 +26,8 @@ function createUnoptimizedSelector(uiSection) {
   );
 }
 
-function artistListEqual(a, b) {
-  return hasDifferentItemsOrOrder(a, b);
-}
-
-const createArtistEqualSelector = createSelectorCreator(
-  defaultMemoize,
-  artistListEqual
-);
-
 function createArtistClientSideCollectionItemsSelector(uiSection) {
-  return createArtistEqualSelector(
+  return createDeepEqualSelector(
     createUnoptimizedSelector(uiSection),
     (artist) => artist
   );

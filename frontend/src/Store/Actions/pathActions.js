@@ -1,8 +1,8 @@
 import { createAction } from 'redux-actions';
-import { createThunk, handleThunks } from 'Store/thunks';
 import createAjaxRequest from 'Utilities/createAjaxRequest';
-import { set } from './baseActions';
+import { createThunk, handleThunks } from 'Store/thunks';
 import createHandleActions from './Creators/createHandleActions';
+import { set } from './baseActions';
 
 //
 // Variables

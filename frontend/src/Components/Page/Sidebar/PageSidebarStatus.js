@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import Label from 'Components/Label';
 import { kinds, sizes } from 'Helpers/Props';
+import Label from 'Components/Label';
 
 function PageSidebarStatus({ count, errors, warnings }) {
   if (!count) {

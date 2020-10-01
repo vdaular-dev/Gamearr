@@ -1,5 +1,7 @@
 using System;
 using System.Data.SQLite;
+using Marr.Data;
+using Marr.Data.Reflection;
 using NLog;
 using NzbDrone.Common.Composition;
 using NzbDrone.Common.Disk;
@@ -7,6 +9,7 @@ using NzbDrone.Common.EnvironmentInfo;
 using NzbDrone.Common.Exceptions;
 using NzbDrone.Common.Instrumentation;
 using NzbDrone.Core.Datastore.Migration.Framework;
+
 
 namespace NzbDrone.Core.Datastore
 {
@@ -28,6 +31,7 @@ namespace NzbDrone.Core.Datastore
         {
             InitializeEnvironment();
 
+            MapRepository.Instance.ReflectionStrategy = new SimpleReflectionStrategy();
             TableMapping.Map();
         }
 
@@ -69,7 +73,7 @@ namespace NzbDrone.Core.Datastore
         public IDatabase Create(MigrationContext migrationContext)
         {
             string connectionString;
-
+            
             switch (migrationContext.MigrationType)
             {
                 case MigrationType.Main:
@@ -79,7 +83,6 @@ namespace NzbDrone.Core.Datastore
 
                         break;
                     }
-
                 case MigrationType.Log:
                     {
                         connectionString = _connectionStringFactory.LogDbConnectionString;
@@ -87,7 +90,6 @@ namespace NzbDrone.Core.Datastore
 
                         break;
                     }
-
                 default:
                     {
                         throw new ArgumentException("Invalid MigrationType");
@@ -96,11 +98,12 @@ namespace NzbDrone.Core.Datastore
 
             var db = new Database(migrationContext.MigrationType.ToString(), () =>
             {
-                var conn = SQLiteFactory.Instance.CreateConnection();
-                conn.ConnectionString = connectionString;
-                conn.Open();
+                var dataMapper = new DataMapper(SQLiteFactory.Instance, connectionString)
+                {
+                    SqlMode = SqlModes.Text,
+                };
 
-                return conn;
+                return dataMapper;
             });
 
             return db;
@@ -108,6 +111,7 @@ namespace NzbDrone.Core.Datastore
 
         private void CreateMain(string connectionString, MigrationContext migrationContext)
         {
+
             try
             {
                 _restoreDatabaseService.Restore();
@@ -119,14 +123,14 @@ namespace NzbDrone.Core.Datastore
 
                 if (OsInfo.IsOsx)
                 {
-                    throw new CorruptDatabaseException("Database file: {0} is corrupt, restore from backup if available. See: https://github.com/Sonarr/Sonarr/wiki/FAQ#i-use-sonarr-on-a-mac-and-it-suddenly-stopped-working-what-happened", e, fileName);
+                    throw new CorruptDatabaseException("Database file: {0} is corrupt, restore from backup if available. See: https://github.com/Gamearr/Gamearr/wiki/FAQ#i-use-gamearr-on-a-mac-and-it-suddenly-stopped-working-what-happened", e, fileName);
                 }
 
-                throw new CorruptDatabaseException("Database file: {0} is corrupt, restore from backup if available. See: https://github.com/Lidarr/Lidarr/wiki/FAQ#i-am-getting-an-error-database-disk-image-is-malformed", e, fileName);
+                throw new CorruptDatabaseException("Database file: {0} is corrupt, restore from backup if available. See: https://github.com/Gamearr/Gamearr/wiki/FAQ#i-am-getting-an-error-database-disk-image-is-malformed", e, fileName);
             }
             catch (Exception e)
             {
-                throw new LidarrStartupException(e, "Error creating main database");
+                throw new GamearrStartupException(e, "Error creating main database");
             }
         }
 
@@ -158,7 +162,7 @@ namespace NzbDrone.Core.Datastore
             }
             catch (Exception e)
             {
-                throw new LidarrStartupException(e, "Error creating log database");
+                throw new GamearrStartupException(e, "Error creating log database");
             }
         }
     }

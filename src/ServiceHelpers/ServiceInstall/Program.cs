@@ -2,7 +2,7 @@
 {
     public static class Program
     {
-        private static void Main()
+        static void Main()
         {
             ServiceHelper.Run(@"/i");
         }

@@ -1,11 +1,11 @@
 import { createAction } from 'redux-actions';
-import { filterBuilderTypes, filterBuilderValueTypes, filterTypePredicates, sortDirections } from 'Helpers/Props';
 import sortByName from 'Utilities/Array/sortByName';
-import { filterPredicates, filters, sortPredicates } from './artistActions';
-import createHandleActions from './Creators/createHandleActions';
-import createSetClientSideCollectionFilterReducer from './Creators/Reducers/createSetClientSideCollectionFilterReducer';
-import createSetClientSideCollectionSortReducer from './Creators/Reducers/createSetClientSideCollectionSortReducer';
+import { filterBuilderTypes, filterBuilderValueTypes, filterTypePredicates, sortDirections } from 'Helpers/Props';
 import createSetTableOptionReducer from './Creators/Reducers/createSetTableOptionReducer';
+import createSetClientSideCollectionSortReducer from './Creators/Reducers/createSetClientSideCollectionSortReducer';
+import createSetClientSideCollectionFilterReducer from './Creators/Reducers/createSetClientSideCollectionFilterReducer';
+import createHandleActions from './Creators/createHandleActions';
+import { filters, filterPredicates, sortPredicates } from './artistActions';
 
 //
 // Variables
@@ -204,7 +204,7 @@ export const defaultState = {
     trackCount: function(item) {
       const { statistics = {} } = item;
 
-      return statistics.totalTrackCount || 0;
+      return statistics.totalTrackCount;
     },
 
     sizeOnDisk: function(item) {

@@ -1,16 +1,16 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
+import { align, icons } from 'Helpers/Props';
 import LoadingIndicator from 'Components/Loading/LoadingIndicator';
-import PageContent from 'Components/Page/PageContent';
-import PageContentBody from 'Components/Page/PageContentBody';
-import PageToolbar from 'Components/Page/Toolbar/PageToolbar';
-import PageToolbarButton from 'Components/Page/Toolbar/PageToolbarButton';
-import PageToolbarSection from 'Components/Page/Toolbar/PageToolbarSection';
 import Table from 'Components/Table/Table';
 import TableBody from 'Components/Table/TableBody';
 import TableOptionsModalWrapper from 'Components/Table/TableOptions/TableOptionsModalWrapper';
 import TablePager from 'Components/Table/TablePager';
-import { align, icons } from 'Helpers/Props';
+import PageContent from 'Components/Page/PageContent';
+import PageContentBodyConnector from 'Components/Page/PageContentBodyConnector';
+import PageToolbar from 'Components/Page/Toolbar/PageToolbar';
+import PageToolbarSection from 'Components/Page/Toolbar/PageToolbarSection';
+import PageToolbarButton from 'Components/Page/Toolbar/PageToolbarButton';
 import BlacklistRowConnector from './BlacklistRowConnector';
 
 class Blacklist extends Component {
@@ -22,8 +22,6 @@ class Blacklist extends Component {
     const {
       isFetching,
       isPopulated,
-      isArtistFetching,
-      isArtistPopulated,
       error,
       items,
       columns,
@@ -32,9 +30,6 @@ class Blacklist extends Component {
       onClearBlacklistPress,
       ...otherProps
     } = this.props;
-
-    const isAllPopulated = isPopulated && isArtistPopulated;
-    const isAnyFetching = isFetching || isArtistFetching;
 
     return (
       <PageContent title="Blacklist">
@@ -61,26 +56,26 @@ class Blacklist extends Component {
           </PageToolbarSection>
         </PageToolbar>
 
-        <PageContentBody>
+        <PageContentBodyConnector>
           {
-            isAnyFetching && !isAllPopulated &&
+            isFetching && !isPopulated &&
               <LoadingIndicator />
           }
 
           {
-            !isAnyFetching && !!error &&
+            !isFetching && !!error &&
               <div>Unable to load blacklist</div>
           }
 
           {
-            isAllPopulated && !error && !items.length &&
+            isPopulated && !error && !items.length &&
               <div>
                 No history blacklist
               </div>
           }
 
           {
-            isAllPopulated && !error && !!items.length &&
+            isPopulated && !error && !!items.length &&
               <div>
                 <Table
                   columns={columns}
@@ -108,15 +103,13 @@ class Blacklist extends Component {
                 />
               </div>
           }
-        </PageContentBody>
+        </PageContentBodyConnector>
       </PageContent>
     );
   }
 }
 
 Blacklist.propTypes = {
-  isArtistFetching: PropTypes.bool.isRequired,
-  isArtistPopulated: PropTypes.bool.isRequired,
   isFetching: PropTypes.bool.isRequired,
   isPopulated: PropTypes.bool.isRequired,
   error: PropTypes.object,

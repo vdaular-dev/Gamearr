@@ -1,22 +1,21 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import TrackQuality from 'Album/TrackQuality';
+import formatBytes from 'Utilities/Number/formatBytes';
+import hasDifferentItems from 'Utilities/Object/hasDifferentItems';
+import { icons, kinds, tooltipPositions, sortDirections } from 'Helpers/Props';
 import Icon from 'Components/Icon';
-import LoadingIndicator from 'Components/Loading/LoadingIndicator';
+import TableRow from 'Components/Table/TableRow';
 import TableRowCell from 'Components/Table/Cells/TableRowCell';
 import TableRowCellButton from 'Components/Table/Cells/TableRowCellButton';
 import TableSelectCell from 'Components/Table/Cells/TableSelectCell';
-import TableRow from 'Components/Table/TableRow';
 import Popover from 'Components/Tooltip/Popover';
 import Tooltip from 'Components/Tooltip/Tooltip';
-import { icons, kinds, sortDirections, tooltipPositions } from 'Helpers/Props';
+import SelectGameModal from 'InteractiveImport/Game/SelectGameModal';
 import SelectAlbumModal from 'InteractiveImport/Album/SelectAlbumModal';
-import SelectArtistModal from 'InteractiveImport/Artist/SelectArtistModal';
-import SelectQualityModal from 'InteractiveImport/Quality/SelectQualityModal';
 import SelectTrackModal from 'InteractiveImport/Track/SelectTrackModal';
-import formatBytes from 'Utilities/Number/formatBytes';
-import hasDifferentItems from 'Utilities/Object/hasDifferentItems';
+import SelectQualityModal from 'InteractiveImport/Quality/SelectQualityModal';
 import InteractiveImportRowCellPlaceholder from './InteractiveImportRowCellPlaceholder';
+import LoadingIndicator from 'Components/Loading/LoadingIndicator';
 import styles from './InteractiveImportRow.css';
 
 class InteractiveImportRow extends Component {
@@ -28,7 +27,7 @@ class InteractiveImportRow extends Component {
     super(props, context);
 
     this.state = {
-      isSelectArtistModalOpen: false,
+      isSelectGameModalOpen: false,
       isSelectAlbumModalOpen: false,
       isSelectTrackModalOpen: false,
       isSelectQualityModalOpen: false
@@ -106,8 +105,8 @@ class InteractiveImportRow extends Component {
   //
   // Listeners
 
-  onSelectArtistPress = () => {
-    this.setState({ isSelectArtistModalOpen: true });
+  onSelectGamePress = () => {
+    this.setState({ isSelectGameModalOpen: true });
   }
 
   onSelectAlbumPress = () => {
@@ -122,8 +121,8 @@ class InteractiveImportRow extends Component {
     this.setState({ isSelectQualityModalOpen: true });
   }
 
-  onSelectArtistModalClose = (changed) => {
-    this.setState({ isSelectArtistModalOpen: false });
+  onSelectGameModalClose = (changed) => {
+    this.setState({ isSelectGameModalOpen: false });
     this.selectRowAfterChange(changed);
   }
 
@@ -149,7 +148,7 @@ class InteractiveImportRow extends Component {
     const {
       id,
       allowArtistChange,
-      path,
+      relativePath,
       artist,
       album,
       albumReleaseId,
@@ -165,7 +164,7 @@ class InteractiveImportRow extends Component {
     } = this.props;
 
     const {
-      isSelectArtistModalOpen,
+      isSelectGameModalOpen,
       isSelectAlbumModalOpen,
       isSelectTrackModalOpen,
       isSelectQualityModalOpen
@@ -190,7 +189,7 @@ class InteractiveImportRow extends Component {
 
     const pathCellContents = (
       <div>
-        {path}
+        {relativePath}
       </div>
     );
 
@@ -213,8 +212,8 @@ class InteractiveImportRow extends Component {
         />
 
         <TableRowCell
-          className={styles.path}
-          title={path}
+          className={styles.relativePath}
+          title={relativePath}
         >
           {pathCell}
         </TableRowCell>
@@ -222,7 +221,7 @@ class InteractiveImportRow extends Component {
         <TableRowCellButton
           isDisabled={!allowArtistChange}
           title={allowArtistChange ? 'Click to change artist' : undefined}
-          onPress={this.onSelectArtistPress}
+          onPress={this.onSelectGamePress}
         >
           {
             showArtistPlaceholder ? <InteractiveImportRowCellPlaceholder /> : artistName
@@ -305,10 +304,10 @@ class InteractiveImportRow extends Component {
           }
         </TableRowCell>
 
-        <SelectArtistModal
-          isOpen={isSelectArtistModalOpen}
+        <SelectGameModal
+          isOpen={isSelectGameModalOpen}
           ids={[id]}
-          onModalClose={this.onSelectArtistModalClose}
+          onModalClose={this.onSelectGameModalClose}
         />
 
         <SelectAlbumModal
@@ -328,7 +327,7 @@ class InteractiveImportRow extends Component {
           audioTags={audioTags}
           sortKey='mediumNumber'
           sortDirection={sortDirections.ASCENDING}
-          filename={path}
+          filename={relativePath}
           onModalClose={this.onSelectTrackModalClose}
         />
 
@@ -349,7 +348,7 @@ class InteractiveImportRow extends Component {
 InteractiveImportRow.propTypes = {
   id: PropTypes.number.isRequired,
   allowArtistChange: PropTypes.bool.isRequired,
-  path: PropTypes.string.isRequired,
+  relativePath: PropTypes.string.isRequired,
   artist: PropTypes.object,
   album: PropTypes.object,
   albumReleaseId: PropTypes.number,

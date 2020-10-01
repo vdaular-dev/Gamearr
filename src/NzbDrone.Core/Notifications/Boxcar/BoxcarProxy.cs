@@ -1,10 +1,10 @@
-using System;
+﻿using System;
 using System.Net;
 using FluentValidation.Results;
 using NLog;
-using NzbDrone.Common.EnvironmentInfo;
-using NzbDrone.Core.Rest;
 using RestSharp;
+using NzbDrone.Core.Rest;
+using NzbDrone.Common.EnvironmentInfo;
 
 namespace NzbDrone.Core.Notifications.Boxcar
 {
@@ -16,13 +16,11 @@ namespace NzbDrone.Core.Notifications.Boxcar
 
     public class BoxcarProxy : IBoxcarProxy
     {
-        private const string URL = "https://new.boxcar.io/api/notifications";
-        private readonly IRestClientFactory _restClientFactory;
         private readonly Logger _logger;
+        private const string URL = "https://new.boxcar.io/api/notifications";
 
-        public BoxcarProxy(IRestClientFactory restClientFactory, Logger logger)
+        public BoxcarProxy(Logger logger)
         {
-            _restClientFactory = restClientFactory;
             _logger = logger;
         }
 
@@ -46,7 +44,7 @@ namespace NzbDrone.Core.Notifications.Boxcar
             try
             {
                 const string title = "Test Notification";
-                const string body = "This is a test message from Lidarr";
+                const string body = "This is a test message from Gamearr";
 
                 SendNotification(title, body, settings);
                 return null;
@@ -73,13 +71,13 @@ namespace NzbDrone.Core.Notifications.Boxcar
         {
             try
             {
-                var client = _restClientFactory.BuildClient(URL);
+                var client = RestClientFactory.BuildClient(URL);
 
                 request.AddParameter("user_credentials", settings.Token);
                 request.AddParameter("notification[title]", title);
                 request.AddParameter("notification[long_message]", message);
                 request.AddParameter("notification[source_name]", BuildInfo.AppName);
-                request.AddParameter("notification[icon_url]", "https://github.com/lidarr/Lidarr/raw/develop/Logo/64.png");
+                request.AddParameter("notification[icon_url]", "https://raw.githubusercontent.com/Gamearr/Gamearr/master/Logo/64.png");
 
                 client.ExecuteAndValidate(request);
             }

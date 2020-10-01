@@ -1,14 +1,24 @@
 using System;
 using NLog;
+using NzbDrone.Common.Messaging;
 using NzbDrone.Core.Configuration;
 using NzbDrone.Core.Download.TrackedDownloads;
 using NzbDrone.Core.Messaging.Events;
 
 namespace NzbDrone.Core.Download
 {
+    public class DownloadCompletedEvent : IEvent
+    {
+        public TrackedDownload TrackedDownload { get; private set; }
+
+        public DownloadCompletedEvent(TrackedDownload trackedDownload)
+        {
+            TrackedDownload = trackedDownload;
+        }
+    }
+
     public class DownloadEventHub : IHandle<DownloadFailedEvent>,
-                                    IHandle<DownloadCompletedEvent>,
-                                    IHandle<DownloadCanBeRemovedEvent>
+                                    IHandle<DownloadCompletedEvent>
     {
         private readonly IConfigService _configService;
         private readonly IProvideDownloadClient _downloadClientProvider;
@@ -23,6 +33,19 @@ namespace NzbDrone.Core.Download
             _logger = logger;
         }
 
+        public void Handle(DownloadCompletedEvent message)
+        {
+            if (!_configService.RemoveCompletedDownloads ||
+                message.TrackedDownload.DownloadItem.Removed ||
+                !message.TrackedDownload.DownloadItem.CanBeRemoved ||
+                message.TrackedDownload.DownloadItem.Status == DownloadItemStatus.Downloading)
+            {
+                return;
+            }
+
+            RemoveFromDownloadClient(message.TrackedDownload);
+        }
+
         public void Handle(DownloadFailedEvent message)
         {
             var trackedDownload = message.TrackedDownload;
@@ -35,26 +58,6 @@ namespace NzbDrone.Core.Download
             RemoveFromDownloadClient(trackedDownload);
         }
 
-        public void Handle(DownloadCompletedEvent message)
-        {
-            if (_configService.RemoveCompletedDownloads &&
-                !message.TrackedDownload.DownloadItem.Removed &&
-                message.TrackedDownload.DownloadItem.CanBeRemoved &&
-                message.TrackedDownload.DownloadItem.Status != DownloadItemStatus.Downloading)
-            {
-                RemoveFromDownloadClient(message.TrackedDownload);
-            }
-            else
-            {
-                MarkItemAsImported(message.TrackedDownload);
-            }
-        }
-
-        public void Handle(DownloadCanBeRemovedEvent message)
-        {
-            // Already verified that it can be removed, just needs to be removed
-            RemoveFromDownloadClient(message.TrackedDownload);
-        }
 
         private void RemoveFromDownloadClient(TrackedDownload trackedDownload)
         {
@@ -71,25 +74,7 @@ namespace NzbDrone.Core.Download
             }
             catch (Exception e)
             {
-                _logger.Error(e, "Couldn't remove item {0} from client {1}", trackedDownload.DownloadItem.Title, downloadClient.Name);
-            }
-        }
-
-        private void MarkItemAsImported(TrackedDownload trackedDownload)
-        {
-            var downloadClient = _downloadClientProvider.Get(trackedDownload.DownloadClient);
-            try
-            {
-                _logger.Debug("[{0}] Marking download as imported from {1}", trackedDownload.DownloadItem.Title, trackedDownload.DownloadItem.DownloadClient);
-                downloadClient.MarkItemAsImported(trackedDownload.DownloadItem);
-            }
-            catch (NotSupportedException e)
-            {
-                _logger.Debug(e.Message);
-            }
-            catch (Exception e)
-            {
-                _logger.Error(e, "Couldn't mark item {0} as imported from client {1}", trackedDownload.DownloadItem.Title, downloadClient.Name);
+                _logger.Error(e, "Couldn't remove item from client {0}", trackedDownload.DownloadItem.Title);
             }
         }
     }

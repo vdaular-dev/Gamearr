@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using NLog;
 using NzbDrone.Common.Disk;
@@ -13,18 +15,15 @@ namespace NzbDrone.Core.Extras.Others
     public class OtherExtraService : ExtraFileManager<OtherExtraFile>
     {
         private readonly IOtherExtraFileService _otherExtraFileService;
-        private readonly IMediaFileAttributeService _mediaFileAttributeService;
 
         public OtherExtraService(IConfigService configService,
                                  IDiskProvider diskProvider,
                                  IDiskTransferService diskTransferService,
                                  IOtherExtraFileService otherExtraFileService,
-                                 IMediaFileAttributeService mediaFileAttributeService,
                                  Logger logger)
             : base(configService, diskProvider, diskTransferService, logger)
         {
             _otherExtraFileService = otherExtraFileService;
-            _mediaFileAttributeService = mediaFileAttributeService;
         }
 
         public override int Order => 2;
@@ -68,7 +67,6 @@ namespace NzbDrone.Core.Extras.Others
         {
             var extraFile = ImportFile(artist, trackFile, path, readOnly, extension, null);
 
-            _mediaFileAttributeService.SetFilePermissions(path);
             _otherExtraFileService.Upsert(extraFile);
 
             return extraFile;

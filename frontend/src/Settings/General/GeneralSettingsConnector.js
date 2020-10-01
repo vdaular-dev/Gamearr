@@ -2,14 +2,14 @@ import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
-import * as commandNames from 'Commands/commandNames';
+import createSettingsSectionSelector from 'Store/Selectors/createSettingsSectionSelector';
+import createCommandExecutingSelector from 'Store/Selectors/createCommandExecutingSelector';
+import createSystemStatusSelector from 'Store/Selectors/createSystemStatusSelector';
+import { setGeneralSettingsValue, saveGeneralSettings, fetchGeneralSettings } from 'Store/Actions/settingsActions';
 import { clearPendingChanges } from 'Store/Actions/baseActions';
 import { executeCommand } from 'Store/Actions/commandActions';
-import { fetchGeneralSettings, saveGeneralSettings, setGeneralSettingsValue } from 'Store/Actions/settingsActions';
 import { restart } from 'Store/Actions/systemActions';
-import createCommandExecutingSelector from 'Store/Selectors/createCommandExecutingSelector';
-import createSettingsSectionSelector from 'Store/Selectors/createSettingsSectionSelector';
-import createSystemStatusSelector from 'Store/Selectors/createSystemStatusSelector';
+import * as commandNames from 'Commands/commandNames';
 import GeneralSettings from './GeneralSettings';
 
 const SECTION = 'general';
@@ -24,11 +24,11 @@ function createMapStateToProps() {
       return {
         advancedSettings,
         isResettingApiKey,
+        isMono: systemStatus.isMono,
         isWindows: systemStatus.isWindows,
         isWindowsService: systemStatus.isWindows && systemStatus.mode === 'service',
         isDocker: systemStatus.isDocker,
         mode: systemStatus.mode,
-        packageUpdateMechanism: systemStatus.packageUpdateMechanism,
         ...sectionSettings
       };
     }

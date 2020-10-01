@@ -1,13 +1,13 @@
-﻿using System;
+﻿using FluentValidation.Results;
+using NLog;
+using System;
+using OAuth;
+using System.Net;
 using System.Collections.Specialized;
 using System.IO;
-using System.Net;
 using System.Web;
-using FluentValidation.Results;
-using NLog;
 using NzbDrone.Common.Extensions;
 using NzbDrone.Common.Http;
-using NzbDrone.Common.OAuth;
 
 namespace NzbDrone.Core.Notifications.Twitter
 {
@@ -46,7 +46,7 @@ namespace NzbDrone.Core.Notifications.Twitter
             var oAuthRequest = OAuthRequest.ForAccessToken(consumerKey, consumerSecret, oauthToken, "", oauthVerifier);
             oAuthRequest.RequestUrl = "https://api.twitter.com/oauth/access_token";
             var qscoll = OAuthQuery(oAuthRequest);
-
+            
             return new OAuthToken
             {
                 AccessToken = qscoll["oauth_token"],
@@ -82,6 +82,7 @@ namespace NzbDrone.Core.Notifications.Twitter
                 {
                     twitter.DirectMessage(message, settings.Mention);
                 }
+
                 else
                 {
                     if (settings.Mention.IsNotNullOrWhiteSpace())
@@ -89,7 +90,7 @@ namespace NzbDrone.Core.Notifications.Twitter
                         message += string.Format(" @{0}", settings.Mention);
                     }
 
-                    twitter.UpdateStatus(message);
+                    twitter.UpdateStatus(message);                    
                 }
             }
             catch (WebException ex)
@@ -121,7 +122,7 @@ namespace NzbDrone.Core.Notifications.Twitter
         {
             try
             {
-                var body = "Lidarr: Test Message @ " + DateTime.Now;
+                var body = "Gamearr: Test Message @ " + DateTime.Now;
 
                 SendNotification(body, settings);
             }
@@ -130,7 +131,6 @@ namespace NzbDrone.Core.Notifications.Twitter
                 _logger.Error(ex, "Unable to send test message");
                 return new ValidationFailure("Host", "Unable to send test message");
             }
-
             return null;
         }
     }

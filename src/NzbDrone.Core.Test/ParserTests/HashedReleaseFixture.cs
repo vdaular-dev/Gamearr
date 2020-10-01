@@ -41,14 +41,14 @@ namespace NzbDrone.Core.Test.ParserTests
             },
             new object[]
             {
-                @"C:\Test\Weeds.S01E10.DVDRip.XviD-Lidarr\AHFMZXGHEWD660.mp3".AsOsAgnostic(),
+                @"C:\Test\Weeds.S01E10.DVDRip.XviD-Gamearr\AHFMZXGHEWD660.mp3".AsOsAgnostic(),
                 "Weeds",
                 Quality.MP3_256,
-                "Lidarr"
+                "Gamearr"
             },
             new object[]
             {
-                @"C:\Test\Deadwood.S02E12.1080p.BluRay.x264-Lidarr\Backup_72023S02-12.mp3".AsOsAgnostic(),
+                @"C:\Test\Deadwood.S02E12.1080p.BluRay.x264-Gamearr\Backup_72023S02-12.mp3".AsOsAgnostic(),
                 "Deadwood",
                 Quality.MP3_256,
                 null
@@ -83,13 +83,11 @@ namespace NzbDrone.Core.Test.ParserTests
             }
         };
 
-        [Test]
-        [TestCaseSource(nameof(HashedReleaseParserCases))]
+        [Test, TestCaseSource(nameof(HashedReleaseParserCases))]
         [Ignore("Hashed code is not currently called with track parsing")]
         public void should_properly_parse_hashed_releases(string path, string title, Quality quality, string releaseGroup)
         {
             var result = Parser.Parser.ParseMusicPath(path);
-
             //result.SeriesTitle.Should().Be(title);
             result.Quality.Quality.Should().Be(quality);
         }

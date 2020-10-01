@@ -2,28 +2,25 @@ import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
-import * as commandNames from 'Commands/commandNames';
-import withCurrentPage from 'Components/withCurrentPage';
-import { executeCommand } from 'Store/Actions/commandActions';
-import { clearQueueDetails, fetchQueueDetails } from 'Store/Actions/queueActions';
-import { clearTrackFiles, fetchTrackFiles } from 'Store/Actions/trackFileActions';
-import * as wantedActions from 'Store/Actions/wantedActions';
-import createCommandExecutingSelector from 'Store/Selectors/createCommandExecutingSelector';
+import { registerPagePopulator, unregisterPagePopulator } from 'Utilities/pagePopulator';
 import hasDifferentItems from 'Utilities/Object/hasDifferentItems';
 import selectUniqueIds from 'Utilities/Object/selectUniqueIds';
-import { registerPagePopulator, unregisterPagePopulator } from 'Utilities/pagePopulator';
+import withCurrentPage from 'Components/withCurrentPage';
+import createCommandExecutingSelector from 'Store/Selectors/createCommandExecutingSelector';
+import * as wantedActions from 'Store/Actions/wantedActions';
+import { executeCommand } from 'Store/Actions/commandActions';
+import { fetchQueueDetails, clearQueueDetails } from 'Store/Actions/queueActions';
+import { fetchTrackFiles, clearTrackFiles } from 'Store/Actions/trackFileActions';
+import * as commandNames from 'Commands/commandNames';
 import CutoffUnmet from './CutoffUnmet';
 
 function createMapStateToProps() {
   return createSelector(
     (state) => state.wanted.cutoffUnmet,
-    (state) => state.artist,
     createCommandExecutingSelector(commandNames.CUTOFF_UNMET_ALBUM_SEARCH),
-    (cutoffUnmet, artist, isSearchingForCutoffUnmetAlbums) => {
+    (cutoffUnmet, isSearchingForCutoffUnmetAlbums) => {
 
       return {
-        isArtistFetching: artist.isFetching,
-        isArtistPopulated: artist.isPopulated,
         isSearchingForCutoffUnmetAlbums,
         isSaving: cutoffUnmet.items.filter((m) => m.isSaving).length > 1,
         ...cutoffUnmet

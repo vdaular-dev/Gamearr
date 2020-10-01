@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using FizzWare.NBuilder;
 using FluentAssertions;
+using Marr.Data;
 using Moq;
 using NUnit.Framework;
 using NzbDrone.Core.DecisionEngine.Specifications;
@@ -11,12 +12,12 @@ using NzbDrone.Core.Download.Pending;
 using NzbDrone.Core.Indexers;
 using NzbDrone.Core.IndexerSearch.Definitions;
 using NzbDrone.Core.MediaFiles;
-using NzbDrone.Core.Music;
 using NzbDrone.Core.Parser.Model;
-using NzbDrone.Core.Profiles.Delay;
 using NzbDrone.Core.Profiles.Qualities;
+using NzbDrone.Core.Profiles.Delay;
 using NzbDrone.Core.Qualities;
 using NzbDrone.Core.Test.Framework;
+using NzbDrone.Core.Music;
 
 namespace NzbDrone.Core.Test.DecisionEngineTests.RssSync
 {
@@ -33,6 +34,7 @@ namespace NzbDrone.Core.Test.DecisionEngineTests.RssSync
             _profile = Builder<QualityProfile>.CreateNew()
                                        .Build();
 
+
             _delayProfile = Builder<DelayProfile>.CreateNew()
                                       .With(d => d.PreferredProtocol = DownloadProtocol.Usenet)
                                       .Build();
@@ -48,7 +50,7 @@ namespace NzbDrone.Core.Test.DecisionEngineTests.RssSync
             _profile.Items = new List<QualityProfileQualityItem>();
             _profile.Items.Add(new QualityProfileQualityItem { Allowed = true, Quality = Quality.MP3_256 });
             _profile.Items.Add(new QualityProfileQualityItem { Allowed = true, Quality = Quality.MP3_320 });
-            _profile.Items.Add(new QualityProfileQualityItem { Allowed = true, Quality = Quality.FLAC });
+            _profile.Items.Add(new QualityProfileQualityItem { Allowed = true, Quality = Quality.MP3_320 });
 
             _profile.Cutoff = Quality.MP3_320.Id;
 
@@ -75,13 +77,9 @@ namespace NzbDrone.Core.Test.DecisionEngineTests.RssSync
         {
             Mocker.GetMock<IMediaFileService>()
                 .Setup(s => s.GetFilesByAlbum(It.IsAny<int>()))
-                .Returns(new List<TrackFile>
-                {
-                    new TrackFile
-                {
+                .Returns(new List<TrackFile> { new TrackFile {
                                                                 Quality = quality
-                }
-                });
+                                                              } });
         }
 
         private void GivenUpgradeForExistingFile()
@@ -185,10 +183,10 @@ namespace NzbDrone.Core.Test.DecisionEngineTests.RssSync
         [Test]
         public void should_be_false_when_release_is_proper_for_existing_album_of_different_quality()
         {
-            _remoteAlbum.ParsedAlbumInfo.Quality = new QualityModel(Quality.MP3_320, new Revision(version: 2));
+            _remoteAlbum.ParsedAlbumInfo.Quality = new QualityModel(Quality.MP3_256, new Revision(version: 2));
             _remoteAlbum.Release.PublishDate = DateTime.UtcNow;
 
-            GivenExistingFile(new QualityModel(Quality.MP3_256));
+            GivenExistingFile(new QualityModel(Quality.MP3_192));
 
             _delayProfile.UsenetDelay = 720;
 

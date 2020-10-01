@@ -11,11 +11,14 @@ namespace NzbDrone.Update.Test
     [TestFixture]
     public class ProgramFixture : TestBase<UpdateApp>
     {
+
+
         [Test]
         public void should_throw_if_null_passed_in()
         {
             Assert.Throws<ArgumentOutOfRangeException>(() => Subject.Start(null));
         }
+
 
         [TestCase("d", "")]
         [TestCase("", "")]
@@ -31,14 +34,18 @@ namespace NzbDrone.Update.Test
         [Test]
         public void should_call_update_with_correct_path()
         {
-            var processPath = @"C:\Lidarr\lidarr.exe".AsOsAgnostic();
+            var ProcessPath = @"C:\Gamearr\gamearr.exe".AsOsAgnostic();
 
             Mocker.GetMock<IProcessProvider>().Setup(c => c.GetProcessById(12))
-                .Returns(new ProcessInfo() { StartPath = processPath });
+                .Returns(new ProcessInfo() { StartPath = ProcessPath });
 
-            Subject.Start(new[] { "12", "", processPath });
 
-            Mocker.GetMock<IInstallUpdateService>().Verify(c => c.Start(@"C:\Lidarr".AsOsAgnostic(), 12), Times.Once());
+            Subject.Start(new[] { "12", "", ProcessPath });
+
+
+            Mocker.GetMock<IInstallUpdateService>().Verify(c => c.Start(@"C:\Gamearr".AsOsAgnostic(), 12), Times.Once());
         }
+
+
     }
 }

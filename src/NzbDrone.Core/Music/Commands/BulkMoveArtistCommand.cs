@@ -4,22 +4,21 @@ using NzbDrone.Core.Messaging.Commands;
 
 namespace NzbDrone.Core.Music.Commands
 {
-    public class BulkMoveArtistCommand : Command
+    public class BulkMoveGameCommand : Command
     {
-        public List<BulkMoveArtist> Artist { get; set; }
+        public List<BulkMoveGame> Artist { get; set; }
         public string DestinationRootFolder { get; set; }
-        public bool MoveFiles { get; set; }
 
         public override bool SendUpdatesToClient => true;
         public override bool RequiresDiskAccess => true;
     }
 
-    public class BulkMoveArtist : IEquatable<BulkMoveArtist>
+    public class BulkMoveGame : IEquatable<BulkMoveGame>
     {
         public int ArtistId { get; set; }
         public string SourcePath { get; set; }
 
-        public bool Equals(BulkMoveArtist other)
+        public bool Equals(BulkMoveGame other)
         {
             if (other == null)
             {
@@ -41,7 +40,7 @@ namespace NzbDrone.Core.Music.Commands
                 return false;
             }
 
-            return ArtistId.Equals(((BulkMoveArtist)obj).ArtistId);
+            return ArtistId.Equals(((BulkMoveGame)obj).ArtistId);
         }
 
         public override int GetHashCode()

@@ -42,7 +42,7 @@ namespace NzbDrone.Core.Download.Clients.DownloadStation
         [FieldDefinition(3, Label = "Password", Type = FieldType.Password)]
         public string Password { get; set; }
 
-        [FieldDefinition(4, Label = "Category", Type = FieldType.Textbox, HelpText = "Adding a category specific to Lidarr avoids conflicts with unrelated downloads, but it's optional. Creates a [category] subdirectory in the output directory.")]
+        [FieldDefinition(4, Label = "Category", Type = FieldType.Textbox, HelpText = "Adding a category specific to Gamearr avoids conflicts with unrelated downloads, but it's optional. Creates a [category] subdirectory in the output directory.")]
         public string MusicCategory { get; set; }
 
         [FieldDefinition(5, Label = "Directory", Type = FieldType.Textbox, HelpText = "Optional shared folder to put downloads into, leave blank to use the default Download Station location")]
@@ -53,8 +53,8 @@ namespace NzbDrone.Core.Download.Clients.DownloadStation
 
         public DownloadStationSettings()
         {
-            Host = "127.0.0.1";
-            Port = 5000;
+            this.Host = "127.0.0.1";
+            this.Port = 5000;
         }
 
         public NzbDroneValidationResult Validate()

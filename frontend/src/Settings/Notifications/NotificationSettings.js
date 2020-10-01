@@ -1,6 +1,6 @@
 import React from 'react';
 import PageContent from 'Components/Page/PageContent';
-import PageContentBody from 'Components/Page/PageContentBody';
+import PageContentBodyConnector from 'Components/Page/PageContentBodyConnector';
 import SettingsToolbarConnector from 'Settings/SettingsToolbarConnector';
 import NotificationsConnector from './Notifications/NotificationsConnector';
 
@@ -11,9 +11,9 @@ function NotificationSettings() {
         showSave={false}
       />
 
-      <PageContentBody>
+      <PageContentBodyConnector>
         <NotificationsConnector />
-      </PageContentBody>
+      </PageContentBodyConnector>
     </PageContent>
   );
 }

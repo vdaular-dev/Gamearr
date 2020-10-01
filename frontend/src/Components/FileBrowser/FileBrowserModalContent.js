@@ -1,19 +1,19 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
+import { kinds, scrollDirections } from 'Helpers/Props';
 import Alert from 'Components/Alert';
-import PathInput from 'Components/Form/PathInput';
 import Button from 'Components/Link/Button';
 import Link from 'Components/Link/Link';
 import LoadingIndicator from 'Components/Loading/LoadingIndicator';
-import ModalBody from 'Components/Modal/ModalBody';
 import ModalContent from 'Components/Modal/ModalContent';
-import ModalFooter from 'Components/Modal/ModalFooter';
 import ModalHeader from 'Components/Modal/ModalHeader';
+import ModalBody from 'Components/Modal/ModalBody';
+import ModalFooter from 'Components/Modal/ModalFooter';
 import Scroller from 'Components/Scroller/Scroller';
 import Table from 'Components/Table/Table';
 import TableBody from 'Components/Table/TableBody';
-import { kinds, scrollDirections } from 'Helpers/Props';
+import PathInput from 'Components/Form/PathInput';
 import FileBrowserRow from './FileBrowserRow';
 import styles from './FileBrowserModalContent.css';
 
@@ -128,7 +128,7 @@ class FileBrowserModalContent extends Component {
                 className={styles.mappedDrivesWarning}
                 kind={kinds.WARNING}
               >
-                Mapped network drives are not available when running as a Windows Service, see the <Link className={styles.faqLink} to="https://github.com/Lidarr/Lidarr/wiki/FAQ">FAQ</Link> for more information.
+                Mapped network drives are not available when running as a Windows Service, see the <Link className={styles.faqLink} to="https://github.com/Gamearr/Gamearr/wiki/FAQ">FAQ</Link> for more information.
               </Alert>
           }
 

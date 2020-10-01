@@ -8,6 +8,7 @@ using NzbDrone.Common.EnvironmentInfo;
 using NzbDrone.Common.Exceptions;
 using NzbDrone.Common.Instrumentation;
 using NzbDrone.Common.Processes;
+using NzbDrone.Common.Security;
 using NzbDrone.Core.Configuration;
 using NzbDrone.Core.Instrumentation;
 
@@ -15,14 +16,17 @@ namespace NzbDrone.Host
 {
     public static class Bootstrap
     {
-        private static readonly Logger Logger = NzbDroneLogger.GetLogger(typeof(Bootstrap));
         private static IContainer _container;
+        private static readonly Logger Logger = NzbDroneLogger.GetLogger(typeof(Bootstrap));
 
         public static void Start(StartupContext startupContext, IUserAlert userAlert, Action<IContainer> startCallback = null)
         {
             try
             {
-                Logger.Info("Starting Lidarr - {0} - Version {1}", Assembly.GetCallingAssembly().Location, Assembly.GetExecutingAssembly().GetName().Version);
+                SecurityProtocolPolicy.Register();
+                X509CertificateValidationPolicy.Register();
+
+                Logger.Info("Starting Gamearr - {0} - Version {1}", Assembly.GetCallingAssembly().Location, Assembly.GetExecutingAssembly().GetName().Version);
 
                 if (!PlatformValidation.IsValidate(userAlert))
                 {
@@ -44,6 +48,7 @@ namespace NzbDrone.Host
                 {
                     startCallback(_container);
                 }
+
                 else
                 {
                     SpinToExit(appMode);
@@ -51,11 +56,11 @@ namespace NzbDrone.Host
             }
             catch (InvalidConfigFileException ex)
             {
-                throw new LidarrStartupException(ex);
+                throw new GamearrStartupException(ex);
             }
             catch (AccessDeniedConfigFileException ex)
             {
-                throw new LidarrStartupException(ex);
+                throw new GamearrStartupException(ex);
             }
             catch (TerminateApplicationException ex)
             {
@@ -93,11 +98,6 @@ namespace NzbDrone.Host
 
         private static void EnsureSingleInstance(bool isService, IStartupContext startupContext)
         {
-            if (startupContext.Flags.Contains(StartupContext.NO_SINGLE_INSTANCE_CHECK))
-            {
-                return;
-            }
-
             var instancePolicy = _container.Resolve<ISingleInstancePolicy>();
 
             if (startupContext.Flags.Contains(StartupContext.TERMINATE))
@@ -159,7 +159,6 @@ namespace NzbDrone.Host
                     {
                         return true;
                     }
-
                 default:
                     {
                         return false;

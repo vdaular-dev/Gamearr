@@ -6,8 +6,9 @@ using NzbDrone.Core.Datastore;
 using NzbDrone.Core.DecisionEngine.Specifications;
 using NzbDrone.Core.Indexers;
 using NzbDrone.Core.Indexers.TorrentRss;
-using NzbDrone.Core.Music;
+using NzbDrone.Core.IndexerSearch.Definitions;
 using NzbDrone.Core.Parser.Model;
+using NzbDrone.Core.Music;
 using NzbDrone.Test.Common;
 
 namespace NzbDrone.Core.Test.DecisionEngineTests.Search
@@ -43,6 +44,7 @@ namespace NzbDrone.Core.Test.DecisionEngineTests.Search
             Mocker.GetMock<IIndexerFactory>()
                   .Setup(v => v.Get(1))
                   .Returns(_indexerDefinition);
+
         }
 
         private void GivenReleaseSeeders(int? seeders)

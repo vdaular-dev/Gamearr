@@ -3,21 +3,21 @@ import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { DndProvider } from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
+import { inputTypes } from 'Helpers/Props';
+import Button from 'Components/Link/Button';
 import Form from 'Components/Form/Form';
 import FormGroup from 'Components/Form/FormGroup';
-import FormInputGroup from 'Components/Form/FormInputGroup';
-import FormInputHelpText from 'Components/Form/FormInputHelpText';
 import FormLabel from 'Components/Form/FormLabel';
-import Button from 'Components/Link/Button';
+import FormInputHelpText from 'Components/Form/FormInputHelpText';
+import FormInputGroup from 'Components/Form/FormInputGroup';
 import Modal from 'Components/Modal/Modal';
-import ModalBody from 'Components/Modal/ModalBody';
 import ModalContent from 'Components/Modal/ModalContent';
-import ModalFooter from 'Components/Modal/ModalFooter';
 import ModalHeader from 'Components/Modal/ModalHeader';
-import { inputTypes } from 'Helpers/Props';
+import ModalBody from 'Components/Modal/ModalBody';
+import ModalFooter from 'Components/Modal/ModalFooter';
 import TableOptionsColumn from './TableOptionsColumn';
-import TableOptionsColumnDragPreview from './TableOptionsColumnDragPreview';
 import TableOptionsColumnDragSource from './TableOptionsColumnDragSource';
+import TableOptionsColumnDragPreview from './TableOptionsColumnDragPreview';
 import styles from './TableOptionsModal.css';
 
 class TableOptionsModal extends Component {
@@ -136,7 +136,7 @@ class TableOptionsModal extends Component {
             isOpen ?
               <ModalContent onModalClose={onModalClose}>
                 <ModalHeader>
-                  Table Options
+            Table Options
                 </ModalHeader>
 
                 <ModalBody>
@@ -231,7 +231,7 @@ class TableOptionsModal extends Component {
                   <Button
                     onPress={onModalClose}
                   >
-                    Close
+              Close
                   </Button>
                 </ModalFooter>
               </ModalContent> :

@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import monitorOptions from 'Utilities/Artist/monitorOptions';
+import monitorOptions from 'Utilities/Game/monitorOptions';
 import SelectInput from './SelectInput';
 
 function MonitorAlbumsSelectInput(props) {

@@ -4,7 +4,6 @@ using NLog;
 using NzbDrone.Common.Disk;
 using NzbDrone.Core.Configuration;
 using NzbDrone.Core.DecisionEngine;
-using NzbDrone.Core.Download;
 using NzbDrone.Core.Parser.Model;
 
 namespace NzbDrone.Core.MediaFiles.TrackImport.Specifications
@@ -22,7 +21,7 @@ namespace NzbDrone.Core.MediaFiles.TrackImport.Specifications
             _logger = logger;
         }
 
-        public Decision IsSatisfiedBy(LocalTrack item, DownloadClientItem downloadClientItem)
+        public Decision IsSatisfiedBy(LocalTrack localTrack)
         {
             if (_configService.SkipFreeSpaceCheckWhenImporting)
             {
@@ -32,13 +31,13 @@ namespace NzbDrone.Core.MediaFiles.TrackImport.Specifications
 
             try
             {
-                if (item.ExistingFile)
+                if (localTrack.ExistingFile)
                 {
                     _logger.Debug("Skipping free space check for existing track");
                     return Decision.Accept();
                 }
 
-                var path = Directory.GetParent(item.Artist.Path);
+                var path = Directory.GetParent(localTrack.Artist.Path);
                 var freeSpace = _diskProvider.GetAvailableSpace(path.FullName);
 
                 if (!freeSpace.HasValue)
@@ -47,9 +46,9 @@ namespace NzbDrone.Core.MediaFiles.TrackImport.Specifications
                     return Decision.Accept();
                 }
 
-                if (freeSpace < item.Size + _configService.MinimumFreeSpaceWhenImporting.Megabytes())
+                if (freeSpace < localTrack.Size + 100.Megabytes())
                 {
-                    _logger.Warn("Not enough free space ({0}) to import: {1} ({2})", freeSpace, item, item.Size);
+                    _logger.Warn("Not enough free space ({0}) to import: {1} ({2})", freeSpace, localTrack, localTrack.Size);
                     return Decision.Reject("Not enough free space");
                 }
             }
@@ -59,7 +58,7 @@ namespace NzbDrone.Core.MediaFiles.TrackImport.Specifications
             }
             catch (Exception ex)
             {
-                _logger.Error(ex, "Unable to check free disk space while importing. {0}", item.Path);
+                _logger.Error(ex, "Unable to check free disk space while importing. {0}", localTrack.Path);
             }
 
             return Decision.Accept();

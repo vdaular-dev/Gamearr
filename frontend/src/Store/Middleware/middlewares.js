@@ -1,8 +1,8 @@
-import { routerMiddleware } from 'connected-react-router';
 import { applyMiddleware, compose } from 'redux';
 import thunk from 'redux-thunk';
-import createPersistState from './createPersistState';
+import { routerMiddleware } from 'connected-react-router';
 import createSentryMiddleware from './createSentryMiddleware';
+import createPersistState from './createPersistState';
 
 export default function(history) {
   const middlewares = [];

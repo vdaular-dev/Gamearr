@@ -1,14 +1,10 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import albumEntities from 'Album/albumEntities';
-import AlbumSearchCellConnector from 'Album/AlbumSearchCellConnector';
-import AlbumTitleLink from 'Album/AlbumTitleLink';
-import EpisodeStatusConnector from 'Album/EpisodeStatusConnector';
-import ArtistNameLink from 'Artist/ArtistNameLink';
+import GameNameLink from 'Game/GameNameLink';
 import RelativeDateCellConnector from 'Components/Table/Cells/RelativeDateCellConnector';
+import TableRow from 'Components/Table/TableRow';
 import TableRowCell from 'Components/Table/Cells/TableRowCell';
 import TableSelectCell from 'Components/Table/Cells/TableSelectCell';
-import TableRow from 'Components/Table/TableRow';
 import styles from './CutoffUnmetRow.css';
 
 function CutoffUnmetRow(props) {
@@ -49,33 +45,13 @@ function CutoffUnmetRow(props) {
             return null;
           }
 
-          if (name === 'artists.sortName') {
+          if (name === 'artist.sortName') {
             return (
               <TableRowCell key={name}>
-                <ArtistNameLink
+                <GameNameLink
                   foreignArtistId={artist.foreignArtistId}
                   artistName={artist.artistName}
                 />
-              </TableRowCell>
-            );
-          }
-
-          if (name === 'albums.title') {
-            return (
-              <TableRowCell key={name}>
-                <AlbumTitleLink
-                  foreignAlbumId={foreignAlbumId}
-                  title={title}
-                  disambiguation={disambiguation}
-                />
-              </TableRowCell>
-            );
-          }
-
-          if (name === 'albumType') {
-            return (
-              <TableRowCell key={name}>
-                {albumType}
               </TableRowCell>
             );
           }

@@ -6,6 +6,7 @@ namespace NzbDrone.Core.MetadataSource.SkyHook.Resource
     {
         public TrackResource()
         {
+
         }
 
         public string ArtistId { get; set; }
@@ -19,5 +20,6 @@ namespace NzbDrone.Core.MetadataSource.SkyHook.Resource
         public int TrackPosition { get; set; }
         public bool Explicit { get; set; }
         public int MediumNumber { get; set; }
+
     }
 }

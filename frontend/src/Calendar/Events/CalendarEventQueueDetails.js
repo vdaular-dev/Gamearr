@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import QueueDetails from 'Activity/Queue/QueueDetails';
-import CircularProgressBar from 'Components/CircularProgressBar';
 import colors from 'Styles/Variables/colors';
+import CircularProgressBar from 'Components/CircularProgressBar';
+import QueueDetails from 'Activity/Queue/QueueDetails';
 
 function CalendarEventQueueDetails(props) {
   const {

@@ -1,10 +1,10 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using NLog;
-using NzbDrone.Common.TPL;
 using NzbDrone.Core.Parser.Model;
+using NzbDrone.Common.TPL;
+using System;
 namespace NzbDrone.Core.Indexers
 {
     public interface IFetchAndParseRss

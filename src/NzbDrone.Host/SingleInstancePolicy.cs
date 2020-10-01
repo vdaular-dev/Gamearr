@@ -32,7 +32,7 @@ namespace NzbDrone.Host
         {
             if (IsAlreadyRunning())
             {
-                _logger.Warn("Another instance of Lidarr is already running.");
+                _logger.Warn("Another instance of Gamearr is already running.");
                 _browserService.LaunchWebUI();
                 throw new TerminateApplicationException("Another instance is already running");
             }
@@ -50,7 +50,7 @@ namespace NzbDrone.Host
         {
             if (IsAlreadyRunning())
             {
-                _logger.Debug("Another instance of Lidarr is already running.");
+                _logger.Debug("Another instance of Gamearr is already running.");
             }
         }
 
@@ -73,14 +73,14 @@ namespace NzbDrone.Host
 
                 if (otherProcesses.Any())
                 {
-                    _logger.Info("{0} instance(s) of Lidarr are running", otherProcesses.Count);
+                    _logger.Info("{0} instance(s) of Gamearr are running", otherProcesses.Count);
                 }
 
                 return otherProcesses;
             }
             catch (Exception ex)
             {
-                _logger.Warn(ex, "Failed to check for multiple instances of Lidarr.");
+                _logger.Warn(ex, "Failed to check for multiple instances of Gamearr.");
                 return new List<int>();
             }
         }

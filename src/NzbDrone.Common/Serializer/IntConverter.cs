@@ -23,7 +23,6 @@ namespace NzbDrone.Common.Serializer
             {
                 throw new JsonSerializationException("Can't convert type " + existingValue.GetType().FullName + " to number");
             }
-
             if (objectType == typeof(long))
             {
                 return Convert.ToInt64(reader.Value);

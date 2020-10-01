@@ -21,12 +21,10 @@ namespace NzbDrone.Core.Notifications.Xbmc
 
     public class XbmcJsonApiProxy : IXbmcJsonApiProxy
     {
-        private readonly IRestClientFactory _restClientFactory;
         private readonly Logger _logger;
 
-        public XbmcJsonApiProxy(IRestClientFactory restClientFactory, Logger logger)
+        public XbmcJsonApiProxy(Logger logger)
         {
-            _restClientFactory = restClientFactory;
             _logger = logger;
         }
 
@@ -43,7 +41,7 @@ namespace NzbDrone.Core.Notifications.Xbmc
             var parameters = new Dictionary<string, object>();
             parameters.Add("title", title);
             parameters.Add("message", message);
-            parameters.Add("image", "https://raw.github.com/Lidarr/Lidarr/develop/Logo/64.png");
+            parameters.Add("image", "https://raw.github.com/Gamearr/Gamearr/develop/Logo/64.png");
             parameters.Add("displaytime", settings.DisplayTime * 1000);
 
             ProcessRequest(request, settings, "GUI.ShowNotification", parameters);
@@ -78,7 +76,7 @@ namespace NzbDrone.Core.Notifications.Xbmc
 
             var response = ProcessRequest(request, settings, "Player.GetActivePlayers");
 
-            return Json.Deserialize<ActivePlayersResult>(response).Result;
+            return Json.Deserialize<ActivePlayersEdenResult>(response).Result;
         }
 
         public List<KodiArtist> GetArtist(XbmcSettings settings)
@@ -112,7 +110,7 @@ namespace NzbDrone.Core.Notifications.Xbmc
         private IRestClient BuildClient(XbmcSettings settings)
         {
             var url = string.Format(@"http://{0}/jsonrpc", settings.Address);
-            var client = _restClientFactory.BuildClient(url);
+            var client = RestClientFactory.BuildClient(url);
 
             if (!settings.Username.IsNullOrWhiteSpace())
             {

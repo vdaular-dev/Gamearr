@@ -1,18 +1,18 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import Form from 'Components/Form/Form';
-import FormGroup from 'Components/Form/FormGroup';
-import FormInputGroup from 'Components/Form/FormInputGroup';
-import FormLabel from 'Components/Form/FormLabel';
+import { inputTypes, kinds } from 'Helpers/Props';
+import { stringSettingShape } from 'Helpers/Props/Shapes/settingShape';
 import Button from 'Components/Link/Button';
 import SpinnerErrorButton from 'Components/Link/SpinnerErrorButton';
 import LoadingIndicator from 'Components/Loading/LoadingIndicator';
-import ModalBody from 'Components/Modal/ModalBody';
 import ModalContent from 'Components/Modal/ModalContent';
-import ModalFooter from 'Components/Modal/ModalFooter';
 import ModalHeader from 'Components/Modal/ModalHeader';
-import { inputTypes, kinds } from 'Helpers/Props';
-import { stringSettingShape } from 'Helpers/Props/Shapes/settingShape';
+import ModalBody from 'Components/Modal/ModalBody';
+import ModalFooter from 'Components/Modal/ModalFooter';
+import Form from 'Components/Form/Form';
+import FormGroup from 'Components/Form/FormGroup';
+import FormLabel from 'Components/Form/FormLabel';
+import FormInputGroup from 'Components/Form/FormInputGroup';
 import styles from './EditRemotePathMappingModalContent.css';
 
 function EditRemotePathMappingModalContent(props) {
@@ -88,7 +88,7 @@ function EditRemotePathMappingModalContent(props) {
                 <FormInputGroup
                   type={inputTypes.PATH}
                   name="localPath"
-                  helpText="Path that Lidarr should use to access the remote path locally"
+                  helpText="Path that Gamearr should use to access the remote path locally"
                   {...localPath}
                   onChange={onInputChange}
                 />

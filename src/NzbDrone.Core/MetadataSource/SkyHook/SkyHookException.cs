@@ -5,8 +5,7 @@ namespace NzbDrone.Core.MetadataSource.SkyHook
 {
     public class SkyHookException : NzbDroneClientException
     {
-        public SkyHookException(string message)
-            : base(HttpStatusCode.ServiceUnavailable, message)
+        public SkyHookException(string message) : base(HttpStatusCode.ServiceUnavailable, message)
         {
         }
 

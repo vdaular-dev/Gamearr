@@ -20,7 +20,7 @@ namespace NzbDrone.SysTray
         private readonly IProcessProvider _processProvider;
 
         private readonly NotifyIcon _trayIcon = new NotifyIcon();
-        private readonly ContextMenuStrip _trayMenu = new ContextMenuStrip();
+        private readonly ContextMenu _trayMenu = new ContextMenu();
 
         public SystemTrayApp(IBrowserService browserService, IRuntimeInfo runtimeInfo, IProcessProvider processProvider)
         {
@@ -34,14 +34,14 @@ namespace NzbDrone.SysTray
             Application.ThreadException += OnThreadException;
             Application.ApplicationExit += OnApplicationExit;
 
-            _trayMenu.Items.Add(new ToolStripMenuItem("Launch Browser", null, LaunchBrowser));
-            _trayMenu.Items.Add(new ToolStripMenuItem("-"));
-            _trayMenu.Items.Add(new ToolStripMenuItem("Exit", null, OnExit));
+            _trayMenu.MenuItems.Add("Launch Browser", LaunchBrowser);
+            _trayMenu.MenuItems.Add("-");
+            _trayMenu.MenuItems.Add("Exit", OnExit);
 
-            _trayIcon.Text = string.Format("Lidarr - {0}", BuildInfo.Version);
+            _trayIcon.Text = string.Format("Gamearr - {0}", BuildInfo.Version);
             _trayIcon.Icon = Properties.Resources.NzbDroneIcon;
 
-            _trayIcon.ContextMenuStrip = _trayMenu;
+            _trayIcon.ContextMenu = _trayMenu;
             _trayIcon.Visible = true;
             _trayIcon.DoubleClick += LaunchBrowser;
 
@@ -76,8 +76,9 @@ namespace NzbDrone.SysTray
 
             if (InvokeRequired)
             {
-                Invoke(new MethodInvoker(() => Dispose(isDisposing)));
+                base.Invoke(new MethodInvoker(() => Dispose(isDisposing)));
             }
+
             else
             {
                 base.Dispose(isDisposing);
@@ -98,6 +99,7 @@ namespace NzbDrone.SysTray
             }
             catch (Exception)
             {
+
             }
         }
 
@@ -127,6 +129,7 @@ namespace NzbDrone.SysTray
             }
             catch (Exception)
             {
+
             }
         }
     }

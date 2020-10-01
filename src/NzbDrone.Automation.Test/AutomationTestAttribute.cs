@@ -7,6 +7,7 @@ namespace NzbDrone.Automation.Test
         public AutomationTestAttribute()
             : base("AutomationTest")
         {
+
         }
     }
 }

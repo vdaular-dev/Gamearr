@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
@@ -7,7 +6,6 @@ using System.Xml.Linq;
 using NLog;
 using NUnit.Framework;
 using NzbDrone.Common.EnvironmentInfo;
-using NzbDrone.Common.Extensions;
 using NzbDrone.Common.Processes;
 using NzbDrone.Core.Configuration;
 using RestSharp;
@@ -19,18 +17,14 @@ namespace NzbDrone.Test.Common
         private readonly IProcessProvider _processProvider;
         private readonly IRestClient _restClient;
         private Process _nzbDroneProcess;
-        private List<string> _startupLog;
 
         public string AppData { get; private set; }
         public string ApiKey { get; private set; }
-        public int Port { get; private set; }
 
-        public NzbDroneRunner(Logger logger, int port = 8686)
+        public NzbDroneRunner(Logger logger, int port = 8383)
         {
             _processProvider = new ProcessProvider(logger);
-            _restClient = new RestClient($"http://localhost:{port}/api/v1");
-
-            Port = port;
+            _restClient = new RestClient("http://localhost:8383/api");
         }
 
         public void Start()
@@ -39,30 +33,16 @@ namespace NzbDrone.Test.Common
             Directory.CreateDirectory(AppData);
 
             GenerateConfigFile();
+            
+            var gamearrConsoleExe = OsInfo.IsWindows ? "Gamearr.Console.exe" : "Gamearr.exe";
 
-            string lidarrConsoleExe;
-            if (OsInfo.IsWindows)
-            {
-                lidarrConsoleExe = "Lidarr.Console.exe";
-            }
-            else if (PlatformInfo.IsMono)
-            {
-                lidarrConsoleExe = "Lidarr.exe";
-            }
-            else
-            {
-                lidarrConsoleExe = "Lidarr";
-            }
-
-            _startupLog = new List<string>();
             if (BuildInfo.IsDebug)
             {
-                var frameworkFolder = PlatformInfo.IsNetCore ? "netcoreapp3.1" : "net462";
-                Start(Path.Combine(TestContext.CurrentContext.TestDirectory, "..", "..", "_output", frameworkFolder, lidarrConsoleExe));
+                Start(Path.Combine(TestContext.CurrentContext.TestDirectory, "..", "_output", "Gamearr.Console.exe"));
             }
             else
             {
-                Start(Path.Combine(TestContext.CurrentContext.TestDirectory, "..", "bin", lidarrConsoleExe));
+                Start(Path.Combine("bin", gamearrConsoleExe));
             }
 
             while (true)
@@ -71,10 +51,9 @@ namespace NzbDrone.Test.Common
 
                 if (_nzbDroneProcess.HasExited)
                 {
-                    TestContext.Progress.WriteLine("Lidarr has exited unexpectedly");
+                    TestContext.Progress.WriteLine("Gamearr has exited unexpectedly");
                     Thread.Sleep(2000);
-                    var output = _startupLog.Join(Environment.NewLine);
-                    Assert.Fail("Process has exited: ExitCode={0} Output={1}", _nzbDroneProcess.ExitCode, output);
+                    Assert.Fail("Process has exited: ExitCode={0}", _nzbDroneProcess.ExitCode);
                 }
 
                 var request = new RestRequest("system/status");
@@ -85,40 +64,14 @@ namespace NzbDrone.Test.Common
 
                 if (statusCall.ResponseStatus == ResponseStatus.Completed)
                 {
-                    _startupLog = null;
-                    TestContext.Progress.WriteLine($"Lidarr {Port} is started. Running Tests");
+                    TestContext.Progress.WriteLine("Gamearr is started. Running Tests");
                     return;
                 }
 
-                TestContext.Progress.WriteLine("Waiting for Lidarr to start. Response Status : {0}  [{1}] {2}", statusCall.ResponseStatus, statusCall.StatusDescription, statusCall.ErrorException.Message);
+                TestContext.Progress.WriteLine("Waiting for Gamearr to start. Response Status : {0}  [{1}] {2}", statusCall.ResponseStatus, statusCall.StatusDescription, statusCall.ErrorException.Message);
 
                 Thread.Sleep(500);
             }
-        }
-
-        public void Kill()
-        {
-            try
-            {
-                if (_nzbDroneProcess != null)
-                {
-                    _nzbDroneProcess.Refresh();
-                    if (_nzbDroneProcess.HasExited)
-                    {
-                        var log = File.ReadAllLines(Path.Combine(AppData, "logs", "Lidarr.trace.txt"));
-                        var output = log.Join(Environment.NewLine);
-                        TestContext.Progress.WriteLine("Process has exited prematurely: ExitCode={0} Output:\n{1}", _nzbDroneProcess.ExitCode, output);
-                    }
-
-                    _processProvider.Kill(_nzbDroneProcess.Id);
-                }
-            }
-            catch (InvalidOperationException)
-            {
-                // May happen if the process closes while being closed
-            }
-
-            TestBase.DeleteTempFolder(AppData);
         }
 
         public void KillAll()
@@ -143,20 +96,16 @@ namespace NzbDrone.Test.Common
 
         private void Start(string outputNzbdroneConsoleExe)
         {
-            TestContext.Progress.WriteLine("Starting instance from {0} on port {1}", outputNzbdroneConsoleExe, Port);
+            TestContext.Progress.WriteLine("Starting instance from {0}", outputNzbdroneConsoleExe);
 
-            var args = "-nobrowser -nosingleinstancecheck -data=\"" + AppData + "\"";
+            var args = "-nobrowser -data=\"" + AppData + "\"";
             _nzbDroneProcess = _processProvider.Start(outputNzbdroneConsoleExe, args, null, OnOutputDataReceived, OnOutputDataReceived);
+
         }
 
         private void OnOutputDataReceived(string data)
         {
-            TestContext.Progress.WriteLine($" [{Port}] > " + data);
-
-            if (_startupLog != null)
-            {
-                _startupLog.Add(data);
-            }
+            TestContext.Progress.WriteLine(" > " + data);
 
             if (data.Contains("Press enter to exit"))
             {
@@ -172,12 +121,12 @@ namespace NzbDrone.Test.Common
             var apiKey = Guid.NewGuid().ToString().Replace("-", "");
 
             var xDoc = new XDocument(
-                new XDeclaration("1.0", "utf-8", "yes"),
+                new XDeclaration("1.0", "utf-8", "yes"), 
                 new XElement(ConfigFileProvider.CONFIG_ELEMENT_NAME,
                              new XElement(nameof(ConfigFileProvider.ApiKey), apiKey),
-                             new XElement(nameof(ConfigFileProvider.LogLevel), "trace"),
-                             new XElement(nameof(ConfigFileProvider.AnalyticsEnabled), false),
-                             new XElement(nameof(ConfigFileProvider.Port), Port)));
+                             new XElement(nameof(ConfigFileProvider.AnalyticsEnabled), false)
+                    )
+                );
 
             var data = xDoc.ToString();
 

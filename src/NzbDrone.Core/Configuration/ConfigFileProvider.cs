@@ -2,12 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.Linq;
 using NzbDrone.Common.Cache;
 using NzbDrone.Common.Disk;
 using NzbDrone.Common.EnvironmentInfo;
 using NzbDrone.Common.Extensions;
+using NzbDrone.Common.Instrumentation;
 using NzbDrone.Core.Authentication;
 using NzbDrone.Core.Configuration.Events;
 using NzbDrone.Core.Lifecycle;
@@ -32,13 +34,10 @@ namespace NzbDrone.Core.Configuration
         bool AnalyticsEnabled { get; }
         string LogLevel { get; }
         string ConsoleLogLevel { get; }
-        bool LogSql { get; }
-        int LogRotate { get; }
         bool FilterSentryEvents { get; }
         string Branch { get; }
         string ApiKey { get; }
-        string SslCertPath { get; }
-        string SslCertPassword { get; }
+        string SslCertHash { get; }
         string UrlBase { get; }
         string UiFolder { get; }
         bool UpdateAutomatically { get; }
@@ -55,6 +54,7 @@ namespace NzbDrone.Core.Configuration
         private readonly ICached<string> _cache;
 
         private readonly string _configFile;
+        private static readonly Regex HiddenCharacterRegex = new Regex("[^a-z0-9]", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         private static readonly object Mutex = new object();
 
@@ -99,12 +99,15 @@ namespace NzbDrone.Core.Configuration
                     continue;
                 }
 
-                object currentValue;
-                allWithDefaults.TryGetValue(configValue.Key, out currentValue);
-                if (currentValue == null)
+                if (configValue.Key.Equals("SslCertHash", StringComparison.InvariantCultureIgnoreCase) && configValue.Value.ToString().IsNotNullOrWhiteSpace())
                 {
+                    SetValue(configValue.Key.FirstCharToUpper(), HiddenCharacterRegex.Replace(configValue.Value.ToString(), string.Empty));
                     continue;
                 }
+
+                object currentValue;
+                allWithDefaults.TryGetValue(configValue.Key, out currentValue);
+                if (currentValue == null) continue;
 
                 var equal = configValue.Value.ToString().Equals(currentValue.ToString());
 
@@ -133,7 +136,7 @@ namespace NzbDrone.Core.Configuration
             }
         }
 
-        public int Port => GetValueInt("Port", 8686);
+        public int Port => GetValueInt("Port", 8383);
 
         public int SslPort => GetValueInt("SslPort", 6868);
 
@@ -179,11 +182,9 @@ namespace NzbDrone.Core.Configuration
 
         public string LogLevel => GetValue("LogLevel", "info");
         public string ConsoleLogLevel => GetValue("ConsoleLogLevel", string.Empty, persist: false);
-        public bool LogSql => GetValueBoolean("LogSql", false, persist: false);
-        public int LogRotate => GetValueInt("LogRotate", 50, persist: false);
         public bool FilterSentryEvents => GetValueBoolean("FilterSentryEvents", true, persist: false);
-        public string SslCertPath => GetValue("SslCertPath", "");
-        public string SslCertPassword => GetValue("SslCertPassword", "");
+
+        public string SslCertHash => GetValue("SslCertHash", "");
 
         public string UrlBase
         {
@@ -200,7 +201,7 @@ namespace NzbDrone.Core.Configuration
             }
         }
 
-        public string UiFolder => BuildInfo.IsDebug ? Path.Combine("..", "UI") : "UI";
+        public string UiFolder => GetValue("UiFolder", "UI", false);
 
         public bool UpdateAutomatically => GetValueBoolean("UpdateAutomatically", false, false);
 
@@ -208,9 +209,9 @@ namespace NzbDrone.Core.Configuration
 
         public string UpdateScriptPath => GetValue("UpdateScriptPath", "", false);
 
-        public int GetValueInt(string key, int defaultValue, bool persist = true)
+        public int GetValueInt(string key, int defaultValue)
         {
-            return Convert.ToInt32(GetValue(key, defaultValue, persist));
+            return Convert.ToInt32(GetValue(key, defaultValue));
         }
 
         public bool GetValueBoolean(string key, bool defaultValue, bool persist = true)
@@ -264,6 +265,7 @@ namespace NzbDrone.Core.Configuration
             {
                 parentContainer.Add(new XElement(key, valueString));
             }
+
             else
             {
                 parentContainer.Descendants(key).Single().Value = valueString;
@@ -320,12 +322,12 @@ namespace NzbDrone.Core.Configuration
 
                         if (contents.IsNullOrWhiteSpace())
                         {
-                            throw new InvalidConfigFileException($"{_configFile} is empty. Please delete the config file and Lidarr will recreate it.");
+                            throw new InvalidConfigFileException($"{_configFile} is empty. Please delete the config file and Gamearr will recreate it.");
                         }
 
                         if (contents.All(char.IsControl))
                         {
-                            throw new InvalidConfigFileException($"{_configFile} is corrupt. Please delete the config file and Lidarr will recreate it.");
+                            throw new InvalidConfigFileException($"{_configFile} is corrupt. Please delete the config file and Gamearr will recreate it.");
                         }
 
                         return XDocument.Parse(_diskProvider.ReadAllText(_configFile));
@@ -337,13 +339,15 @@ namespace NzbDrone.Core.Configuration
                     return xDoc;
                 }
             }
+
             catch (XmlException ex)
             {
-                throw new InvalidConfigFileException($"{_configFile} is corrupt is invalid. Please delete the config file and Lidarr will recreate it.", ex);
+                throw new InvalidConfigFileException($"{_configFile} is corrupt is invalid. Please delete the config file and Gamearr will recreate it.", ex);
             }
+
             catch (UnauthorizedAccessException ex)
             {
-                throw new AccessDeniedConfigFileException($"Lidarr does not have access to config file: {_configFile}. Please fix permissions", ex);
+                throw new AccessDeniedConfigFileException($"Gamearr does not have access to config file: {_configFile}. Please fix permissions", ex);
             }
         }
 
@@ -358,8 +362,9 @@ namespace NzbDrone.Core.Configuration
             }
             catch (UnauthorizedAccessException ex)
             {
-                throw new AccessDeniedConfigFileException($"Lidarr does not have access to config file: {_configFile}. Please fix permissions", ex);
+                throw new AccessDeniedConfigFileException($"Gamearr does not have access to config file: {_configFile}. Please fix permissions", ex);
             }
+
         }
 
         private string GenerateApiKey()

@@ -3,10 +3,10 @@ using FluentAssertions;
 using Moq;
 using NUnit.Framework;
 using NzbDrone.Core.DecisionEngine.Specifications;
-using NzbDrone.Core.Music;
 using NzbDrone.Core.Parser.Model;
 using NzbDrone.Core.Profiles.Releases;
 using NzbDrone.Core.Test.Framework;
+using NzbDrone.Core.Music;
 
 namespace NzbDrone.Core.Test.DecisionEngineTests
 {
@@ -20,15 +20,15 @@ namespace NzbDrone.Core.Test.DecisionEngineTests
         {
             _remoteAlbum = new RemoteAlbum
             {
-                Artist = new Artist
-                {
-                    Tags = new HashSet<int>()
-                },
-                Release = new ReleaseInfo
-                {
-                    Title = "Dexter.S08E01.EDITED.WEBRip.x264-KYR"
-                }
-            };
+                               Artist = new Artist
+                                        {
+                                            Tags = new HashSet<int>()
+                                        },
+                               Release = new ReleaseInfo
+                                         {
+                                             Title = "Dexter.S08E01.EDITED.WEBRip.x264-KYR"
+                                         }
+                           };
 
             Mocker.SetConstant<ITermMatcherService>(Mocker.Resolve<TermMatcherService>());
         }
@@ -36,7 +36,7 @@ namespace NzbDrone.Core.Test.DecisionEngineTests
         private void GivenRestictions(string required, string ignored)
         {
             Mocker.GetMock<IReleaseProfileService>()
-                  .Setup(s => s.EnabledForTags(It.IsAny<HashSet<int>>(), It.IsAny<int>()))
+                  .Setup(s => s.AllForTags(It.IsAny<HashSet<int>>()))
                   .Returns(new List<ReleaseProfile>
                            {
                                new ReleaseProfile()
@@ -51,7 +51,7 @@ namespace NzbDrone.Core.Test.DecisionEngineTests
         public void should_be_true_when_restrictions_are_empty()
         {
             Mocker.GetMock<IReleaseProfileService>()
-                  .Setup(s => s.EnabledForTags(It.IsAny<HashSet<int>>(), It.IsAny<int>()))
+                  .Setup(s => s.AllForTags(It.IsAny<HashSet<int>>()))
                   .Returns(new List<ReleaseProfile>());
 
             Subject.IsSatisfiedBy(_remoteAlbum, null).Accepted.Should().BeTrue();
@@ -117,7 +117,7 @@ namespace NzbDrone.Core.Test.DecisionEngineTests
             _remoteAlbum.Release.Title = "[ www.Speed.cd ] - Katy Perry - Witness (2017) MP3 [320 kbps] ";
 
             Mocker.GetMock<IReleaseProfileService>()
-                  .Setup(s => s.EnabledForTags(It.IsAny<HashSet<int>>(), It.IsAny<int>()))
+                  .Setup(s => s.AllForTags(It.IsAny<HashSet<int>>()))
                   .Returns(new List<ReleaseProfile>
                            {
                                new ReleaseProfile { Required = "320", Ignored = "www.Speed.cd" }

@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
-using MonoTorrent;
 using NzbDrone.Common.Extensions;
 using NzbDrone.Core.Parser.Model;
 
@@ -52,7 +51,8 @@ namespace NzbDrone.Core.Indexers
             {
                 try
                 {
-                    return MagnetLink.Parse(magnetUrl).InfoHash.ToHex();
+                    var magnetLink = new MonoTorrent.MagnetLink(magnetUrl);
+                    return magnetLink.InfoHash.ToHex();
                 }
                 catch
                 {

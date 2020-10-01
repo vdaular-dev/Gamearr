@@ -18,15 +18,18 @@ namespace NzbDrone.Core.Messaging.Events
 
         private readonly Dictionary<string, object> _eventSubscribers;
 
-        private class EventSubscribers<TEvent>
-            where TEvent : class, IEvent
+        private class EventSubscribers<TEvent> where TEvent : class, IEvent
         {
+            private IServiceFactory _serviceFactory;
+
             public IHandle<TEvent>[] _syncHandlers;
             public IHandleAsync<TEvent>[] _asyncHandlers;
             public IHandleAsync<IEvent>[] _globalHandlers;
 
             public EventSubscribers(IServiceFactory serviceFactory)
             {
+                _serviceFactory = serviceFactory;
+
                 _syncHandlers = serviceFactory.BuildAll<IHandle<TEvent>>()
                                               .OrderBy(GetEventHandleOrder)
                                               .ToArray();
@@ -47,8 +50,7 @@ namespace NzbDrone.Core.Messaging.Events
             _eventSubscribers = new Dictionary<string, object>();
         }
 
-        public void PublishEvent<TEvent>(TEvent @event)
-            where TEvent : class, IEvent
+        public void PublishEvent<TEvent>(TEvent @event) where TEvent : class, IEvent
         {
             Ensure.That(@event, () => @event).IsNotNull();
 
@@ -84,6 +86,7 @@ namespace NzbDrone.Core.Messaging.Events
 
                 subscribers = target as EventSubscribers<TEvent>;
             }
+
 
             //call synchronous handlers first.
             var handlers = subscribers._syncHandlers;
@@ -137,10 +140,10 @@ namespace NzbDrone.Core.Messaging.Events
             return string.Format("{0}<{1}>", eventType.Name.Remove(eventType.Name.IndexOf('`')), eventType.GetGenericArguments()[0].Name);
         }
 
-        internal static int GetEventHandleOrder<TEvent>(IHandle<TEvent> eventHandler)
-            where TEvent : class, IEvent
+        internal static int GetEventHandleOrder<TEvent>(IHandle<TEvent> eventHandler) where TEvent : class, IEvent
         {
-            var method = eventHandler.GetType().GetMethod(nameof(eventHandler.Handle), new Type[] { typeof(TEvent) });
+            // TODO: Convert "Handle" to nameof(eventHandler.Handle) after .net 4.5
+            var method = eventHandler.GetType().GetMethod("Handle", new Type[] { typeof(TEvent) });
 
             if (method == null)
             {

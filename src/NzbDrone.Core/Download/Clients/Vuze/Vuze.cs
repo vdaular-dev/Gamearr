@@ -24,18 +24,13 @@ namespace NzbDrone.Core.Download.Clients.Vuze
         {
         }
 
-        public override void RemoveItem(string downloadId, bool deleteData)
-        {
-            _proxy.RemoveTorrent(downloadId, deleteData, Settings);
-        }
-
         protected override OsPath GetOutputPath(OsPath outputPath, TransmissionTorrent torrent)
         {
             // Vuze has similar behavior as uTorrent:
             // - A multi-file torrent is downloaded in a job folder and 'outputPath' points to that directory directly.
             // - A single-file torrent is downloaded in the root folder and 'outputPath' poinst to that root folder.
             // We have to make sure the return value points to the job folder OR file.
-            if (outputPath == null || outputPath.FileName == torrent.Name || torrent.FileCount > 1)
+            if (outputPath == null || outputPath.FileName == torrent.Name)
             {
                 _logger.Trace("Vuze output directory: {0}", outputPath);
             }

@@ -1,32 +1,38 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using FluentAssertions;
-using Lidarr.Api.V1.Albums;
-using Lidarr.Api.V1.Artist;
-using Lidarr.Api.V1.Blacklist;
-using Lidarr.Api.V1.Config;
-using Lidarr.Api.V1.DownloadClient;
-using Lidarr.Api.V1.History;
-using Lidarr.Api.V1.Profiles.Quality;
-using Lidarr.Api.V1.RootFolders;
-using Lidarr.Api.V1.Tags;
-using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.AspNet.SignalR.Client;
+using Microsoft.AspNet.SignalR.Client.Transports;
 using NLog;
 using NLog.Config;
 using NLog.Targets;
 using NUnit.Framework;
+using Gamearr.Api.V1.Blacklist;
+using Gamearr.Api.V1.Commands;
+using Gamearr.Api.V1.Config;
+using Gamearr.Api.V1.DownloadClient;
+using Gamearr.Api.V1.TrackFiles;
+using Gamearr.Api.V1.History;
+using Gamearr.Api.V1.Profiles.Quality;
+using Gamearr.Api.V1.RootFolders;
+using Gamearr.Api.V1.Artist;
+using Gamearr.Api.V1.Albums;
+using Gamearr.Api.V1.Tracks;
+using Gamearr.Api.V1.Tags;
 using NzbDrone.Common.EnvironmentInfo;
-using NzbDrone.Core.MediaFiles.TrackImport.Manual;
+using NzbDrone.Common.Serializer;
 using NzbDrone.Core.Qualities;
+using NzbDrone.Core.Music.Commands;
 using NzbDrone.Integration.Test.Client;
 using NzbDrone.SignalR;
-using NzbDrone.Test.Common;
 using NzbDrone.Test.Common.Categories;
 using RestSharp;
+using NzbDrone.Core.MediaFiles.TrackImport.Manual;
+using NzbDrone.Test.Common;
 
 namespace NzbDrone.Integration.Test
 {
@@ -56,8 +62,7 @@ namespace NzbDrone.Integration.Test
         public ClientBase<AlbumResource> WantedCutoffUnmet;
 
         private List<SignalRMessage> _signalRReceived;
-
-        private HubConnection _signalrConnection;
+        private Connection _signalrConnection;
 
         protected IEnumerable<SignalRMessage> SignalRMessages => _signalRReceived;
 
@@ -136,11 +141,19 @@ namespace NzbDrone.Integration.Test
         }
 
         [TearDown]
-        public async Task IntegrationTearDown()
+        public void IntegrationTearDown()
         {
             if (_signalrConnection != null)
             {
-                await _signalrConnection.StopAsync();
+                switch (_signalrConnection.State)
+                {
+                    case ConnectionState.Connected:
+                    case ConnectionState.Connecting:
+                        {
+                            _signalrConnection.Stop();
+                            break;
+                        }
+                }
 
                 _signalrConnection = null;
                 _signalRReceived = new List<SignalRMessage>();
@@ -158,22 +171,6 @@ namespace NzbDrone.Integration.Test
             }
         }
 
-        protected void IgnoreOnMonoVersions(params string[] version_strings)
-        {
-            if (!PlatformInfo.IsMono)
-            {
-                return;
-            }
-
-            var current = PlatformInfo.GetVersion();
-            var versions = version_strings.Select(x => new Version(x)).ToList();
-
-            if (versions.Any(x => x.Major == current.Major && x.Minor == current.Minor))
-            {
-                throw new IgnoreException($"Ignored on mono {PlatformInfo.GetVersion()}");
-            }
-        }
-
         public string GetTempDirectory(params string[] args)
         {
             var path = Path.Combine(TempDirectory, Path.Combine(args));
@@ -183,51 +180,33 @@ namespace NzbDrone.Integration.Test
             return path;
         }
 
-        protected async Task ConnectSignalR()
+        protected void ConnectSignalR()
         {
             _signalRReceived = new List<SignalRMessage>();
-            _signalrConnection = new HubConnectionBuilder()
-                .WithUrl("http://localhost:8686/signalr/messages", options =>
-                    {
-                        options.AccessTokenProvider = () => Task.FromResult(ApiKey);
-                    })
-                .Build();
-
-            var cts = new CancellationTokenSource();
-
-            _signalrConnection.Closed += e =>
+            _signalrConnection = new Connection("http://localhost:8383/signalr");
+            _signalrConnection.Start(new LongPollingTransport()).ContinueWith(task =>
             {
-                cts.Cancel();
-                return Task.CompletedTask;
-            };
-
-            _signalrConnection.On<SignalRMessage>("receiveMessage", (message) =>
-            {
-                _signalRReceived.Add(message);
+                if (task.IsFaulted)
+                {
+                    Assert.Fail("SignalrConnection failed. {0}", task.Exception.GetBaseException());
+                }
             });
 
-            var connected = false;
             var retryCount = 0;
 
-            while (!connected)
+            while (_signalrConnection.State != ConnectionState.Connected)
             {
-                try
+                if (retryCount > 25)
                 {
-                    await _signalrConnection.StartAsync();
-                    connected = true;
-                    break;
-                }
-                catch
-                {
-                    if (retryCount > 25)
-                    {
-                        Assert.Fail("Couldn't establish signalR connection");
-                    }
+                    Assert.Fail("Couldn't establish signalr connection. State: {0}", _signalrConnection.State);
                 }
 
                 retryCount++;
+                Console.WriteLine("Connecting to signalR" + _signalrConnection.State);
                 Thread.Sleep(200);
             }
+
+            _signalrConnection.Received += json => _signalRReceived.Add(Json.Deserialize<SignalRMessage>(json)); ;
         }
 
         public static void WaitForCompletion(Func<bool> predicate, int timeout = 10000, int interval = 500)
@@ -236,28 +215,24 @@ namespace NzbDrone.Integration.Test
             for (var i = 0; i < count; i++)
             {
                 if (predicate())
-                {
                     return;
-                }
 
                 Thread.Sleep(interval);
             }
 
             if (predicate())
-            {
                 return;
-            }
 
             Assert.Fail("Timed on wait");
         }
 
-        public ArtistResource EnsureArtist(string lidarrId, string artistName, bool? monitored = null)
+        public ArtistResource EnsureArtist(string gamearrId, string artistName, bool? monitored = null)
         {
-            var result = Artist.All().FirstOrDefault(v => v.ForeignArtistId == lidarrId);
+            var result = Artist.All().FirstOrDefault(v => v.ForeignArtistId == gamearrId);
 
             if (result == null)
             {
-                var lookup = Artist.Lookup("lidarr:" + lidarrId);
+                var lookup = Artist.Lookup("gamearr:" + gamearrId);
                 var artist = lookup.First();
                 artist.QualityProfileId = 1;
                 artist.MetadataProfileId = 1;
@@ -297,9 +272,10 @@ namespace NzbDrone.Integration.Test
             return result;
         }
 
-        public void EnsureNoArtist(string lidarrId, string artistTitle)
+
+        public void EnsureNoArtist(string gamearrId, string artistTitle)
         {
-            var result = Artist.All().FirstOrDefault(v => v.ForeignArtistId == lidarrId);
+            var result = Artist.All().FirstOrDefault(v => v.ForeignArtistId == gamearrId);
 
             if (result != null)
             {
@@ -318,12 +294,9 @@ namespace NzbDrone.Integration.Test
                 Directory.CreateDirectory(Path.GetDirectoryName(path));
                 File.WriteAllText(path, "Fake Track");
 
-                Commands.PostAndWait(new ManualImportCommand
-                {
-                    Files = new List<ManualImportFile>
-                    {
-                            new ManualImportFile
-                            {
+                Commands.PostAndWait(new ManualImportCommand {
+                        Files = new List<ManualImportFile> {
+                            new ManualImportFile {
                                 Path = path,
                                 ArtistId = artist.Id,
                                 AlbumId = albumId,
@@ -331,10 +304,10 @@ namespace NzbDrone.Integration.Test
                                 TrackIds = new List<int> { trackId },
                                 Quality = new QualityModel(quality)
                             }
-                    }
-                });
+                        }
+                    });
                 Commands.WaitAll();
-
+                
                 var track = Tracks.GetTracksInArtist(artist.Id).Single(x => x.Id == trackId);
 
                 track.TrackFileId.Should().NotBe(0);

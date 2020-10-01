@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace NzbDrone.Core.Notifications.MediaBrowser.Model
 {
     public class EmbyMediaFolder

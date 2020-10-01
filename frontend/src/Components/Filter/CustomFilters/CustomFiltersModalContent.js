@@ -1,10 +1,10 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import Button from 'Components/Link/Button';
-import ModalBody from 'Components/Modal/ModalBody';
 import ModalContent from 'Components/Modal/ModalContent';
-import ModalFooter from 'Components/Modal/ModalFooter';
 import ModalHeader from 'Components/Modal/ModalHeader';
+import ModalBody from 'Components/Modal/ModalBody';
+import ModalFooter from 'Components/Modal/ModalFooter';
 import CustomFilter from './CustomFilter';
 import styles from './CustomFiltersModalContent.css';
 
@@ -24,7 +24,7 @@ function CustomFiltersModalContent(props) {
   return (
     <ModalContent onModalClose={onModalClose}>
       <ModalHeader>
-        Custom Filters
+          Custom Filters
       </ModalHeader>
 
       <ModalBody>
@@ -58,7 +58,7 @@ function CustomFiltersModalContent(props) {
         <Button
           onPress={onModalClose}
         >
-          Close
+            Close
         </Button>
       </ModalFooter>
     </ModalContent>

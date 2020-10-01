@@ -1,5 +1,4 @@
-﻿using Dapper;
-using NzbDrone.Core.Datastore;
+﻿using NzbDrone.Core.Datastore;
 
 namespace NzbDrone.Core.Housekeeping.Housekeepers
 {
@@ -14,9 +13,9 @@ namespace NzbDrone.Core.Housekeeping.Housekeepers
 
         public void Clean()
         {
-            using (var mapper = _database.OpenConnection())
-            {
-                mapper.Execute(@"DELETE FROM MetadataFiles
+            var mapper = _database.GetDataMapper();
+
+            mapper.ExecuteNonQuery(@"DELETE FROM MetadataFiles
                                      WHERE Id IN (
                                          SELECT Id FROM MetadataFiles
                                          WHERE RelativePath
@@ -26,7 +25,6 @@ namespace NzbDrone.Core.Housekeeping.Housekeepers
                                          OR RelativePath
                                          LIKE '/%'
                                      )");
-            }
         }
     }
 }

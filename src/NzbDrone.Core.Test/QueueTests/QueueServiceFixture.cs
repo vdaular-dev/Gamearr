@@ -1,16 +1,17 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using NUnit.Framework;
 using FizzWare.NBuilder;
 using FluentAssertions;
 using Moq;
-using NUnit.Framework;
+using NzbDrone.Core.Test.Framework;
 using NzbDrone.Core.Download.TrackedDownloads;
 using NzbDrone.Core.History;
 using NzbDrone.Core.Music;
-using NzbDrone.Core.Parser.Model;
 using NzbDrone.Core.Queue;
-using NzbDrone.Core.Test.Framework;
+using NzbDrone.Core.Parser.Model;
+
 
 namespace NzbDrone.Core.Test.QueueTests
 {
@@ -51,8 +52,10 @@ namespace NzbDrone.Core.Test.QueueTests
                 .Build();
 
             Mocker.GetMock<IHistoryService>()
-                .Setup(c => c.Find(It.IsAny<string>(), HistoryEventType.Grabbed)).Returns(
-                    new List<History.History> { historyItem });
+                .Setup(c => c.Find(It.IsAny<string>(), HistoryEventType.Grabbed)).Returns
+                (
+                    new List<History.History> { historyItem }
+                );
         }
 
         [Test]

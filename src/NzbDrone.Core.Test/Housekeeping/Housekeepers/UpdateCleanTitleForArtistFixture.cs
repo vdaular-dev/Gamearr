@@ -1,9 +1,10 @@
 using FizzWare.NBuilder;
+using FluentAssertions;
 using Moq;
 using NUnit.Framework;
 using NzbDrone.Core.Housekeeping.Housekeepers;
-using NzbDrone.Core.Music;
 using NzbDrone.Core.Test.Framework;
+using NzbDrone.Core.Music;
 
 namespace NzbDrone.Core.Test.Housekeeping.Housekeepers
 {

@@ -37,10 +37,6 @@ class OverlayScroller extends Component {
 
   _setScrollRef = (ref) => {
     this._scroller = ref;
-
-    if (ref) {
-      this.props.registerScroller(ref.view);
-    }
   }
 
   _renderThumb = (props) => {
@@ -64,7 +60,6 @@ class OverlayScroller extends Component {
 
     return (
       <div
-        className={styles.track}
         style={finalStyle}
         {...props}
       />
@@ -83,7 +78,6 @@ class OverlayScroller extends Component {
 
     return (
       <div
-        className={styles.track}
         style={finalStyle}
         {...props}
       />
@@ -163,8 +157,7 @@ OverlayScroller.propTypes = {
   autoHide: PropTypes.bool.isRequired,
   autoScroll: PropTypes.bool.isRequired,
   children: PropTypes.node,
-  onScroll: PropTypes.func,
-  registerScroller: PropTypes.func
+  onScroll: PropTypes.func
 };
 
 OverlayScroller.defaultProps = {
@@ -172,8 +165,7 @@ OverlayScroller.defaultProps = {
   trackClassName: styles.thumb,
   scrollDirection: scrollDirections.VERTICAL,
   autoHide: false,
-  autoScroll: true,
-  registerScroller: () => {}
+  autoScroll: true
 };
 
 export default OverlayScroller;

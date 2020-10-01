@@ -1,14 +1,14 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import TextInput from 'Components/Form/TextInput';
+import { icons, kinds } from 'Helpers/Props';
 import Icon from 'Components/Icon';
+import TextInput from 'Components/Form/TextInput';
 import Button from 'Components/Link/Button';
 import SpinnerButton from 'Components/Link/SpinnerButton';
-import ModalBody from 'Components/Modal/ModalBody';
 import ModalContent from 'Components/Modal/ModalContent';
-import ModalFooter from 'Components/Modal/ModalFooter';
 import ModalHeader from 'Components/Modal/ModalHeader';
-import { icons, kinds } from 'Helpers/Props';
+import ModalBody from 'Components/Modal/ModalBody';
+import ModalFooter from 'Components/Modal/ModalFooter';
 import styles from './RestoreBackupModalContent.css';
 
 function getErrorMessage(error) {
@@ -196,11 +196,11 @@ class RestoreBackupModalContent extends Component {
 
         <ModalFooter>
           <div className={styles.additionalInfo}>
-            Note: Lidarr will automatically restart and reload the UI during the restore process.
+            Note: Gamearr will automatically restart and reload the UI during the restore process.
           </div>
 
           <Button onPress={onModalClose}>
-            Cancel
+              Cancel
           </Button>
 
           <SpinnerButton
@@ -209,7 +209,7 @@ class RestoreBackupModalContent extends Component {
             isSpinning={isRestoring}
             onPress={this.onRestorePress}
           >
-            Restore
+              Restore
           </SpinnerButton>
         </ModalFooter>
       </ModalContent>

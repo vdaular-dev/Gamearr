@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
-import DescriptionList from 'Components/DescriptionList/DescriptionList';
-import DescriptionListItemDescription from 'Components/DescriptionList/DescriptionListItemDescription';
-import DescriptionListItemTitle from 'Components/DescriptionList/DescriptionListItemTitle';
-import FieldSet from 'Components/FieldSet';
 import Link from 'Components/Link/Link';
+import FieldSet from 'Components/FieldSet';
+import DescriptionList from 'Components/DescriptionList/DescriptionList';
+import DescriptionListItemTitle from 'Components/DescriptionList/DescriptionListItemTitle';
+import DescriptionListItemDescription from 'Components/DescriptionList/DescriptionListItemDescription';
 
 class MoreInfo extends Component {
 
@@ -16,27 +16,27 @@ class MoreInfo extends Component {
         <DescriptionList>
           <DescriptionListItemTitle>Home page</DescriptionListItemTitle>
           <DescriptionListItemDescription>
-            <Link to="https://lidarr.audio/">lidarr.audio</Link>
+            <Link to="https://gamearr.game/">gamearr.game</Link>
           </DescriptionListItemDescription>
 
           <DescriptionListItemTitle>Wiki</DescriptionListItemTitle>
           <DescriptionListItemDescription>
-            <Link to="https://github.com/lidarr/Lidarr/wiki">wiki.lidarr.audio</Link>
+            <Link to="https://github.com/gamearr/Gamearr/wiki">wiki.gamearr.game</Link>
           </DescriptionListItemDescription>
 
           <DescriptionListItemTitle>Reddit</DescriptionListItemTitle>
           <DescriptionListItemDescription>
-            <Link to="https://www.reddit.com/r/Lidarr/">Lidarr</Link>
+            <Link to="https://www.reddit.com/r/Gamearr/">Gamearr</Link>
           </DescriptionListItemDescription>
 
           <DescriptionListItemTitle>Discord</DescriptionListItemTitle>
           <DescriptionListItemDescription>
-            <Link to="https://discord.gg/8Y7rDc9">#lidarr on Discord</Link>
+            <Link to="https://discord.gg/VUzFAqF">#gamearr on Discord</Link>
           </DescriptionListItemDescription>
 
           <DescriptionListItemTitle>Donations</DescriptionListItemTitle>
           <DescriptionListItemDescription>
-            <Link to="https://opencollective.com/lidarr">Donate to Lidarr</Link>
+            <Link to="https://opencollective.com/gamearr">Donate to Gamearr</Link>
           </DescriptionListItemDescription>
 
           <DescriptionListItemTitle>Sonarr Donations</DescriptionListItemTitle>
@@ -46,12 +46,12 @@ class MoreInfo extends Component {
 
           <DescriptionListItemTitle>Source</DescriptionListItemTitle>
           <DescriptionListItemDescription>
-            <Link to="https://github.com/lidarr/Lidarr/">github.com/Lidarr/Lidarr</Link>
+            <Link to="https://github.com/gamearr/Gamearr/">github.com/Gamearr/Gamearr</Link>
           </DescriptionListItemDescription>
 
           <DescriptionListItemTitle>Feature Requests</DescriptionListItemTitle>
           <DescriptionListItemDescription>
-            <Link to="https://github.com/lidarr/Lidarr/issues">github.com/Lidarr/Lidarr/issues</Link>
+            <Link to="https://github.com/gamearr/Gamearr/issues">github.com/Gamearr/Gamearr/issues</Link>
           </DescriptionListItemDescription>
 
         </DescriptionList>

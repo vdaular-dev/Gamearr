@@ -2,32 +2,29 @@ import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
-import * as commandNames from 'Commands/commandNames';
-import withCurrentPage from 'Components/withCurrentPage';
-import { clearAlbums, fetchAlbums } from 'Store/Actions/albumActions';
-import { executeCommand } from 'Store/Actions/commandActions';
-import * as queueActions from 'Store/Actions/queueActions';
-import createCommandExecutingSelector from 'Store/Selectors/createCommandExecutingSelector';
+import { registerPagePopulator, unregisterPagePopulator } from 'Utilities/pagePopulator';
 import hasDifferentItems from 'Utilities/Object/hasDifferentItems';
 import selectUniqueIds from 'Utilities/Object/selectUniqueIds';
-import { registerPagePopulator, unregisterPagePopulator } from 'Utilities/pagePopulator';
+import withCurrentPage from 'Components/withCurrentPage';
+import createCommandExecutingSelector from 'Store/Selectors/createCommandExecutingSelector';
+import { executeCommand } from 'Store/Actions/commandActions';
+import * as queueActions from 'Store/Actions/queueActions';
+import { fetchAlbums, clearAlbums } from 'Store/Actions/albumActions';
+import * as commandNames from 'Commands/commandNames';
 import Queue from './Queue';
 
 function createMapStateToProps() {
   return createSelector(
-    (state) => state.artist,
     (state) => state.albums,
     (state) => state.queue.options,
     (state) => state.queue.paged,
-    createCommandExecutingSelector(commandNames.REFRESH_MONITORED_DOWNLOADS),
-    (artist, albums, options, queue, isRefreshMonitoredDownloadsExecuting) => {
+    createCommandExecutingSelector(commandNames.CHECK_FOR_FINISHED_DOWNLOAD),
+    (albums, options, queue, isCheckForFinishedDownloadExecuting) => {
       return {
-        isArtistFetching: artist.isFetching,
-        isArtistPopulated: artist.isPopulated,
         isAlbumsFetching: albums.isFetching,
         isAlbumsPopulated: albums.isPopulated,
         albumsError: albums.error,
-        isRefreshMonitoredDownloadsExecuting,
+        isCheckForFinishedDownloadExecuting,
         ...options,
         ...queue
       };
@@ -132,7 +129,7 @@ class QueueConnector extends Component {
 
   onRefreshPress = () => {
     this.props.executeCommand({
-      name: commandNames.REFRESH_MONITORED_DOWNLOADS
+      name: commandNames.CHECK_FOR_FINISHED_DOWNLOAD
     });
   }
 
@@ -140,8 +137,8 @@ class QueueConnector extends Component {
     this.props.grabQueueItems({ ids });
   }
 
-  onRemoveSelectedPress = (payload) => {
-    this.props.removeQueueItems(payload);
+  onRemoveSelectedPress = (ids, blacklist, skipredownload) => {
+    this.props.removeQueueItems({ ids, blacklist, skipredownload });
   }
 
   //

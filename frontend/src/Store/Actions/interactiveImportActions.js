@@ -1,15 +1,15 @@
 import moment from 'moment';
 import { createAction } from 'redux-actions';
 import { batchActions } from 'redux-batched-actions';
-import { sortDirections } from 'Helpers/Props';
-import { createThunk, handleThunks } from 'Store/thunks';
 import createAjaxRequest from 'Utilities/createAjaxRequest';
 import updateSectionState from 'Utilities/State/updateSectionState';
-import { set, update } from './baseActions';
+import { createThunk, handleThunks } from 'Store/thunks';
+import { sortDirections } from 'Helpers/Props';
+import createSetClientSideCollectionSortReducer from './Creators/Reducers/createSetClientSideCollectionSortReducer';
 import createFetchHandler from './Creators/createFetchHandler';
 import createHandleActions from './Creators/createHandleActions';
 import createSaveProviderHandler from './Creators/createSaveProviderHandler';
-import createSetClientSideCollectionSortReducer from './Creators/Reducers/createSetClientSideCollectionSortReducer';
+import { set, update } from './baseActions';
 
 //
 // Variables
@@ -18,8 +18,6 @@ export const section = 'interactiveImport';
 
 const albumsSection = `${section}.albums`;
 const trackFilesSection = `${section}.trackFiles`;
-
-const MAXIMUM_RECENT_FOLDERS = 10;
 
 //
 // State
@@ -36,10 +34,10 @@ export const defaultState = {
   recentFolders: [],
   importMode: 'move',
   sortPredicates: {
-    path: function(item, direction) {
-      const path = item.path;
+    relativePath: function(item, direction) {
+      const relativePath = item.relativePath;
 
-      return path.toLowerCase();
+      return relativePath.toLowerCase();
     },
 
     artist: function(item, direction) {
@@ -49,7 +47,7 @@ export const defaultState = {
     },
 
     quality: function(item, direction) {
-      return item.qualityWeight || 0;
+      return item.quality ? item.qualityWeight : 0;
     }
   },
 
@@ -205,14 +203,12 @@ export const reducers = createHandleActions({
     const index = recentFolders.findIndex((r) => r.folder === folder);
 
     if (index > -1) {
-      recentFolders.splice(index, 1);
+      recentFolders.splice(index, 1, recentFolder);
+    } else {
+      recentFolders.push(recentFolder);
     }
 
-    recentFolders.push(recentFolder);
-
-    const sliceIndex = Math.max(recentFolders.length - MAXIMUM_RECENT_FOLDERS, 0);
-
-    return Object.assign({}, state, { recentFolders: recentFolders.slice(sliceIndex) });
+    return Object.assign({}, state, { recentFolders });
   },
 
   [REMOVE_RECENT_FOLDER]: function(state, { payload }) {

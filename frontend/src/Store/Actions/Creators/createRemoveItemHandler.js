@@ -1,7 +1,7 @@
 import $ from 'jquery';
 import { batchActions } from 'redux-batched-actions';
 import createAjaxRequest from 'Utilities/createAjaxRequest';
-import { removeItem, set } from '../baseActions';
+import { set, removeItem } from '../baseActions';
 
 function createRemoveItemHandler(section, url) {
   return function(getState, payload, dispatch) {

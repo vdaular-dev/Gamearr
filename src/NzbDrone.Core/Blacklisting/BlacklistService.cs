@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using NzbDrone.Common.Extensions;
 using NzbDrone.Core.Datastore;
@@ -7,8 +6,8 @@ using NzbDrone.Core.Download;
 using NzbDrone.Core.Indexers;
 using NzbDrone.Core.Messaging.Commands;
 using NzbDrone.Core.Messaging.Events;
-using NzbDrone.Core.Music.Events;
 using NzbDrone.Core.Parser.Model;
+using NzbDrone.Core.Music.Events;
 
 namespace NzbDrone.Core.Blacklisting
 {
@@ -18,7 +17,6 @@ namespace NzbDrone.Core.Blacklisting
         PagingSpec<Blacklist> Paged(PagingSpec<Blacklist> pagingSpec);
         void Delete(int id);
     }
-
     public class BlacklistService : IBlacklistService,
 
                                     IExecute<ClearBlacklistCommand>,
@@ -35,15 +33,12 @@ namespace NzbDrone.Core.Blacklisting
         public bool Blacklisted(int artistId, ReleaseInfo release)
         {
             var blacklistedByTitle = _blacklistRepository.BlacklistedByTitle(artistId, release.Title);
-
+            
             if (release.DownloadProtocol == DownloadProtocol.Torrent)
             {
                 var torrentInfo = release as TorrentInfo;
 
-                if (torrentInfo == null)
-                {
-                    return false;
-                }
+                if (torrentInfo == null) return false;
 
                 if (torrentInfo.InfoHash.IsNullOrWhiteSpace())
                 {
@@ -109,10 +104,7 @@ namespace NzbDrone.Core.Blacklisting
 
         private bool HasSamePublishedDate(Blacklist item, DateTime publishedDate)
         {
-            if (!item.PublishedDate.HasValue)
-            {
-                return true;
-            }
+            if (!item.PublishedDate.HasValue) return true;
 
             return item.PublishedDate.Value.AddMinutes(-2) <= publishedDate &&
                    item.PublishedDate.Value.AddMinutes(2) >= publishedDate;
@@ -120,10 +112,7 @@ namespace NzbDrone.Core.Blacklisting
 
         private bool HasSameSize(Blacklist item, long size)
         {
-            if (!item.Size.HasValue)
-            {
-                return true;
-            }
+            if (!item.Size.HasValue) return true;
 
             var difference = Math.Abs(item.Size.Value - size);
 
@@ -138,18 +127,18 @@ namespace NzbDrone.Core.Blacklisting
         public void Handle(DownloadFailedEvent message)
         {
             var blacklist = new Blacklist
-            {
-                ArtistId = message.ArtistId,
-                AlbumIds = message.AlbumIds,
-                SourceTitle = message.SourceTitle,
-                Quality = message.Quality,
-                Date = DateTime.UtcNow,
-                PublishedDate = DateTime.Parse(message.Data.GetValueOrDefault("publishedDate")),
-                Size = long.Parse(message.Data.GetValueOrDefault("size", "0")),
-                Indexer = message.Data.GetValueOrDefault("indexer"),
-                Protocol = (DownloadProtocol)Convert.ToInt32(message.Data.GetValueOrDefault("protocol")),
-                Message = message.Message,
-                TorrentInfoHash = message.Data.GetValueOrDefault("torrentInfoHash")
+                            {
+                                ArtistId = message.ArtistId,
+                                AlbumIds = message.AlbumIds,
+                                SourceTitle = message.SourceTitle,
+                                Quality = message.Quality,
+                                Date = DateTime.UtcNow,
+                                PublishedDate = DateTime.Parse(message.Data.GetValueOrDefault("publishedDate")),
+                                Size = long.Parse(message.Data.GetValueOrDefault("size", "0")),
+                                Indexer = message.Data.GetValueOrDefault("indexer"),
+                                Protocol = (DownloadProtocol)Convert.ToInt32(message.Data.GetValueOrDefault("protocol")),
+                                Message = message.Message,
+                                TorrentInfoHash = message.Data.GetValueOrDefault("torrentInfoHash")
             };
 
             _blacklistRepository.Insert(blacklist);

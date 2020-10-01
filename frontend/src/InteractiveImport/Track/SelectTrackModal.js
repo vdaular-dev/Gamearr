@@ -1,7 +1,6 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import Modal from 'Components/Modal/Modal';
-import SelectTrackModalContentConnector from './SelectTrackModalContentConnector';
 
 class SelectTrackModal extends Component {
 

@@ -45,6 +45,7 @@ namespace NzbDrone.Core.Profiles.Releases
             else
             {
                 return new CaseInsensitiveTermMatcher(term);
+
             }
         }
     }

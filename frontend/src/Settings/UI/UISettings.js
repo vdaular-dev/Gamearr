@@ -1,15 +1,15 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
+import { inputTypes } from 'Helpers/Props';
+import LoadingIndicator from 'Components/Loading/LoadingIndicator';
 import FieldSet from 'Components/FieldSet';
+import PageContent from 'Components/Page/PageContent';
+import PageContentBodyConnector from 'Components/Page/PageContentBodyConnector';
+import SettingsToolbarConnector from 'Settings/SettingsToolbarConnector';
 import Form from 'Components/Form/Form';
 import FormGroup from 'Components/Form/FormGroup';
-import FormInputGroup from 'Components/Form/FormInputGroup';
 import FormLabel from 'Components/Form/FormLabel';
-import LoadingIndicator from 'Components/Loading/LoadingIndicator';
-import PageContent from 'Components/Page/PageContent';
-import PageContentBody from 'Components/Page/PageContentBody';
-import { inputTypes } from 'Helpers/Props';
-import SettingsToolbarConnector from 'Settings/SettingsToolbarConnector';
+import FormInputGroup from 'Components/Form/FormInputGroup';
 import styles from './UISettings.css';
 
 export const firstDayOfWeekOptions = [
@@ -20,7 +20,7 @@ export const firstDayOfWeekOptions = [
 export const weekColumnOptions = [
   { key: 'ddd M/D', value: 'Tue 3/25' },
   { key: 'ddd MM/DD', value: 'Tue 03/25' },
-  { key: 'ddd D/M', value: 'Tue 25/3' },
+  { key: 'ddd D/M', value: 'Tue 25/03' },
   { key: 'ddd DD/MM', value: 'Tue 25/03' }
 ];
 
@@ -66,7 +66,7 @@ class UISettings extends Component {
           onSavePress={onSavePress}
         />
 
-        <PageContentBody>
+        <PageContentBodyConnector>
           {
             isFetching &&
               <LoadingIndicator />
@@ -174,55 +174,10 @@ class UISettings extends Component {
                       {...settings.enableColorImpairedMode}
                     />
                   </FormGroup>
-
-                  <FormGroup>
-                    <FormLabel>Expand Items by Default</FormLabel>
-                    <div className={styles.columnGroup}>
-                      <FormInputGroup
-                        type={inputTypes.CHECK}
-                        name="expandAlbumByDefault"
-                        helpText="Albums"
-                        onChange={onInputChange}
-                        {...settings.expandAlbumByDefault}
-                      />
-
-                      <FormInputGroup
-                        type={inputTypes.CHECK}
-                        name="expandEPByDefault"
-                        helpText="EPs"
-                        onChange={onInputChange}
-                        {...settings.expandEPByDefault}
-                      />
-
-                      <FormInputGroup
-                        type={inputTypes.CHECK}
-                        name="expandSingleByDefault"
-                        helpText="Singles"
-                        onChange={onInputChange}
-                        {...settings.expandSingleByDefault}
-                      />
-
-                      <FormInputGroup
-                        type={inputTypes.CHECK}
-                        name="expandBroadcastByDefault"
-                        helpText="Broadcast"
-                        onChange={onInputChange}
-                        {...settings.expandBroadcastByDefault}
-                      />
-
-                      <FormInputGroup
-                        type={inputTypes.CHECK}
-                        name="expandOtherByDefault"
-                        helpText="Other"
-                        onChange={onInputChange}
-                        {...settings.expandOtherByDefault}
-                      />
-                    </div>
-                  </FormGroup>
                 </FieldSet>
               </Form>
           }
-        </PageContentBody>
+        </PageContentBodyConnector>
       </PageContent>
     );
   }

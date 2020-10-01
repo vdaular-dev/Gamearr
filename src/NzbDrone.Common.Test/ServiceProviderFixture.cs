@@ -1,17 +1,16 @@
 ﻿using System;
 using System.Security.Principal;
 using System.ServiceProcess;
-using System.Threading;
 using FluentAssertions;
 using NUnit.Framework;
 using NzbDrone.Common.EnvironmentInfo;
-using NzbDrone.Common.Processes;
 using NzbDrone.Test.Common;
 using NzbDrone.Test.Common.Categories;
 
 namespace NzbDrone.Common.Test
 {
     [TestFixture]
+    [Timeout(15000)]
     public class ServiceProviderFixture : TestBase<ServiceProvider>
     {
         private const string ALWAYS_INSTALLED_SERVICE = "SCardSvr"; //Smart Card
@@ -21,9 +20,6 @@ namespace NzbDrone.Common.Test
         public void Setup()
         {
             WindowsOnly();
-
-            Mocker.SetConstant<IProcessProvider>(Mocker.Resolve<ProcessProvider>());
-
             CleanupService();
         }
 
@@ -35,6 +31,7 @@ namespace NzbDrone.Common.Test
                 CleanupService();
             }
         }
+
 
         private void CleanupService()
         {
@@ -61,6 +58,7 @@ namespace NzbDrone.Common.Test
             Subject.ServiceExist("random_service_name").Should().BeFalse();
         }
 
+
         [Test]
         public void Service_should_be_installed_and_then_uninstalled()
         {
@@ -73,7 +71,6 @@ namespace NzbDrone.Common.Test
             Subject.Install(TEMP_SERVICE_NAME);
             Subject.ServiceExist(TEMP_SERVICE_NAME).Should().BeTrue();
             Subject.Uninstall(TEMP_SERVICE_NAME);
-            Thread.Sleep(2000);
             Subject.ServiceExist(TEMP_SERVICE_NAME).Should().BeFalse();
 
             ExceptionVerification.ExpectedWarns(1);
@@ -121,6 +118,7 @@ namespace NzbDrone.Common.Test
             Subject.Start(ALWAYS_INSTALLED_SERVICE);
             Assert.Throws<InvalidOperationException>(() => Subject.Start(ALWAYS_INSTALLED_SERVICE));
 
+
             ExceptionVerification.ExpectedWarns(1);
         }
 
@@ -130,14 +128,15 @@ namespace NzbDrone.Common.Test
             Subject.GetService(ALWAYS_INSTALLED_SERVICE).Status
                 .Should().NotBe(ServiceControllerStatus.Running);
 
+
             Subject.Stop(ALWAYS_INSTALLED_SERVICE);
+
 
             Subject.GetService(ALWAYS_INSTALLED_SERVICE).Status
                 .Should().Be(ServiceControllerStatus.Stopped);
 
             ExceptionVerification.ExpectedWarns(1);
         }
-
         private static bool IsAnAdministrator()
         {
             var principal = new WindowsPrincipal(WindowsIdentity.GetCurrent());

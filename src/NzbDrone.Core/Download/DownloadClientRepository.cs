@@ -6,6 +6,7 @@ namespace NzbDrone.Core.Download
 {
     public interface IDownloadClientRepository : IProviderRepository<DownloadClientDefinition>
     {
+
     }
 
     public class DownloadClientRepository : ProviderRepository<DownloadClientDefinition>, IDownloadClientRepository

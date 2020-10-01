@@ -1,13 +1,12 @@
 using System;
 using System.Collections.Generic;
 using FluentValidation.Results;
-using NzbDrone.Core.Music;
 using NzbDrone.Core.ThingiProvider;
+using NzbDrone.Core.Music;
 
 namespace NzbDrone.Core.Notifications
 {
-    public abstract class NotificationBase<TSettings> : INotification
-        where TSettings : IProviderConfig, new()
+    public abstract class NotificationBase<TSettings> : INotification where TSettings : IProviderConfig, new()
     {
         protected const string ALBUM_GRABBED_TITLE = "Album Grabbed";
         protected const string ALBUM_DOWNLOADED_TITLE = "Album Downloaded";
@@ -16,12 +15,12 @@ namespace NzbDrone.Core.Notifications
         protected const string IMPORT_FAILURE_TITLE = "Import Failed";
         protected const string TRACK_RETAGGED_TITLE = "Track File Tags Updated";
 
-        protected const string ALBUM_GRABBED_TITLE_BRANDED = "Lidarr - " + ALBUM_GRABBED_TITLE;
-        protected const string ALBUM_DOWNLOADED_TITLE_BRANDED = "Lidarr - " + ALBUM_DOWNLOADED_TITLE;
-        protected const string HEALTH_ISSUE_TITLE_BRANDED = "Lidarr - " + HEALTH_ISSUE_TITLE;
-        protected const string DOWNLOAD_FAILURE_TITLE_BRANDED = "Lidarr - " + DOWNLOAD_FAILURE_TITLE;
-        protected const string IMPORT_FAILURE_TITLE_BRANDED = "Lidarr - " + IMPORT_FAILURE_TITLE;
-        protected const string TRACK_RETAGGED_TITLE_BRANDED = "Lidarr - " + TRACK_RETAGGED_TITLE;
+        protected const string ALBUM_GRABBED_TITLE_BRANDED = "Gamearr - " + ALBUM_GRABBED_TITLE;
+        protected const string ALBUM_DOWNLOADED_TITLE_BRANDED = "Gamearr - " + ALBUM_DOWNLOADED_TITLE;
+        protected const string HEALTH_ISSUE_TITLE_BRANDED = "Gamearr - " + HEALTH_ISSUE_TITLE;
+        protected const string DOWNLOAD_FAILURE_TITLE_BRANDED = "Gamearr - " + DOWNLOAD_FAILURE_TITLE;
+        protected const string IMPORT_FAILURE_TITLE_BRANDED = "Gamearr - " + IMPORT_FAILURE_TITLE;
+        protected const string TRACK_RETAGGED_TITLE_BRANDED = "Gamearr - " + TRACK_RETAGGED_TITLE;
 
         public abstract string Name { get; }
 
@@ -38,34 +37,37 @@ namespace NzbDrone.Core.Notifications
 
         public virtual void OnGrab(GrabMessage grabMessage)
         {
+
         }
 
         public virtual void OnReleaseImport(AlbumDownloadMessage message)
         {
+
         }
 
         public virtual void OnRename(Artist artist)
         {
+
         }
 
         public virtual void OnHealthIssue(HealthCheck.HealthCheck healthCheck)
         {
+
         }
 
         public virtual void OnDownloadFailure(DownloadFailedMessage message)
         {
+
         }
 
         public virtual void OnImportFailure(AlbumDownloadMessage message)
         {
+
         }
 
         public virtual void OnTrackRetag(TrackRetagMessage message)
         {
-        }
 
-        public virtual void ProcessQueue()
-        {
         }
 
         public bool SupportsOnGrab => HasConcreteImplementation("OnGrab");
@@ -84,10 +86,8 @@ namespace NzbDrone.Core.Notifications
             return GetType().Name;
         }
 
-        public virtual object RequestAction(string action, IDictionary<string, string> query)
-        {
-            return null;
-        }
+        public virtual object RequestAction(string action, IDictionary<string, string> query) { return null; }
+
 
         private bool HasConcreteImplementation(string methodName)
         {
@@ -100,5 +100,6 @@ namespace NzbDrone.Core.Notifications
 
             return !method.DeclaringType.IsAbstract;
         }
+
     }
 }

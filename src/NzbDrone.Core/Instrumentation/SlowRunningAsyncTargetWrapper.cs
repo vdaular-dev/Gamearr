@@ -13,6 +13,7 @@ namespace NzbDrone.Core.Instrumentation
         public SlowRunningAsyncTargetWrapper(Target wrappedTarget)
             : base(wrappedTarget)
         {
+
         }
 
         protected override void StopLazyWriterThread()
@@ -36,6 +37,7 @@ namespace NzbDrone.Core.Instrumentation
         protected override void StartLazyWriterTimer()
         {
             // Is executed when the background task has finished processing the queue. (also executed by base.InitializeTarget once)
+
             if (Interlocked.Decrement(ref _state) == 1)
             { // There might be more work. Restart timer.
                 base.StartLazyWriterTimer();

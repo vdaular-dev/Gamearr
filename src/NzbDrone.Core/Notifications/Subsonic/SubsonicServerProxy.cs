@@ -1,10 +1,10 @@
-using System.IO;
-using System.Xml.Linq;
 using NLog;
 using NzbDrone.Common.Extensions;
 using NzbDrone.Common.Http;
 using NzbDrone.Core.Rest;
 using RestSharp;
+using System.IO;
+using System.Xml.Linq;
 
 namespace NzbDrone.Core.Notifications.Subsonic
 {
@@ -18,12 +18,10 @@ namespace NzbDrone.Core.Notifications.Subsonic
 
     public class SubsonicServerProxy : ISubsonicServerProxy
     {
-        private readonly IRestClientFactory _restClientFactory;
         private readonly Logger _logger;
 
-        public SubsonicServerProxy(IRestClientFactory restClientFactory, Logger logger)
+        public SubsonicServerProxy(Logger logger)
         {
-            _restClientFactory = restClientFactory;
             _logger = logger;
         }
 
@@ -66,7 +64,7 @@ namespace NzbDrone.Core.Notifications.Subsonic
 
             _logger.Trace("Version response: {0}", response.Content);
             CheckForError(response, settings);
-
+            
             var xDoc = XDocument.Load(new StringReader(response.Content.Replace("&", "&amp;")));
             var version = xDoc.Root?.Attribute("version")?.Value;
 
@@ -80,7 +78,7 @@ namespace NzbDrone.Core.Notifications.Subsonic
 
         private RestClient GetSubsonicServerClient(SubsonicSettings settings)
         {
-            return _restClientFactory.BuildClient(GetBaseUrl(settings, "rest"));
+            return RestClientFactory.BuildClient(GetBaseUrl(settings, "rest"));
         }
 
         private RestRequest GetSubsonicServerRequest(string resource, Method method, SubsonicSettings settings)
@@ -91,7 +89,7 @@ namespace NzbDrone.Core.Notifications.Subsonic
             {
                 request.AddParameter("u", settings.Username);
                 request.AddParameter("p", settings.Password);
-                request.AddParameter("c", "Lidarr");
+                request.AddParameter("c", "Gamearr");
                 request.AddParameter("v", "1.15.0");
             }
 
@@ -128,6 +126,7 @@ namespace NzbDrone.Core.Notifications.Subsonic
                 }
 
                 throw new SubsonicException(errorMessage);
+
             }
 
             if (response.Content.IsNullOrWhiteSpace())

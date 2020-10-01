@@ -2,14 +2,15 @@
 using FluentAssertions;
 using NUnit.Framework;
 using NzbDrone.Core.History;
-using NzbDrone.Core.Qualities;
 using NzbDrone.Core.Test.Framework;
+using NzbDrone.Core.Qualities;
 
 namespace NzbDrone.Core.Test.HistoryTests
 {
     [TestFixture]
     public class HistoryRepositoryFixture : DbTest<HistoryRepository, History.History>
     {
+
         [Test]
         public void should_read_write_dictionary()
         {
@@ -24,6 +25,7 @@ namespace NzbDrone.Core.Test.HistoryTests
 
             StoredModel.Data.Should().HaveCount(2);
         }
+
 
         [Test]
         public void should_get_download_history()
@@ -47,5 +49,6 @@ namespace NzbDrone.Core.Test.HistoryTests
 
             downloadHistory.Should().HaveCount(1);
         }
+
     }
 }

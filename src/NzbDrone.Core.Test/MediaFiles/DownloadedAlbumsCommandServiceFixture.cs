@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO.Abstractions;
-using System.IO.Abstractions.TestingHelpers;
 using FizzWare.NBuilder;
 using Moq;
 using NUnit.Framework;
@@ -10,10 +9,11 @@ using NzbDrone.Core.Download.TrackedDownloads;
 using NzbDrone.Core.MediaFiles;
 using NzbDrone.Core.MediaFiles.Commands;
 using NzbDrone.Core.MediaFiles.TrackImport;
-using NzbDrone.Core.Music;
 using NzbDrone.Core.Parser.Model;
 using NzbDrone.Core.Test.Framework;
+using NzbDrone.Core.Music;
 using NzbDrone.Test.Common;
+using System.IO.Abstractions.TestingHelpers;
 
 namespace NzbDrone.Core.Test.MediaFiles
 {
@@ -28,6 +28,7 @@ namespace NzbDrone.Core.Test.MediaFiles
         [SetUp]
         public void Setup()
         {
+
             Mocker.GetMock<IDownloadedTracksImportService>()
                 .Setup(v => v.ProcessRootFolder(It.IsAny<IDirectoryInfo>()))
                 .Returns(new List<ImportResult>());
@@ -46,11 +47,11 @@ namespace NzbDrone.Core.Test.MediaFiles
                 .Build();
 
             _trackedDownload = new TrackedDownload
-            {
-                DownloadItem = downloadItem,
-                RemoteAlbum = remoteAlbum,
-                State = TrackedDownloadState.Downloading
-            };
+                    {
+                        DownloadItem = downloadItem,
+                        RemoteAlbum = remoteAlbum,
+                        State = TrackedDownloadStage.Downloading
+                    };
         }
 
         private void GivenExistingFolder(string path)
@@ -76,7 +77,9 @@ namespace NzbDrone.Core.Test.MediaFiles
             Assert.Throws<ArgumentException>(() => Subject.Execute(new DownloadedAlbumsScanCommand()));
 
             Mocker.GetMock<IDownloadedTracksImportService>().Verify(c => c.ProcessRootFolder(It.IsAny<IDirectoryInfo>()), Times.Never());
+
         }
+
 
         [Test]
         public void should_process_folder_if_downloadclientid_is_not_specified()

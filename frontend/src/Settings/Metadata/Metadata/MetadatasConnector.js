@@ -3,14 +3,16 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
 import { fetchMetadata } from 'Store/Actions/settingsActions';
-import createSortedSectionSelector from 'Store/Selectors/createSortedSectionSelector';
-import sortByName from 'Utilities/Array/sortByName';
 import Metadatas from './Metadatas';
 
 function createMapStateToProps() {
   return createSelector(
-    createSortedSectionSelector('settings.metadata', sortByName),
-    (metadata) => metadata
+    (state) => state.settings.metadata,
+    (metadata) => {
+      return {
+        ...metadata
+      };
+    }
   );
 }
 

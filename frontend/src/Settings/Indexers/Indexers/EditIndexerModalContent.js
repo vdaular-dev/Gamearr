@@ -1,18 +1,18 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import Form from 'Components/Form/Form';
-import FormGroup from 'Components/Form/FormGroup';
-import FormInputGroup from 'Components/Form/FormInputGroup';
-import FormLabel from 'Components/Form/FormLabel';
-import ProviderFieldFormGroup from 'Components/Form/ProviderFieldFormGroup';
+import { inputTypes, kinds } from 'Helpers/Props';
 import Button from 'Components/Link/Button';
 import SpinnerErrorButton from 'Components/Link/SpinnerErrorButton';
 import LoadingIndicator from 'Components/Loading/LoadingIndicator';
-import ModalBody from 'Components/Modal/ModalBody';
 import ModalContent from 'Components/Modal/ModalContent';
-import ModalFooter from 'Components/Modal/ModalFooter';
 import ModalHeader from 'Components/Modal/ModalHeader';
-import { inputTypes, kinds } from 'Helpers/Props';
+import ModalBody from 'Components/Modal/ModalBody';
+import ModalFooter from 'Components/Modal/ModalFooter';
+import Form from 'Components/Form/Form';
+import FormGroup from 'Components/Form/FormGroup';
+import FormLabel from 'Components/Form/FormLabel';
+import FormInputGroup from 'Components/Form/FormInputGroup';
+import ProviderFieldFormGroup from 'Components/Form/ProviderFieldFormGroup';
 import styles from './EditIndexerModalContent.css';
 
 function EditIndexerModalContent(props) {
@@ -42,8 +42,7 @@ function EditIndexerModalContent(props) {
     enableInteractiveSearch,
     supportsRss,
     supportsSearch,
-    fields,
-    priority
+    fields
   } = item;
 
   return (
@@ -96,7 +95,7 @@ function EditIndexerModalContent(props) {
                 <FormInputGroup
                   type={inputTypes.CHECK}
                   name="enableAutomaticSearch"
-                  helpText={supportsSearch.value ? 'Will be used when automatic searches are performed via the UI or by Lidarr' : undefined}
+                  helpText={supportsSearch.value ? 'Will be used when automatic searches are performed via the UI or by Gamearr' : undefined}
                   helpTextWarning={supportsSearch.value ? undefined : 'Search is not supported with this indexer'}
                   isDisabled={!supportsSearch.value}
                   {...enableAutomaticSearch}
@@ -132,22 +131,7 @@ function EditIndexerModalContent(props) {
                   );
                 })
               }
-              <FormGroup
-                advancedSettings={advancedSettings}
-                isAdvanced={true}
-              >
-                <FormLabel>Indexer Priority</FormLabel>
 
-                <FormInputGroup
-                  type={inputTypes.NUMBER}
-                  name="priority"
-                  helpText="Indexer Priority from 1 (Highest) to 50 (Lowest). Default: 25."
-                  min={1}
-                  max={50}
-                  {...priority}
-                  onChange={onInputChange}
-                />
-              </FormGroup>
             </Form>
         }
       </ModalBody>

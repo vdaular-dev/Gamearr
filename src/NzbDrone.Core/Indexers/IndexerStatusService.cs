@@ -25,6 +25,7 @@ namespace NzbDrone.Core.Indexers
             return GetProviderStatus(indexerId).LastRssSyncReleaseInfo;
         }
 
+
         public void UpdateRssSyncStatus(int indexerId, ReleaseInfo releaseInfo)
         {
             lock (_syncRoot)

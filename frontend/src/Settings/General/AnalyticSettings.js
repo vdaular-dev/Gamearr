@@ -1,10 +1,10 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import { inputTypes, sizes } from 'Helpers/Props';
 import FieldSet from 'Components/FieldSet';
 import FormGroup from 'Components/Form/FormGroup';
-import FormInputGroup from 'Components/Form/FormInputGroup';
 import FormLabel from 'Components/Form/FormLabel';
-import { inputTypes, sizes } from 'Helpers/Props';
+import FormInputGroup from 'Components/Form/FormInputGroup';
 
 function AnalyticSettings(props) {
   const {
@@ -24,7 +24,7 @@ function AnalyticSettings(props) {
         <FormInputGroup
           type={inputTypes.CHECK}
           name="analyticsEnabled"
-          helpText="Send anonymous usage and error information to Lidarr's servers. This includes information on your browser, which Lidarr WebUI pages you use, error reporting as well as OS and runtime version. We will use this information to prioritize features and bug fixes."
+          helpText="Send anonymous usage and error information to Gamearr's servers. This includes information on your browser, which Gamearr WebUI pages you use, error reporting as well as OS and runtime version. We will use this information to prioritize features and bug fixes."
           helpTextWarning="Requires restart to take effect"
           onChange={onInputChange}
           {...analyticsEnabled}

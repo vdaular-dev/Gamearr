@@ -8,7 +8,6 @@ using NzbDrone.Common.Http;
 using NzbDrone.Core.Configuration;
 using NzbDrone.Core.Parser;
 using NzbDrone.Core.ThingiProvider;
-using NzbDrone.Core.Validation;
 
 namespace NzbDrone.Core.Indexers.Newznab
 {
@@ -49,8 +48,8 @@ namespace NzbDrone.Core.Indexers.Newznab
                 yield return GetDefinition("nzbplanet.net", GetSettings("https://api.nzbplanet.net"));
                 yield return GetDefinition("omgwtfnzbs", GetSettings("https://api.omgwtfnzbs.me"));
                 yield return GetDefinition("OZnzb.com", GetSettings("https://api.oznzb.com"));
+                yield return GetDefinition("PFmonkey", GetSettings("https://www.pfmonkey.com"));
                 yield return GetDefinition("SimplyNZBs", GetSettings("https://simplynzbs.com"));
-                yield return GetDefinition("Tabula Rasa", GetSettings("https://www.tabula-rasa.pw", apiPath: @"/api/v1/api"));
                 yield return GetDefinition("Usenet Crawler", GetSettings("https://www.usenet-crawler.com"));
             }
         }
@@ -64,31 +63,26 @@ namespace NzbDrone.Core.Indexers.Newznab
         private IndexerDefinition GetDefinition(string name, NewznabSettings settings)
         {
             return new IndexerDefinition
-            {
-                EnableRss = false,
-                EnableAutomaticSearch = false,
-                EnableInteractiveSearch = false,
-                Name = name,
-                Implementation = GetType().Name,
-                Settings = settings,
-                Protocol = DownloadProtocol.Usenet,
-                SupportsRss = SupportsRss,
-                SupportsSearch = SupportsSearch
-            };
+                   {
+                       EnableRss = false,
+                       EnableAutomaticSearch = false,
+                       EnableInteractiveSearch = false,
+                       Name = name,
+                       Implementation = GetType().Name,
+                       Settings = settings,
+                       Protocol = DownloadProtocol.Usenet,
+                       SupportsRss = SupportsRss,
+                       SupportsSearch = SupportsSearch
+                   };
         }
 
-        private NewznabSettings GetSettings(string url, string apiPath = null, int[] categories = null)
+        private NewznabSettings GetSettings(string url, params int[] categories)
         {
             var settings = new NewznabSettings { BaseUrl = url };
 
-            if (categories != null)
+            if (categories.Any())
             {
                 settings.Categories = categories;
-            }
-
-            if (apiPath.IsNotNullOrWhiteSpace())
-            {
-                settings.ApiPath = apiPath;
             }
 
             return settings;
@@ -97,11 +91,8 @@ namespace NzbDrone.Core.Indexers.Newznab
         protected override void Test(List<ValidationFailure> failures)
         {
             base.Test(failures);
-            if (failures.HasErrors())
-            {
-                return;
-            }
 
+            if (failures.Any()) return;
             failures.AddIfNotNull(TestCapabilities());
         }
 

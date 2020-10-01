@@ -1,3 +1,4 @@
+using System.Linq;
 using NzbDrone.Common.Extensions;
 using NzbDrone.Core.Indexers;
 using NzbDrone.Core.ThingiProvider.Events;
@@ -23,14 +24,14 @@ namespace NzbDrone.Core.HealthCheck.Checks
 
             if (enabled.Empty())
             {
-                return new HealthCheck(GetType(), HealthCheckResult.Error, "No indexers available with RSS sync enabled, Lidarr will not grab new releases automatically");
+                return new HealthCheck(GetType(), HealthCheckResult.Error, "No indexers available with RSS sync enabled, Gamearr will not grab new releases automatically");
             }
 
             var active = _indexerFactory.RssEnabled(true);
 
             if (active.Empty())
             {
-                return new HealthCheck(GetType(), HealthCheckResult.Warning, "All rss-capable indexers are temporarily unavailable due to recent indexer errors");
+                 return new HealthCheck(GetType(), HealthCheckResult.Warning, "All rss-capable indexers are temporarily unavailable due to recent indexer errors");
             }
 
             return new HealthCheck(GetType());

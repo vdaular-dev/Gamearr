@@ -29,6 +29,7 @@ namespace NzbDrone.Common.Instrumentation
                         message += ": " + logEvent.Exception.Message;
                     }
                 }
+
             }
 
             return message;

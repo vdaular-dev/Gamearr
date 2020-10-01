@@ -5,11 +5,11 @@ using Microsoft.Win32;
 
 namespace NzbDrone.Common.EnvironmentInfo
 {
+
     public enum PlatformType
     {
         DotNet = 0,
-        Mono = 1,
-        NetCore = 2
+        Mono = 1
     }
 
     public interface IPlatformInfo
@@ -26,10 +26,6 @@ namespace NzbDrone.Common.EnvironmentInfo
 
         static PlatformInfo()
         {
-#if NETCOREAPP
-            _platform = PlatformType.NetCore;
-            _version = Environment.Version;
-#else
             if (Type.GetType("Mono.Runtime") != null)
             {
                 _platform = PlatformType.Mono;
@@ -40,13 +36,11 @@ namespace NzbDrone.Common.EnvironmentInfo
                 _platform = PlatformType.DotNet;
                 _version = GetDotNetVersion();
             }
-#endif
         }
 
         public static PlatformType Platform => _platform;
         public static bool IsMono => Platform == PlatformType.Mono;
         public static bool IsDotNet => Platform == PlatformType.DotNet;
-        public static bool IsNetCore => Platform == PlatformType.NetCore;
 
         public static string PlatformName
         {
@@ -56,14 +50,8 @@ namespace NzbDrone.Common.EnvironmentInfo
                 {
                     return ".NET";
                 }
-                else if (IsMono)
-                {
-                    return "Mono";
-                }
-                else
-                {
-                    return ".NET Core";
-                }
+
+                return "Mono";
             }
         }
 
@@ -121,47 +109,38 @@ namespace NzbDrone.Common.EnvironmentInfo
                     {
                         return new Version(4, 8, 0);
                     }
-
                     if (releaseKey >= 461808)
                     {
                         return new Version(4, 7, 2);
                     }
-
                     if (releaseKey >= 461308)
                     {
                         return new Version(4, 7, 1);
                     }
-
                     if (releaseKey >= 460798)
                     {
                         return new Version(4, 7);
                     }
-
                     if (releaseKey >= 394802)
                     {
                         return new Version(4, 6, 2);
                     }
-
                     if (releaseKey >= 394254)
                     {
                         return new Version(4, 6, 1);
                     }
-
                     if (releaseKey >= 393295)
                     {
                         return new Version(4, 6);
                     }
-
                     if (releaseKey >= 379893)
                     {
                         return new Version(4, 5, 2);
                     }
-
                     if (releaseKey >= 378675)
                     {
                         return new Version(4, 5, 1);
                     }
-
                     if (releaseKey >= 378389)
                     {
                         return new Version(4, 5);

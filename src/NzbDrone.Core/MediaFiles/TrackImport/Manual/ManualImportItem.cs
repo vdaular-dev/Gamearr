@@ -1,9 +1,9 @@
 using System.Collections.Generic;
-using NzbDrone.Core.Datastore;
 using NzbDrone.Core.DecisionEngine;
-using NzbDrone.Core.Music;
-using NzbDrone.Core.Parser.Model;
 using NzbDrone.Core.Qualities;
+using NzbDrone.Core.Music;
+using NzbDrone.Core.Datastore;
+using NzbDrone.Core.Parser.Model;
 
 namespace NzbDrone.Core.MediaFiles.TrackImport.Manual
 {
@@ -15,6 +15,7 @@ namespace NzbDrone.Core.MediaFiles.TrackImport.Manual
         }
 
         public string Path { get; set; }
+        public string RelativePath { get; set; }
         public string Name { get; set; }
         public long Size { get; set; }
         public Artist Artist { get; set; }

@@ -1,14 +1,14 @@
+using NLog;
+using NzbDrone.Core.Music;
 using System.Collections.Generic;
 using System.Linq;
-using NLog;
 using NzbDrone.Common.Extensions;
-using NzbDrone.Core.Music;
 
 namespace NzbDrone.Core.Profiles.Releases
 {
     public interface IPreferredWordService
     {
-        int Calculate(Artist artist, string title, int indexerId);
+        int Calculate(Artist artist, string title);
         List<string> GetMatchingPreferredWords(Artist artist, string title);
     }
 
@@ -25,11 +25,11 @@ namespace NzbDrone.Core.Profiles.Releases
             _logger = logger;
         }
 
-        public int Calculate(Artist artist, string title, int indexerId)
+        public int Calculate(Artist series, string title)
         {
             _logger.Trace("Calculating preferred word score for '{0}'", title);
 
-            var releaseProfiles = _releaseProfileService.EnabledForTags(artist.Tags, indexerId);
+            var releaseProfiles = _releaseProfileService.AllForTags(series.Tags);
             var matchingPairs = new List<KeyValuePair<string, int>>();
 
             foreach (var releaseProfile in releaseProfiles)
@@ -54,7 +54,7 @@ namespace NzbDrone.Core.Profiles.Releases
 
         public List<string> GetMatchingPreferredWords(Artist artist, string title)
         {
-            var releaseProfiles = _releaseProfileService.EnabledForTags(artist.Tags, 0);
+            var releaseProfiles = _releaseProfileService.AllForTags(artist.Tags);
             var matchingPairs = new List<KeyValuePair<string, int>>();
 
             _logger.Trace("Calculating preferred word score for '{0}'", title);

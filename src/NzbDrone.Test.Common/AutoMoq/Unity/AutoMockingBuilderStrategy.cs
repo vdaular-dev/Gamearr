@@ -1,11 +1,12 @@
-﻿using System;
+﻿
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Microsoft.Practices.ObjectBuilder2;
+using Microsoft.Practices.Unity;
 using Moq;
-using Unity;
-using Unity.Builder;
-using Unity.Strategies;
 
 namespace NzbDrone.Test.Common.AutoMoq.Unity
 {
@@ -23,7 +24,7 @@ namespace NzbDrone.Test.Common.AutoMoq.Unity
             _container = container;
         }
 
-        public override void PreBuildUp(ref BuilderContext context)
+        public override void PreBuildUp(IBuilderContext context)
         {
             var autoMoqer = _container.Resolve<AutoMoqer>();
 
@@ -36,16 +37,18 @@ namespace NzbDrone.Test.Common.AutoMoq.Unity
             }
         }
 
+        #region private methods
+
         private bool AMockObjectShouldBeCreatedForThisType(Type type)
         {
             var mocker = _container.Resolve<AutoMoqer>();
             return TypeIsNotRegistered(type) && (mocker.ResolveType == null || mocker.ResolveType != type);
+            //return TypeIsNotRegistered(type) && type.IsInterface;
         }
 
-        private static Type GetTheTypeFromTheBuilderContext(BuilderContext context)
+        private static Type GetTheTypeFromTheBuilderContext(IBuilderContext context)
         {
-            // return (context.OriginalBuildKey).Type;
-            return context.Type;
+            return (context.OriginalBuildKey).Type;
         }
 
         private bool TypeIsNotRegistered(Type type)
@@ -76,5 +79,7 @@ namespace NzbDrone.Test.Common.AutoMoq.Unity
         {
             return new[] { typeof(object[]) };
         }
+
+        #endregion
     }
 }

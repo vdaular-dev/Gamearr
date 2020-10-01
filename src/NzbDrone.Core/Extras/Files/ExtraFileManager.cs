@@ -23,6 +23,7 @@ namespace NzbDrone.Core.Extras.Files
 
     public abstract class ExtraFileManager<TExtraFile> : IManageExtraFiles
         where TExtraFile : ExtraFile, new()
+
     {
         private readonly IConfigService _configService;
         private readonly IDiskProvider _diskProvider;

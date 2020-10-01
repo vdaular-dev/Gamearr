@@ -1,12 +1,12 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import { inputTypes } from 'Helpers/Props';
+import LoadingIndicator from 'Components/Loading/LoadingIndicator';
 import FieldSet from 'Components/FieldSet';
 import Form from 'Components/Form/Form';
 import FormGroup from 'Components/Form/FormGroup';
-import FormInputGroup from 'Components/Form/FormInputGroup';
 import FormLabel from 'Components/Form/FormLabel';
-import LoadingIndicator from 'Components/Loading/LoadingIndicator';
-import { inputTypes } from 'Helpers/Props';
+import FormInputGroup from 'Components/Form/FormInputGroup';
 
 const writeAudioTagOptions = [
   { key: 'sync', value: 'All files; keep in sync with MusicBrainz' },
@@ -43,23 +43,23 @@ function MetadataProvider(props) {
           <Form>
             {
               advancedSettings &&
-                <FieldSet legend="Metadata Provider Source">
-                  <FormGroup
-                    advancedSettings={advancedSettings}
-                    isAdvanced={true}
-                  >
-                    <FormLabel>Metadata Source</FormLabel>
+              <FieldSet legend="Metadata Provider Source">
+                <FormGroup
+                  advancedSettings={advancedSettings}
+                  isAdvanced={true}
+                >
+                  <FormLabel>Metadata Source</FormLabel>
 
-                    <FormInputGroup
-                      type={inputTypes.TEXT}
-                      name="metadataSource"
-                      helpText="Alternative Metadata Source (Leave blank for default)"
-                      helpLink="https://github.com/Lidarr/Lidarr/wiki/Metadata-Source"
-                      onChange={onInputChange}
-                      {...settings.metadataSource}
-                    />
-                  </FormGroup>
-                </FieldSet>
+                  <FormInputGroup
+                    type={inputTypes.TEXT}
+                    name="metadataSource"
+                    helpText="Alternative Metadata Source (Leave blank for default)"
+                    helpLink="https://github.com/Gamearr/Gamearr/wiki/Metadata-Source"
+                    onChange={onInputChange}
+                    {...settings.metadataSource}
+                  />
+                </FormGroup>
+              </FieldSet>
             }
 
             <FieldSet legend="Write Metadata to Audio Files">
@@ -70,7 +70,7 @@ function MetadataProvider(props) {
                   type={inputTypes.SELECT}
                   name="writeAudioTags"
                   helpTextWarning="Selecting 'All files' will alter existing files when they are imported."
-                  helpLink="https://github.com/Lidarr/Lidarr/wiki/Write-Tags"
+                  helpLink="https://github.com/Gamearr/Gamearr/wiki/Write-Tags"
                   values={writeAudioTagOptions}
                   onChange={onInputChange}
                   {...settings.writeAudioTags}
@@ -83,7 +83,7 @@ function MetadataProvider(props) {
                 <FormInputGroup
                   type={inputTypes.CHECK}
                   name="scrubAudioTags"
-                  helpText="Remove existing tags from files, leaving only those added by Lidarr."
+                  helpText="Remove existing tags from files, leaving only those added by Gamearr."
                   onChange={onInputChange}
                   {...settings.scrubAudioTags}
                 />

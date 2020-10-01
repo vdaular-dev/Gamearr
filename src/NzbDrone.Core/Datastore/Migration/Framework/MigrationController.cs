@@ -1,12 +1,8 @@
-﻿using System;
+﻿using System.Data.SQLite;
 using System.Diagnostics;
 using System.Reflection;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Initialization;
-using FluentMigrator.Runner.Processors;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using NLog;
 
 namespace NzbDrone.Core.Datastore.Migration.Framework
 {
@@ -17,59 +13,56 @@ namespace NzbDrone.Core.Datastore.Migration.Framework
 
     public class MigrationController : IMigrationController
     {
-        private readonly Logger _logger;
-        private readonly ILoggerProvider _migrationLoggerProvider;
+        private readonly IAnnouncer _announcer;
 
-        public MigrationController(Logger logger,
-                                   ILoggerProvider migrationLoggerProvider)
+        public MigrationController(IAnnouncer announcer)
         {
-            _logger = logger;
-            _migrationLoggerProvider = migrationLoggerProvider;
+            _announcer = announcer;
         }
 
         public void Migrate(string connectionString, MigrationContext migrationContext)
         {
             var sw = Stopwatch.StartNew();
 
-            _logger.Info("*** Migrating {0} ***", connectionString);
+            _announcer.Heading("Migrating " + connectionString);
 
-            var serviceProvider = new ServiceCollection()
-                .AddLogging(lb => lb.AddProvider(_migrationLoggerProvider))
-                .AddFluentMigratorCore()
-                .ConfigureRunner(
-                    builder => builder
-                    .AddNzbDroneSQLite()
-                    .WithGlobalConnectionString(connectionString)
-                    .WithMigrationsIn(Assembly.GetExecutingAssembly()))
-                .Configure<TypeFilterOptions>(opt => opt.Namespace = "NzbDrone.Core.Datastore.Migration")
-                .Configure<ProcessorOptions>(opt =>
-                {
-                    opt.PreviewOnly = false;
-                    opt.Timeout = TimeSpan.FromSeconds(60);
-                })
-                .BuildServiceProvider();
+            var assembly = Assembly.GetExecutingAssembly();
 
-            using (var scope = serviceProvider.CreateScope())
+            var runnerContext = new RunnerContext(_announcer)
             {
-                var runner = scope.ServiceProvider.GetRequiredService<IMigrationRunner>();
+                Namespace = "NzbDrone.Core.Datastore.Migration",
+                ApplicationContext = migrationContext
+            };
 
-                MigrationContext.Current = migrationContext;
+            var options = new MigrationOptions { PreviewOnly = false, Timeout = 60 };
+            var factory = new NzbDroneSqliteProcessorFactory();
+            var processor = factory.Create(connectionString, _announcer, options);
+
+            try
+            {
+                var runner = new MigrationRunner(assembly, runnerContext, processor);
 
                 if (migrationContext.DesiredVersion.HasValue)
                 {
-                    runner.MigrateUp(migrationContext.DesiredVersion.Value);
+                    runner.MigrateUp(migrationContext.DesiredVersion.Value, true);
                 }
                 else
                 {
-                    runner.MigrateUp();
+                    runner.MigrateUp(true);
                 }
-
-                MigrationContext.Current = null;
             }
+            catch (SQLiteException)
+            {
+                processor.Dispose();
+                SQLiteConnection.ClearAllPools();
+                throw;
+            }
+
+            processor.Dispose();
 
             sw.Stop();
 
-            _logger.Debug("Took: {0}", sw.Elapsed);
+            _announcer.ElapsedTime(sw.Elapsed);
         }
     }
 }

@@ -1,18 +1,18 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import Form from 'Components/Form/Form';
-import FormGroup from 'Components/Form/FormGroup';
-import FormInputGroup from 'Components/Form/FormInputGroup';
-import FormLabel from 'Components/Form/FormLabel';
+import { inputTypes, kinds } from 'Helpers/Props';
+import { stringSettingShape } from 'Helpers/Props/Shapes/settingShape';
 import Button from 'Components/Link/Button';
 import SpinnerErrorButton from 'Components/Link/SpinnerErrorButton';
 import LoadingIndicator from 'Components/Loading/LoadingIndicator';
-import ModalBody from 'Components/Modal/ModalBody';
 import ModalContent from 'Components/Modal/ModalContent';
-import ModalFooter from 'Components/Modal/ModalFooter';
 import ModalHeader from 'Components/Modal/ModalHeader';
-import { inputTypes, kinds } from 'Helpers/Props';
-import { stringSettingShape } from 'Helpers/Props/Shapes/settingShape';
+import ModalBody from 'Components/Modal/ModalBody';
+import ModalFooter from 'Components/Modal/ModalFooter';
+import Form from 'Components/Form/Form';
+import FormGroup from 'Components/Form/FormGroup';
+import FormLabel from 'Components/Form/FormLabel';
+import FormInputGroup from 'Components/Form/FormInputGroup';
 import styles from './EditImportListExclusionModalContent.css';
 
 function EditImportListExclusionModalContent(props) {
@@ -58,12 +58,12 @@ function EditImportListExclusionModalContent(props) {
               {...otherProps}
             >
               <FormGroup>
-                <FormLabel>Entity Name</FormLabel>
+                <FormLabel>Artist Name</FormLabel>
 
                 <FormInputGroup
                   type={inputTypes.TEXT}
                   name="artistName"
-                  helpText="The name of the artist/album to exclude (can be anything meaningful)"
+                  helpText="The name of the artist to exclude (can be anything meaningful)"
                   {...artistName}
                   onChange={onInputChange}
                 />
@@ -75,7 +75,7 @@ function EditImportListExclusionModalContent(props) {
                 <FormInputGroup
                   type={inputTypes.TEXT}
                   name="foreignId"
-                  helpText="The Musicbrainz Id of the artist/album to exclude"
+                  helpText="The Musicbrainz Id of the artist to exclude"
                   {...foreignId}
                   onChange={onInputChange}
                 />

@@ -1,10 +1,10 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import { inputTypes, sizes } from 'Helpers/Props';
 import FieldSet from 'Components/FieldSet';
 import FormGroup from 'Components/Form/FormGroup';
-import FormInputGroup from 'Components/Form/FormInputGroup';
 import FormLabel from 'Components/Form/FormLabel';
-import { inputTypes, sizes } from 'Helpers/Props';
+import FormInputGroup from 'Components/Form/FormInputGroup';
 
 function HostSettings(props) {
   const {
@@ -21,8 +21,7 @@ function HostSettings(props) {
     urlBase,
     enableSsl,
     sslPort,
-    sslCertPath,
-    sslCertPassword,
+    sslCertHash,
     launchBrowser
   } = settings;
 
@@ -109,58 +108,38 @@ function HostSettings(props) {
       }
 
       {
-        enableSsl.value ?
+        isWindows && enableSsl.value ?
           <FormGroup
             advancedSettings={advancedSettings}
             isAdvanced={true}
           >
-            <FormLabel>SSL Cert Path</FormLabel>
+            <FormLabel>SSL Cert Hash</FormLabel>
 
             <FormInputGroup
               type={inputTypes.TEXT}
-              name="sslCertPath"
-              helpText="Path to pfx file"
+              name="sslCertHash"
               helpTextWarning="Requires restart to take effect"
               onChange={onInputChange}
-              {...sslCertPath}
+              {...sslCertHash}
             />
           </FormGroup> :
           null
       }
 
       {
-        enableSsl.value ?
-          <FormGroup
-            advancedSettings={advancedSettings}
-            isAdvanced={true}
-          >
-            <FormLabel>SSL Cert Password</FormLabel>
-
-            <FormInputGroup
-              type={inputTypes.PASSWORD}
-              name="sslCertPassword"
-              helpText="Password for pfx file"
-              helpTextWarning="Requires restart to take effect"
-              onChange={onInputChange}
-              {...sslCertPassword}
-            />
-          </FormGroup> :
-          null
-      }
-
-      {
-        isWindows && mode !== 'service' &&
+        isWindows && mode !== 'service' ?
           <FormGroup size={sizes.MEDIUM}>
             <FormLabel>Open browser on start</FormLabel>
 
             <FormInputGroup
               type={inputTypes.CHECK}
               name="launchBrowser"
-              helpText=" Open a web browser and navigate to Lidarr homepage on app start."
+              helpText=" Open a web browser and navigate to Gamearr homepage on app start."
               onChange={onInputChange}
               {...launchBrowser}
             />
-          </FormGroup>
+          </FormGroup> :
+          null
       }
 
     </FieldSet>

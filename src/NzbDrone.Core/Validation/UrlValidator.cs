@@ -21,11 +21,7 @@ namespace NzbDrone.Core.Validation
 
         protected override bool IsValid(PropertyValidatorContext context)
         {
-            if (context.PropertyValue == null)
-            {
-                return false;
-            }
-
+            if (context.PropertyValue == null) return false;
             return context.PropertyValue.ToString().IsValidUrl();
         }
     }

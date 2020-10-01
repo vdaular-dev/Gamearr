@@ -1,4 +1,6 @@
-﻿namespace NzbDrone.Core.IndexerSearch.Definitions
+﻿using System;
+
+namespace NzbDrone.Core.IndexerSearch.Definitions
 {
     public class ArtistSearchCriteria : SearchCriteriaBase
     {

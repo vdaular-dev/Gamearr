@@ -3,8 +3,8 @@ using System.Linq;
 using System.Net;
 using FluentValidation.Results;
 using NLog;
-using NzbDrone.Core.Music;
 using NzbDrone.Core.Rest;
+using NzbDrone.Core.Music;
 
 namespace NzbDrone.Core.Notifications.Emby
 {
@@ -46,7 +46,7 @@ namespace NzbDrone.Core.Notifications.Emby
             {
                 _logger.Debug("Testing connection to MediaBrowser: {0}", settings.Address);
 
-                Notify(settings, "Test from Lidarr", "Success! MediaBrowser has been successfully configured!");
+                Notify(settings, "Test from Gamearr", "Success! MediaBrowser has been successfully configured!");
             }
             catch (RestException ex)
             {

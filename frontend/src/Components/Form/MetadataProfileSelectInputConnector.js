@@ -3,35 +3,21 @@ import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
-import { metadataProfileNames } from 'Helpers/Props';
-import createSortedSectionSelector from 'Store/Selectors/createSortedSectionSelector';
 import sortByName from 'Utilities/Array/sortByName';
 import SelectInput from './SelectInput';
 
 function createMapStateToProps() {
   return createSelector(
-    createSortedSectionSelector('settings.metadataProfiles', sortByName),
+    (state) => state.settings.metadataProfiles,
     (state, { includeNoChange }) => includeNoChange,
     (state, { includeMixed }) => includeMixed,
-    (state, { includeNone }) => includeNone,
-    (metadataProfiles, includeNoChange, includeMixed, includeNone) => {
-
-      const profiles = metadataProfiles.items.filter((item) => item.name !== metadataProfileNames.NONE);
-      const noneProfile = metadataProfiles.items.find((item) => item.name === metadataProfileNames.NONE);
-
-      const values = _.map(profiles, (metadataProfile) => {
+    (metadataProfiles, includeNoChange, includeMixed) => {
+      const values = _.map(metadataProfiles.items.sort(sortByName), (metadataProfile) => {
         return {
           key: metadataProfile.id,
           value: metadataProfile.name
         };
       });
-
-      if (includeNone) {
-        values.push({
-          key: noneProfile.id,
-          value: noneProfile.name
-        });
-      }
 
       if (includeNoChange) {
         values.unshift({
@@ -102,7 +88,6 @@ MetadataProfileSelectInputConnector.propTypes = {
   value: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   values: PropTypes.arrayOf(PropTypes.object).isRequired,
   includeNoChange: PropTypes.bool.isRequired,
-  includeNone: PropTypes.bool.isRequired,
   onChange: PropTypes.func.isRequired
 };
 

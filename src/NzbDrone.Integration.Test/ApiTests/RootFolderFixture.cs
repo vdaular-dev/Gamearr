@@ -1,7 +1,7 @@
 using System;
 using FluentAssertions;
-using Lidarr.Api.V1.RootFolders;
 using NUnit.Framework;
+using Gamearr.Api.V1.RootFolders;
 
 namespace NzbDrone.Integration.Test.ApiTests
 {
@@ -18,7 +18,7 @@ namespace NzbDrone.Integration.Test.ApiTests
         [Ignore("SignalR on CI seems unstable")]
         public void should_add_and_delete_root_folders()
         {
-            ConnectSignalR().Wait();
+            ConnectSignalR();
 
             var rootFolder = new RootFolderResource
             {
@@ -32,9 +32,11 @@ namespace NzbDrone.Integration.Test.ApiTests
 
             RootFolders.All().Should().OnlyContain(c => c.Id == postResponse.Id);
 
+
             RootFolders.Delete(postResponse.Id);
 
             RootFolders.All().Should().BeEmpty();
+
 
             SignalRMessages.Should().Contain(c => c.Name == "rootfolder");
         }
@@ -42,8 +44,6 @@ namespace NzbDrone.Integration.Test.ApiTests
         [Test]
         public void invalid_path_should_return_bad_request()
         {
-            IgnoreOnMonoVersions("5.12", "5.14");
-
             var rootFolder = new RootFolderResource
             {
                 Path = "invalid_path"

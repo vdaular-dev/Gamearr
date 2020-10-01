@@ -1,7 +1,12 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using FluentValidation.Results;
+using Newtonsoft.Json.Linq;
 using NLog;
+using NzbDrone.Common.Cache;
+using NzbDrone.Common.Serializer;
+using NzbDrone.Core.Notifications.Xbmc.Model;
 using NzbDrone.Core.Music;
 
 namespace NzbDrone.Core.Notifications.Xbmc
@@ -17,96 +22,95 @@ namespace NzbDrone.Core.Notifications.Xbmc
     public class XbmcService : IXbmcService
     {
         private readonly IXbmcJsonApiProxy _proxy;
+        private readonly IEnumerable<IApiProvider> _apiProviders;
         private readonly Logger _logger;
 
+        private readonly ICached<XbmcVersion> _xbmcVersionCache;
+
         public XbmcService(IXbmcJsonApiProxy proxy,
+                           IEnumerable<IApiProvider> apiProviders,
+                           ICacheManager cacheManager,
                            Logger logger)
         {
             _proxy = proxy;
+            _apiProviders = apiProviders;
             _logger = logger;
+
+            _xbmcVersionCache = cacheManager.GetCache<XbmcVersion>(GetType());
         }
 
         public void Notify(XbmcSettings settings, string title, string message)
         {
-            _proxy.Notify(settings, title, message);
+            var provider = GetApiProvider(settings);
+            provider.Notify(settings, title, message);
         }
 
         public void Update(XbmcSettings settings, Artist artist)
         {
-            if (!settings.AlwaysUpdate)
-            {
-                _logger.Debug("Determining if there are any active players on XBMC host: {0}", settings.Address);
-                var activePlayers = _proxy.GetActivePlayers(settings);
-
-                if (activePlayers.Any(a => a.Type.Equals("audio")))
-                {
-                    _logger.Debug("Audio is currently playing, skipping library update");
-                    return;
-                }
-            }
-
-            UpdateLibrary(settings, artist);
+            var provider = GetApiProvider(settings);
+            provider.Update(settings, artist);
         }
 
         public void Clean(XbmcSettings settings)
         {
-            _proxy.CleanLibrary(settings);
+            var provider = GetApiProvider(settings);
+            provider.Clean(settings);
         }
 
-        public string GetArtistPath(XbmcSettings settings, Artist artist)
+        private XbmcVersion GetJsonVersion(XbmcSettings settings)
         {
-            var allArtists = _proxy.GetArtist(settings);
-
-            if (!allArtists.Any())
+            return _xbmcVersionCache.Get(settings.Address, () =>
             {
-                _logger.Debug("No Artists returned from XBMC");
-                return null;
-            }
+                var response = _proxy.GetJsonVersion(settings);
 
-            var matchingArtist = allArtists.FirstOrDefault(s =>
-            {
-                var musicBrainzId = s.MusicbrainzArtistId.FirstOrDefault();
+                _logger.Debug("Getting version from response: " + response);
+                var result = Json.Deserialize<XbmcJsonResult<JObject>>(response);
 
-                return musicBrainzId == artist.Metadata.Value.ForeignArtistId || s.Label == artist.Name;
-            });
+                var versionObject = result.Result.Property("version");
 
-            return matchingArtist?.File;
+                if (versionObject.Value.Type == JTokenType.Integer)
+                {
+                    return new XbmcVersion((int)versionObject.Value);
+                }
+
+                if (versionObject.Value.Type == JTokenType.Object)
+                {
+                    return Json.Deserialize<XbmcVersion>(versionObject.Value.ToString());
+                }
+
+                throw new InvalidCastException("Unknown Version structure!: " + versionObject);
+            }, TimeSpan.FromHours(12));
         }
 
-        private void UpdateLibrary(XbmcSettings settings, Artist artist)
+        private IApiProvider GetApiProvider(XbmcSettings settings)
         {
-            try
+            var version = GetJsonVersion(settings);
+            var apiProvider = _apiProviders.SingleOrDefault(a => a.CanHandle(version));
+
+            if (apiProvider == null)
             {
-                var artistPath = GetArtistPath(settings, artist);
-
-                if (artistPath != null)
-                {
-                    _logger.Debug("Updating artist {0} (Path: {1}) on XBMC host: {2}", artist, artistPath, settings.Address);
-                }
-                else
-                {
-                    _logger.Debug("Artist {0} doesn't exist on XBMC host: {1}, Updating Entire Library",
-                        artist,
-                        settings.Address);
-                }
-
-                var response = _proxy.UpdateLibrary(settings, artistPath);
-
-                if (!response.Equals("OK", StringComparison.InvariantCultureIgnoreCase))
-                {
-                    _logger.Debug("Failed to update library for: {0}", settings.Address);
-                }
+                var message = string.Format("Invalid API Version: {0} for {1}", version, settings.Address);
+                throw new InvalidXbmcVersionException(message);
             }
-            catch (Exception ex)
-            {
-                _logger.Debug(ex, ex.Message);
-            }
+
+            return apiProvider;
         }
 
         public ValidationFailure Test(XbmcSettings settings, string message)
         {
+            _xbmcVersionCache.Clear();
+
             try
             {
+                _logger.Debug("Determining version of Host: {0}", settings.Address);
+                var version = GetJsonVersion(settings);
+                _logger.Debug("Version is: {0}", version);
+
+                if (version == new XbmcVersion(0))
+                {
+                    throw new InvalidXbmcVersionException("Version received from XBMC is invalid, please correct your settings.");
+                }
+
                 Notify(settings, "Test Notification", message);
             }
             catch (Exception ex)

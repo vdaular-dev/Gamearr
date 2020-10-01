@@ -39,6 +39,7 @@ namespace NzbDrone.Core.Indexers
             _logger = logger;
         }
 
+
         private ProcessedDecisions Sync()
         {
             _logger.ProgressInfo("Starting RSS Sync");

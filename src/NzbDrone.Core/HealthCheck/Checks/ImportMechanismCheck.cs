@@ -12,6 +12,7 @@ namespace NzbDrone.Core.HealthCheck.Checks
     {
         private readonly IConfigService _configService;
 
+
         public ImportMechanismCheck(IConfigService configService)
         {
             _configService = configService;

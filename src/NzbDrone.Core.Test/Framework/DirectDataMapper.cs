@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
 using System.Linq;
 using NzbDrone.Common.Serializer;
 using NzbDrone.Core.Datastore;
@@ -10,22 +11,33 @@ namespace NzbDrone.Core.Test.Framework
     public interface IDirectDataMapper
     {
         List<Dictionary<string, object>> Query(string sql);
-        List<T> Query<T>(string sql)
-            where T : new();
+        List<T> Query<T>(string sql) where T : new();
+        T QueryScalar<T>(string sql);
     }
 
     public class DirectDataMapper : IDirectDataMapper
     {
-        private readonly IDatabase _database;
+        private readonly DbProviderFactory _providerFactory;
+        private readonly string _connectionString;
 
         public DirectDataMapper(IDatabase database)
         {
-            _database = database;
+            var dataMapper = database.GetDataMapper();
+            _providerFactory = dataMapper.ProviderFactory;
+            _connectionString = dataMapper.ConnectionString;
+        }
+
+        private DbConnection OpenConnection()
+        {
+            var connection = _providerFactory.CreateConnection();
+            connection.ConnectionString = _connectionString;
+            connection.Open();
+            return connection;
         }
 
         public DataTable GetDataTable(string sql)
         {
-            using (var connection = _database.OpenConnection())
+            using (var connection = OpenConnection())
             {
                 using (var cmd = connection.CreateCommand())
                 {
@@ -44,12 +56,18 @@ namespace NzbDrone.Core.Test.Framework
             return dataTable.Rows.Cast<DataRow>().Select(MapToDictionary).ToList();
         }
 
-        public List<T> Query<T>(string sql)
-            where T : new()
+        public List<T> Query<T>(string sql) where T : new()
         {
             var dataTable = GetDataTable(sql);
 
             return dataTable.Rows.Cast<DataRow>().Select(MapToObject<T>).ToList();
+        }
+
+        public T QueryScalar<T>(string sql)
+        {
+            var dataTable = GetDataTable(sql);
+
+            return dataTable.Rows.Cast<DataRow>().Select(d => MapValue(d, 0, typeof(T))).Cast<T>().FirstOrDefault();
         }
 
         protected Dictionary<string, object> MapToDictionary(DataRow dataRow)
@@ -76,8 +94,7 @@ namespace NzbDrone.Core.Test.Framework
             return item;
         }
 
-        protected T MapToObject<T>(DataRow dataRow)
-            where T : new()
+        protected T MapToObject<T>(DataRow dataRow) where T : new()
         {
             var item = new T();
 
@@ -98,24 +115,29 @@ namespace NzbDrone.Core.Test.Framework
                     propertyType = propertyType.GetGenericArguments()[0];
                 }
 
-                object value;
-                if (dataRow.ItemArray[i] == DBNull.Value)
-                {
-                    value = null;
-                }
-                else if (dataRow.Table.Columns[i].DataType == typeof(string) && propertyType != typeof(string))
-                {
-                    value = Json.Deserialize((string)dataRow.ItemArray[i], propertyType);
-                }
-                else
-                {
-                    value = Convert.ChangeType(dataRow.ItemArray[i], propertyType);
-                }
+                object value = MapValue(dataRow, i, propertyType);
+
 
                 propertyInfo.SetValue(item, value, null);
             }
 
             return item;
+        }
+
+        private object MapValue(DataRow dataRow, int i, Type targetType)
+        {
+            if (dataRow.ItemArray[i] == DBNull.Value)
+            {
+                return null;
+            }
+            else if (dataRow.Table.Columns[i].DataType == typeof(string) && targetType != typeof(string))
+            {
+                return Json.Deserialize((string)dataRow.ItemArray[i], targetType);
+            }
+            else
+            {
+                return Convert.ChangeType(dataRow.ItemArray[i], targetType);
+            }
         }
     }
 }

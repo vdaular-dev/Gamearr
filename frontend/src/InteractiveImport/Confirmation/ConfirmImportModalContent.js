@@ -1,14 +1,14 @@
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import Alert from 'Components/Alert';
 import Button from 'Components/Link/Button';
 import LoadingIndicator from 'Components/Loading/LoadingIndicator';
-import ModalBody from 'Components/Modal/ModalBody';
-import ModalContent from 'Components/Modal/ModalContent';
-import ModalFooter from 'Components/Modal/ModalFooter';
-import ModalHeader from 'Components/Modal/ModalHeader';
 import { kinds } from 'Helpers/Props';
+import ModalContent from 'Components/Modal/ModalContent';
+import ModalHeader from 'Components/Modal/ModalHeader';
+import ModalBody from 'Components/Modal/ModalBody';
+import ModalFooter from 'Components/Modal/ModalFooter';
+import Alert from 'Components/Alert';
 
 function formatAlbumFiles(items, album) {
 
@@ -72,9 +72,9 @@ class ConfirmImportModalContent extends Component {
 
         {
           !isFetching && isPopulated &&
-            <ModalHeader>
-              Are you sure?
-            </ModalHeader>
+          <ModalHeader>
+            Are you sure?
+          </ModalHeader>
         }
 
         <ModalBody>

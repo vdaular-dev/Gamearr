@@ -1,10 +1,10 @@
-import classNames from 'classnames';
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import CheckInput from 'Components/Form/CheckInput';
+import classNames from 'classnames';
+import { icons } from 'Helpers/Props';
 import Icon from 'Components/Icon';
 import IconButton from 'Components/Link/IconButton';
-import { icons } from 'Helpers/Props';
+import CheckInput from 'Components/Form/CheckInput';
 import styles from './QualityProfileItem.css';
 
 class QualityProfileItem extends Component {

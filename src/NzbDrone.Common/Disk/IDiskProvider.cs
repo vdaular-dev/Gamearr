@@ -12,7 +12,6 @@ namespace NzbDrone.Common.Disk
         long? GetAvailableSpace(string path);
         void InheritFolderPermissions(string filename);
         void SetPermissions(string path, string mask, string user, string group);
-        void CopyPermissions(string sourcePath, string targetPath, bool includeOwner = false);
         long? GetTotalSize(string path);
         DateTime FolderGetCreationTime(string path);
         DateTime FolderGetLastWrite(string path);
@@ -22,7 +21,6 @@ namespace NzbDrone.Common.Disk
         bool FileExists(string path);
         bool FileExists(string path, StringComparison stringComparison);
         bool FolderWritable(string path);
-        bool FolderEmpty(string path);
         string[] GetDirectories(string path);
         string[] GetFiles(string path, SearchOption searchOption);
         long GetFolderSize(string path);

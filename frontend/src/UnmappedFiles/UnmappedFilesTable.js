@@ -1,17 +1,16 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import LoadingIndicator from 'Components/Loading/LoadingIndicator';
-import PageContent from 'Components/Page/PageContent';
-import PageContentBody from 'Components/Page/PageContentBody';
-import PageToolbar from 'Components/Page/Toolbar/PageToolbar';
-import PageToolbarButton from 'Components/Page/Toolbar/PageToolbarButton';
-import PageToolbarSection from 'Components/Page/Toolbar/PageToolbarSection';
-import TableOptionsModalWrapper from 'Components/Table/TableOptions/TableOptionsModalWrapper';
-import VirtualTable from 'Components/Table/VirtualTable';
-import VirtualTableRow from 'Components/Table/VirtualTableRow';
 import { align, icons, sortDirections } from 'Helpers/Props';
-import UnmappedFilesTableHeader from './UnmappedFilesTableHeader';
+import LoadingIndicator from 'Components/Loading/LoadingIndicator';
+import VirtualTable from 'Components/Table/VirtualTable';
+import TableOptionsModalWrapper from 'Components/Table/TableOptions/TableOptionsModalWrapper';
+import PageContent from 'Components/Page/PageContent';
+import PageContentBodyConnector from 'Components/Page/PageContentBodyConnector';
+import PageToolbar from 'Components/Page/Toolbar/PageToolbar';
+import PageToolbarSection from 'Components/Page/Toolbar/PageToolbarSection';
+import PageToolbarButton from 'Components/Page/Toolbar/PageToolbarButton';
 import UnmappedFilesTableRow from './UnmappedFilesTableRow';
+import UnmappedFilesTableHeader from './UnmappedFilesTableHeader';
 
 class UnmappedFilesTable extends Component {
 
@@ -22,15 +21,16 @@ class UnmappedFilesTable extends Component {
     super(props, context);
 
     this.state = {
-      scroller: null
+      contentBody: null,
+      scrollTop: 0
     };
   }
 
   //
   // Control
 
-  setScrollerRef = (ref) => {
-    this.setState({ scroller: ref });
+  setContentBodyRef = (ref) => {
+    this.setState({ contentBody: ref });
   }
 
   rowRenderer = ({ key, rowIndex, style }) => {
@@ -43,18 +43,21 @@ class UnmappedFilesTable extends Component {
     const item = items[rowIndex];
 
     return (
-      <VirtualTableRow
-        key={key}
+      <UnmappedFilesTableRow
         style={style}
-      >
-        <UnmappedFilesTableRow
-          key={item.id}
-          columns={columns}
-          deleteUnmappedFile={deleteUnmappedFile}
-          {...item}
-        />
-      </VirtualTableRow>
+        key={key}
+        columns={columns}
+        deleteUnmappedFile={deleteUnmappedFile}
+        {...item}
+      />
     );
+  }
+
+  //
+  // Listeners
+
+  onScroll = ({ scrollTop }) => {
+    this.setState({ scrollTop });
   }
 
   render() {
@@ -69,28 +72,18 @@ class UnmappedFilesTable extends Component {
       sortDirection,
       onTableOptionChange,
       onSortPress,
-      isScanningFolders,
-      onAddMissingArtistsPress,
+      deleteUnmappedFile,
       ...otherProps
     } = this.props;
 
     const {
-      scroller
+      scrollTop,
+      contentBody
     } = this.state;
 
     return (
       <PageContent title="UnmappedFiles">
         <PageToolbar>
-          <PageToolbarSection>
-            <PageToolbarButton
-              label="Add missing"
-              iconName={icons.ADD_MISSING_ARTISTS}
-              isDisabled={isPopulated && !error && !items.length}
-              isSpinning={isScanningFolders}
-              onPress={onAddMissingArtistsPress}
-            />
-          </PageToolbarSection>
-
           <PageToolbarSection alignContent={align.RIGHT}>
             <TableOptionsModalWrapper
               {...otherProps}
@@ -106,8 +99,9 @@ class UnmappedFilesTable extends Component {
           </PageToolbarSection>
         </PageToolbar>
 
-        <PageContentBody
-          registerScroller={this.setScrollerRef}
+        <PageContentBodyConnector
+          ref={this.setContentBodyRef}
+          onScroll={this.onScroll}
         >
           {
             isFetching && !isPopulated &&
@@ -122,12 +116,14 @@ class UnmappedFilesTable extends Component {
           }
 
           {
-            isPopulated && !error && !!items.length && scroller &&
+            isPopulated && !error && !!items.length && contentBody &&
               <VirtualTable
                 items={items}
                 columns={columns}
-                scroller={scroller}
+                contentBody={contentBody}
                 isSmallScreen={false}
+                scrollTop={scrollTop}
+                onScroll={this.onScroll}
                 overscanRowCount={10}
                 rowRenderer={this.rowRenderer}
                 header={
@@ -143,7 +139,7 @@ class UnmappedFilesTable extends Component {
                 sortDirection={sortDirection}
               />
           }
-        </PageContentBody>
+        </PageContentBodyConnector>
       </PageContent>
     );
   }
@@ -159,9 +155,7 @@ UnmappedFilesTable.propTypes = {
   sortDirection: PropTypes.oneOf(sortDirections.all),
   onTableOptionChange: PropTypes.func.isRequired,
   onSortPress: PropTypes.func.isRequired,
-  deleteUnmappedFile: PropTypes.func.isRequired,
-  isScanningFolders: PropTypes.bool.isRequired,
-  onAddMissingArtistsPress: PropTypes.func.isRequired
+  deleteUnmappedFile: PropTypes.func.isRequired
 };
 
 export default UnmappedFilesTable;

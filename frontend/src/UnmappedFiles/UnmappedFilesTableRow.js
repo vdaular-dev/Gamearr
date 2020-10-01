@@ -1,14 +1,13 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import TrackQuality from 'Album/TrackQuality';
+import { icons, kinds } from 'Helpers/Props';
+import formatBytes from 'Utilities/Number/formatBytes';
 import IconButton from 'Components/Link/IconButton';
 import ConfirmModal from 'Components/Modal/ConfirmModal';
 import RelativeDateCellConnector from 'Components/Table/Cells/RelativeDateCellConnector';
+import VirtualTableRow from 'Components/Table/VirtualTableRow';
 import VirtualTableRowCell from 'Components/Table/Cells/VirtualTableRowCell';
-import { icons, kinds } from 'Helpers/Props';
 import InteractiveImportModal from 'InteractiveImport/InteractiveImportModal';
-import FileDetailsModal from 'TrackFile/FileDetailsModal';
-import formatBytes from 'Utilities/Number/formatBytes';
 import styles from './UnmappedFilesTableRow.css';
 
 class UnmappedFilesTableRow extends Component {
@@ -63,6 +62,7 @@ class UnmappedFilesTableRow extends Component {
 
   render() {
     const {
+      style,
       id,
       path,
       size,
@@ -80,7 +80,9 @@ class UnmappedFilesTableRow extends Component {
     } = this.state;
 
     return (
-      <>
+      <VirtualTableRow
+        style={style}
+      >
         {
           columns.map((column) => {
             const {
@@ -122,19 +124,6 @@ class UnmappedFilesTableRow extends Component {
                   date={dateAdded}
                   component={VirtualTableRowCell}
                 />
-              );
-            }
-
-            if (name === 'quality') {
-              return (
-                <VirtualTableRowCell
-                  key={name}
-                  className={styles[name]}
-                >
-                  <TrackQuality
-                    quality={quality}
-                  />
-                </VirtualTableRowCell>
               );
             }
 
@@ -194,13 +183,14 @@ class UnmappedFilesTableRow extends Component {
           onCancel={this.onConfirmDeleteModalClose}
         />
 
-      </>
+      </VirtualTableRow>
     );
   }
 
 }
 
 UnmappedFilesTableRow.propTypes = {
+  style: PropTypes.object.isRequired,
   id: PropTypes.number.isRequired,
   path: PropTypes.string.isRequired,
   size: PropTypes.number.isRequired,

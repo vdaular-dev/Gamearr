@@ -10,6 +10,7 @@ using NzbDrone.Common.Serializer;
 namespace NzbDrone.Core.Download.Clients.QBittorrent
 {
     // API https://github.com/qbittorrent/qBittorrent/wiki/Web-API-Documentation
+
     public class QBittorrentProxyV2 : IQBittorrentProxy
     {
         private readonly IHttpClient _httpClient;
@@ -177,20 +178,6 @@ namespace NzbDrone.Core.Download.Clients.QBittorrent
             ProcessRequest(request, settings);
         }
 
-        public void AddLabel(string label, QBittorrentSettings settings)
-        {
-            var request = BuildRequest(settings).Resource("/api/v2/torrents/createCategory")
-                                                .Post()
-                                                .AddFormParameter("category", label);
-            ProcessRequest(request, settings);
-        }
-
-        public Dictionary<string, QBittorrentLabel> GetLabels(QBittorrentSettings settings)
-        {
-            var request = BuildRequest(settings).Resource("/api/v2/torrents/categories");
-            return Json.Deserialize<Dictionary<string, QBittorrentLabel>>(ProcessRequest(request, settings));
-        }
-
         public void SetTorrentSeedingConfiguration(string hash, TorrentSeedConfiguration seedConfiguration, QBittorrentSettings settings)
         {
             var ratioLimit = seedConfiguration.Ratio.HasValue ? seedConfiguration.Ratio : -2;
@@ -238,6 +225,7 @@ namespace NzbDrone.Core.Download.Clients.QBittorrent
 
                 throw;
             }
+
         }
 
         public void PauseTorrent(string hash, QBittorrentSettings settings)
@@ -267,7 +255,7 @@ namespace NzbDrone.Core.Download.Clients.QBittorrent
 
         private HttpRequestBuilder BuildRequest(QBittorrentSettings settings)
         {
-            var requestBuilder = new HttpRequestBuilder(settings.UseSsl, settings.Host, settings.Port, settings.UrlBase)
+            var requestBuilder = new HttpRequestBuilder(settings.UseSsl, settings.Host, settings.Port)
             {
                 LogResponseContent = true,
                 NetworkCredential = new NetworkCredential(settings.Username, settings.Password)
@@ -328,7 +316,6 @@ namespace NzbDrone.Core.Download.Clients.QBittorrent
                 {
                     throw new DownloadClientAuthenticationException("Failed to authenticate with qBittorrent.");
                 }
-
                 return;
             }
 
@@ -366,8 +353,7 @@ namespace NzbDrone.Core.Download.Clients.QBittorrent
                     throw new DownloadClientUnavailableException("Failed to connect to qBittorrent, please check your settings.", ex);
                 }
 
-                // returns "Fails." on bad login
-                if (response.Content != "Ok.")
+                if (response.Content != "Ok.") // returns "Fails." on bad login
                 {
                     _logger.Debug("qbitTorrent authentication failed.");
                     throw new DownloadClientAuthenticationException("Failed to authenticate with qBittorrent.");

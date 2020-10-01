@@ -11,17 +11,17 @@ namespace NzbDrone.Common.Extensions
     public static class PathExtensions
     {
         private const string APP_CONFIG_FILE = "config.xml";
-        private const string DB = "lidarr.db";
-        private const string DB_RESTORE = "lidarr.restore";
+        private const string DB = "gamearr.db";
+        private const string DB_RESTORE = "gamearr.restore";
         private const string LOG_DB = "logs.db";
         private const string NLOG_CONFIG_FILE = "nlog.config";
-        private const string UPDATE_CLIENT_EXE_NAME = "Lidarr.Update";
+        private const string UPDATE_CLIENT_EXE = "Gamearr.Update.exe";
 
-        private static readonly string UPDATE_SANDBOX_FOLDER_NAME = "lidarr_update" + Path.DirectorySeparatorChar;
-        private static readonly string UPDATE_PACKAGE_FOLDER_NAME = "Lidarr" + Path.DirectorySeparatorChar;
-        private static readonly string UPDATE_BACKUP_FOLDER_NAME = "lidarr_backup" + Path.DirectorySeparatorChar;
-        private static readonly string UPDATE_BACKUP_APPDATA_FOLDER_NAME = "lidarr_appdata_backup" + Path.DirectorySeparatorChar;
-        private static readonly string UPDATE_CLIENT_FOLDER_NAME = "Lidarr.Update" + Path.DirectorySeparatorChar;
+        private static readonly string UPDATE_SANDBOX_FOLDER_NAME = "gamearr_update" + Path.DirectorySeparatorChar;
+        private static readonly string UPDATE_PACKAGE_FOLDER_NAME = "Gamearr" + Path.DirectorySeparatorChar;
+        private static readonly string UPDATE_BACKUP_FOLDER_NAME = "gamearr_backup" + Path.DirectorySeparatorChar;
+        private static readonly string UPDATE_BACKUP_APPDATA_FOLDER_NAME = "gamearr_appdata_backup" + Path.DirectorySeparatorChar;
+        private static readonly string UPDATE_CLIENT_FOLDER_NAME = "Gamearr.Update" + Path.DirectorySeparatorChar;
         private static readonly string UPDATE_LOG_FOLDER_NAME = "UpdateLogs" + Path.DirectorySeparatorChar;
 
         private static readonly Regex PARENT_PATH_END_SLASH_REGEX = new Regex(@"(?<!:)\\$", RegexOptions.Compiled);
@@ -32,23 +32,18 @@ namespace NzbDrone.Common.Extensions
             Ensure.That(path, () => path).IsValidPath();
 
             var info = new FileInfo(path.Trim());
-            return info.FullName.CleanFilePathBasic();
-        }
 
-        public static string CleanFilePathBasic(this string path)
-        {
-            //UNC
-            if (OsInfo.IsWindows && path.StartsWith(@"\\"))
+            if (OsInfo.IsWindows && info.FullName.StartsWith(@"\\")) //UNC
             {
-                return path.TrimEnd('/', '\\', ' ');
+                return info.FullName.TrimEnd('/', '\\', ' ');
             }
 
-            if (OsInfo.IsNotWindows && path.TrimEnd('/').Length == 0)
+            if (OsInfo.IsNotWindows && info.FullName.TrimEnd('/').Length == 0)
             {
                 return "/";
             }
 
-            return path.TrimEnd('/').Trim('\\', ' ');
+            return info.FullName.TrimEnd('/').Trim('\\', ' ');
         }
 
         public static bool PathNotEquals(this string firstPath, string secondPath, StringComparison? comparison = null)
@@ -63,11 +58,7 @@ namespace NzbDrone.Common.Extensions
                 comparison = DiskProviderBase.PathStringComparison;
             }
 
-            if (firstPath.Equals(secondPath, comparison.Value))
-            {
-                return true;
-            }
-
+            if (firstPath.Equals(secondPath, comparison.Value)) return true;
             return string.Equals(firstPath.CleanFilePath(), secondPath.CleanFilePath(), comparison.Value);
         }
 
@@ -101,7 +92,6 @@ namespace NzbDrone.Common.Extensions
             {
                 parentPath = parentPath.TrimEnd(Path.DirectorySeparatorChar);
             }
-
             if (childPath != "/" && !parentPath.EndsWith(":\\"))
             {
                 childPath = childPath.TrimEnd(Path.DirectorySeparatorChar);
@@ -227,21 +217,6 @@ namespace NzbDrone.Common.Extensions
             return null;
         }
 
-        public static string ProcessNameToExe(this string processName, PlatformType runtime)
-        {
-            if (OsInfo.IsWindows || runtime != PlatformType.NetCore)
-            {
-                processName += ".exe";
-            }
-
-            return processName;
-        }
-
-        public static string ProcessNameToExe(this string processName)
-        {
-            return processName.ProcessNameToExe(PlatformInfo.Platform);
-        }
-
         public static string GetAppDataPath(this IAppFolderInfo appFolderInfo)
         {
             return appFolderInfo.AppDataFolder;
@@ -302,9 +277,9 @@ namespace NzbDrone.Common.Extensions
             return Path.Combine(GetUpdatePackageFolder(appFolderInfo), UPDATE_CLIENT_FOLDER_NAME);
         }
 
-        public static string GetUpdateClientExePath(this IAppFolderInfo appFolderInfo, PlatformType runtime)
+        public static string GetUpdateClientExePath(this IAppFolderInfo appFolderInfo)
         {
-            return Path.Combine(GetUpdateSandboxFolder(appFolderInfo), UPDATE_CLIENT_EXE_NAME).ProcessNameToExe(runtime);
+            return Path.Combine(GetUpdateSandboxFolder(appFolderInfo), UPDATE_CLIENT_EXE);
         }
 
         public static string GetDatabase(this IAppFolderInfo appFolderInfo)

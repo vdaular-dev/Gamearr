@@ -3,17 +3,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using NLog;
+using NzbDrone.Common.Extensions;
 using NzbDrone.Common.Instrumentation.Extensions;
 using NzbDrone.Core.Datastore;
 using NzbDrone.Core.DecisionEngine;
 using NzbDrone.Core.Download;
 using NzbDrone.Core.Messaging.Commands;
-using NzbDrone.Core.Music;
 using NzbDrone.Core.Queue;
+using NzbDrone.Core.Music;
 
 namespace NzbDrone.Core.IndexerSearch
 {
-    internal class AlbumSearchService : IExecute<AlbumSearchCommand>,
+    class AlbumSearchService : IExecute<AlbumSearchCommand>,
                                IExecute<MissingAlbumSearchCommand>,
                                IExecute<CutoffUnmetAlbumSearchCommand>
     {
@@ -56,6 +57,7 @@ namespace NzbDrone.Core.IndexerSearch
             _logger.ProgressInfo("Completed missing search for {0} albums. {1} reports downloaded.", albums.Count, downloadedCount);
         }
 
+
         public void Execute(AlbumSearchCommand message)
         {
             foreach (var albumId in message.AlbumIds)
@@ -87,7 +89,9 @@ namespace NzbDrone.Core.IndexerSearch
                 pagingSpec.FilterExpressions.Add(v => v.Monitored == true && v.Artist.Value.Monitored == true);
 
                 albums = _albumService.AlbumsWithoutFiles(pagingSpec).Records.Where(e => e.ArtistId.Equals(artistId)).ToList();
+
             }
+
             else
             {
                 var pagingSpec = new PagingSpec<Album>
@@ -101,6 +105,7 @@ namespace NzbDrone.Core.IndexerSearch
                 pagingSpec.FilterExpressions.Add(v => v.Monitored == true && v.Artist.Value.Monitored == true);
 
                 albums = _albumService.AlbumsWithoutFiles(pagingSpec).Records.ToList();
+
             }
 
             var queue = _queueService.GetQueue().Where(q => q.Album != null).Select(q => q.Album.Id);

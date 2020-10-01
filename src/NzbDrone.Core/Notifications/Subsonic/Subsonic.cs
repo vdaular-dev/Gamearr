@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Sockets;
 using FluentValidation.Results;
 using NLog;
@@ -22,14 +23,14 @@ namespace NzbDrone.Core.Notifications.Subsonic
 
         public override void OnGrab(GrabMessage grabMessage)
         {
-            const string header = "Lidarr - Grabbed";
+            const string header = "Gamearr - Grabbed";
 
             Notify(Settings, header, grabMessage.Message);
         }
 
         public override void OnReleaseImport(AlbumDownloadMessage message)
         {
-            const string header = "Lidarr - Downloaded";
+            const string header = "Gamearr - Downloaded";
 
             Notify(Settings, header, message.Message);
             Update();

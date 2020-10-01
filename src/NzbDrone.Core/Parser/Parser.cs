@@ -126,6 +126,7 @@ namespace NzbDrone.Core.Parser
             // Hypen with no or more spaces between artist/album/year
             new Regex(@"^(?:(?<artist>.+?)(?:-))(?<releaseyear>\d{4})(?:-)(?<album>[^-]+)",
                 RegexOptions.IgnoreCase | RegexOptions.Compiled),
+            
         };
 
         private static readonly Regex[] RejectHashedReleasesRegex = new Regex[]
@@ -154,43 +155,32 @@ namespace NzbDrone.Core.Parser
                 new Regex(@"^b00bs$", RegexOptions.Compiled | RegexOptions.IgnoreCase)
             };
 
-        private static readonly RegexReplace NormalizeRegex = new RegexReplace(@"((?:\b|_)(?<!^)(a(?!$)|an|the|and|or|of)(?:\b|_))|\W|_",
-                                                                string.Empty,
+        private static readonly Regex NormalizeRegex = new Regex(@"((?:\b|_)(?<!^)(a(?!$)|an|the|and|or|of)(?:\b|_))|\W|_",
                                                                 RegexOptions.IgnoreCase | RegexOptions.Compiled);
-
-        private static readonly Regex PercentRegex = new Regex(@"(?<=\b\d+)%", RegexOptions.Compiled);
 
         private static readonly Regex FileExtensionRegex = new Regex(@"\.[a-z0-9]{2,4}$",
                                                                 RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
         //TODO Rework this Regex for Music
-        private static readonly RegexReplace SimpleTitleRegex = new RegexReplace(@"(?:(480|720|1080|2160|320)[ip]|[xh][\W_]?26[45]|DD\W?5\W1|[<>*:|]|848x480|1280x720|1920x1080|3840x2160|4096x2160|(8|10)b(it)?)\s*",
-                                                                string.Empty,
+        private static readonly Regex SimpleTitleRegex = new Regex(@"(?:(480|720|1080|2160|320)[ip]|[xh][\W_]?26[45]|DD\W?5\W1|[<>*:|]|848x480|1280x720|1920x1080|3840x2160|4096x2160|(8|10)b(it)?)\s*",
                                                                 RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
-        private static readonly RegexReplace WebsitePrefixRegex = new RegexReplace(@"^\[\s*[-a-z]+(\.[a-z]+)+\s*\][- ]*|^www\.[a-z]+\.(?:com|net)[ -]*",
-                                                                string.Empty,
-                                                                RegexOptions.IgnoreCase | RegexOptions.Compiled);
-
-        private static readonly RegexReplace WebsitePostfixRegex = new RegexReplace(@"\[\s*[-a-z]+(\.[a-z0-9]+)+\s*\]$",
-                                                                string.Empty,
-                                                                RegexOptions.IgnoreCase | RegexOptions.Compiled);
+        private static readonly Regex WebsitePrefixRegex = new Regex(@"^\[\s*[a-z]+(\.[a-z]+)+\s*\][- ]*|^www\.[a-z]+\.(?:com|net)[ -]*",
+                                                                   RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
         private static readonly Regex AirDateRegex = new Regex(@"^(.*?)(?<!\d)((?<airyear>\d{4})[_.-](?<airmonth>[0-1][0-9])[_.-](?<airday>[0-3][0-9])|(?<airmonth>[0-1][0-9])[_.-](?<airday>[0-3][0-9])[_.-](?<airyear>\d{4}))(?!\d)",
                                                                 RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
         private static readonly Regex SixDigitAirDateRegex = new Regex(@"(?<=[_.-])(?<airdate>(?<!\d)(?<airyear>[1-9]\d{1})(?<airmonth>[0-1][0-9])(?<airday>[0-3][0-9]))(?=[_.-])",
+                                                                        RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
+        private static readonly Regex CleanReleaseGroupRegex = new Regex(@"^(.*?[-._ ])|(-(RP|1|NZBGeek|Obfuscated|Scrambled|sample|Pre|postbot|xpost))+$",
                                                                 RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
-        private static readonly RegexReplace CleanReleaseGroupRegex = new RegexReplace(@"^(.*?[-._ ])|(-(RP|1|NZBGeek|Obfuscated|Scrambled|sample|Pre|postbot|xpost|Rakuv[a-z0-9]*|WhiteRev|BUYMORE|AsRequested|AlternativeToRequested|GEROV|Z0iDS3N|Chamele0n|4P|4Planet|AlteZachen))+$",
-                                                                string.Empty,
-                                                                RegexOptions.IgnoreCase | RegexOptions.Compiled);
+        private static readonly Regex CleanTorrentSuffixRegex = new Regex(@"\[(?:ettv|rartv|rarbg|cttv)\]$",
+                                                                   RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
-        private static readonly RegexReplace CleanTorrentSuffixRegex = new RegexReplace(@"\[(?:ettv|rartv|rarbg|cttv)\]$",
-                                                                string.Empty,
-                                                                RegexOptions.IgnoreCase | RegexOptions.Compiled);
-
-        private static readonly Regex ReleaseGroupRegex = new Regex(@"-(?<releasegroup>[a-z0-9]+(?!.+?(?:MP3|ALAC|FLAC|WEB)))(?<!.*?MP3|ALAC|FLAC|WEB)(?:\b|[-._ ]|$)|[-._ ]\[(?<releasegroup>[a-z0-9]+)\]$",
+        private static readonly Regex ReleaseGroupRegex = new Regex(@"-(?<releasegroup>[a-z0-9]+)(?<!MP3|ALAC|FLAC|WEB)(?:\b|[-._ ])",
                                                                 RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
         private static readonly Regex AnimeReleaseGroupRegex = new Regex(@"^(?:\[(?<subgroup>(?!\s).+?(?<!\s))\](?:_|-|\s|\.)?)",
@@ -209,8 +199,7 @@ namespace NzbDrone.Core.Parser
 
         private static readonly string[] Numbers = new[] { "zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine" };
 
-        private static readonly Regex[] CommonTagRegex = new Regex[]
-        {
+        private static readonly Regex[] CommonTagRegex = new Regex[] {
             new Regex(@"(\[|\()*\b((featuring|feat.|feat|ft|ft.)\s{1}){1}\s*.*(\]|\))*", RegexOptions.IgnoreCase | RegexOptions.Compiled),
             new Regex(@"(?:\(|\[)(?:[^\(\[]*)(?:version|limited|deluxe|single|clean|album|special|bonus|promo|remastered)(?:[^\)\]]*)(?:\)|\])", RegexOptions.IgnoreCase | RegexOptions.Compiled)
         };
@@ -222,7 +211,7 @@ namespace NzbDrone.Core.Parser
         };
 
         private static readonly Regex AfterDashRegex = new Regex(@"[-:].*", RegexOptions.Compiled);
-
+        
         public static ParsedTrackInfo ParseMusicPath(string path)
         {
             var fileInfo = new FileInfo(path);
@@ -245,22 +234,18 @@ namespace NzbDrone.Core.Parser
         {
             try
             {
-                if (!ValidateBeforeParsing(title))
-                {
-                    return null;
-                }
+                if (!ValidateBeforeParsing(title)) return null;
 
                 Logger.Debug("Parsing string '{0}'", title);
 
                 var releaseTitle = RemoveFileExtension(title);
 
-                var simpleTitle = SimpleTitleRegex.Replace(releaseTitle);
+                var simpleTitle = SimpleTitleRegex.Replace(releaseTitle, string.Empty);
 
                 // TODO: Quick fix stripping [url] - prefixes.
-                simpleTitle = WebsitePrefixRegex.Replace(simpleTitle);
-                simpleTitle = WebsitePostfixRegex.Replace(simpleTitle);
+                simpleTitle = WebsitePrefixRegex.Replace(simpleTitle, string.Empty);
 
-                simpleTitle = CleanTorrentSuffixRegex.Replace(simpleTitle);
+                simpleTitle = CleanTorrentSuffixRegex.Replace(simpleTitle, string.Empty);
 
                 var airDateMatch = AirDateRegex.Match(simpleTitle);
                 if (airDateMatch.Success)
@@ -313,9 +298,7 @@ namespace NzbDrone.Core.Parser
             catch (Exception e)
             {
                 if (!title.ToLower().Contains("password") && !title.ToLower().Contains("yenc"))
-                {
                     Logger.Error(e, "An error has occurred while trying to parse {0}", title);
-                }
             }
 
             Logger.Debug("Unable to parse {0}", title);
@@ -326,28 +309,20 @@ namespace NzbDrone.Core.Parser
         {
             try
             {
-                if (!ValidateBeforeParsing(title))
-                {
-                    return null;
-                }
-
-                var artistName = artist.Name == "Various Artists" ? "VA" : artist.Name.RemoveAccent();
+                if (!ValidateBeforeParsing(title)) return null;
 
                 Logger.Debug("Parsing string '{0}' using search criteria artist: '{1}' album: '{2}'",
-                             title,
-                             artistName.RemoveAccent(),
-                             string.Join(", ", album.Select(a => a.Title.RemoveAccent())));
+                             title, artist.Name.RemoveAccent(), string.Join(", ", album.Select(a => a.Title.RemoveAccent())));
 
                 var releaseTitle = RemoveFileExtension(title);
 
-                var simpleTitle = SimpleTitleRegex.Replace(releaseTitle);
+                var simpleTitle = SimpleTitleRegex.Replace(releaseTitle, string.Empty);
 
-                simpleTitle = WebsitePrefixRegex.Replace(simpleTitle);
-                simpleTitle = WebsitePostfixRegex.Replace(simpleTitle);
+                simpleTitle = WebsitePrefixRegex.Replace(simpleTitle, string.Empty);
 
-                simpleTitle = CleanTorrentSuffixRegex.Replace(simpleTitle);
+                simpleTitle = CleanTorrentSuffixRegex.Replace(simpleTitle, string.Empty);
 
-                var escapedArtist = Regex.Escape(artistName.RemoveAccent()).Replace(@"\ ", @"[\W_]");
+                var escapedArtist = Regex.Escape(artist.Name.RemoveAccent()).Replace(@"\ ", @"[\W_]");
                 var escapedAlbums = string.Join("|", album.Select(s => Regex.Escape(s.Title.RemoveAccent())).ToList()).Replace(@"\ ", @"[\W_]");
 
                 var releaseRegex = new Regex(@"^(\W*|\b)(?<artist>" + escapedArtist + @")(\W*|\b).*(\W*|\b)(?<album>" + escapedAlbums + @")(\W*|\b)", RegexOptions.IgnoreCase);
@@ -393,9 +368,7 @@ namespace NzbDrone.Core.Parser
             catch (Exception e)
             {
                 if (!title.ToLower().Contains("password") && !title.ToLower().Contains("yenc"))
-                {
                     Logger.Error(e, "An error has occurred while trying to parse {0}", title);
-                }
             }
 
             Logger.Debug("Unable to parse {0}", title);
@@ -406,22 +379,18 @@ namespace NzbDrone.Core.Parser
         {
             try
             {
-                if (!ValidateBeforeParsing(title))
-                {
-                    return null;
-                }
+                if (!ValidateBeforeParsing(title)) return null;
 
                 Logger.Debug("Parsing string '{0}'", title);
 
                 var releaseTitle = RemoveFileExtension(title);
 
-                var simpleTitle = SimpleTitleRegex.Replace(releaseTitle);
+                var simpleTitle = SimpleTitleRegex.Replace(releaseTitle, string.Empty);
 
                 // TODO: Quick fix stripping [url] - prefixes.
-                simpleTitle = WebsitePrefixRegex.Replace(simpleTitle);
-                simpleTitle = WebsitePostfixRegex.Replace(simpleTitle);
+                simpleTitle = WebsitePrefixRegex.Replace(simpleTitle, string.Empty);
 
-                simpleTitle = CleanTorrentSuffixRegex.Replace(simpleTitle);
+                simpleTitle = CleanTorrentSuffixRegex.Replace(simpleTitle, string.Empty);
 
                 var airDateMatch = AirDateRegex.Match(simpleTitle);
                 if (airDateMatch.Success)
@@ -490,9 +459,7 @@ namespace NzbDrone.Core.Parser
             catch (Exception e)
             {
                 if (!title.ToLower().Contains("password") && !title.ToLower().Contains("yenc"))
-                {
                     Logger.Error(e, "An error has occurred while trying to parse {0}", title);
-                }
             }
 
             Logger.Debug("Unable to parse {0}", title);
@@ -501,15 +468,13 @@ namespace NzbDrone.Core.Parser
 
         public static string CleanArtistName(this string name)
         {
-            // If Title only contains numbers return it as is.
-            if (long.TryParse(name, out _))
-            {
+            long number = 0;
+
+            //If Title only contains numbers return it as is.
+            if (long.TryParse(name, out number))
                 return name;
-            }
 
-            name = PercentRegex.Replace(name, "percent");
-
-            return NormalizeRegex.Replace(name).ToLower().RemoveAccent();
+            return NormalizeRegex.Replace(name, string.Empty).ToLower().RemoveAccent();
         }
 
         public static string NormalizeTrackTitle(this string title)
@@ -535,7 +500,7 @@ namespace NzbDrone.Core.Parser
         {
             title = title.Trim();
             title = RemoveFileExtension(title);
-            title = WebsitePrefixRegex.Replace(title);
+            title = WebsitePrefixRegex.Replace(title, "");
 
             var animeMatch = AnimeReleaseGroupRegex.Match(title);
 
@@ -544,7 +509,7 @@ namespace NzbDrone.Core.Parser
                 return animeMatch.Groups["subgroup"].Value;
             }
 
-            title = CleanReleaseGroupRegex.Replace(title);
+            title = CleanReleaseGroupRegex.Replace(title, "");
 
             var matches = ReleaseGroupRegex.Matches(title);
 
@@ -573,7 +538,6 @@ namespace NzbDrone.Core.Parser
                     {
                         return string.Empty;
                     }
-
                     return m.Value;
                 });
 
@@ -592,7 +556,7 @@ namespace NzbDrone.Core.Parser
             {
                 intermediate = regex.Replace(intermediate, string.Empty).Trim();
             }
-
+            
             return intermediate;
         }
 
@@ -618,7 +582,7 @@ namespace NzbDrone.Core.Parser
             artistName = RequestInfoRegex.Replace(artistName, "").Trim(' ');
 
             // Coppied from Radarr (https://github.com/Radarr/Radarr/blob/develop/src/NzbDrone.Core/Parser/Parser.cs)
-            // TODO: Split into separate method and write unit tests for.
+            // TODO: Split into separate method and write unit tests for. 
             var parts = artistName.Split('.');
             artistName = "";
             int n = 0;
@@ -630,7 +594,6 @@ namespace NzbDrone.Core.Parser
                 {
                     nextPart = parts[n + 1];
                 }
-
                 if (part.Length == 1 && part.ToLower() != "a" && !int.TryParse(part, out n))
                 {
                     artistName += part + ".";
@@ -648,14 +611,15 @@ namespace NzbDrone.Core.Parser
                         artistName += " ";
                         previousAcronym = false;
                     }
-
                     artistName += part + " ";
                 }
-
                 n++;
             }
 
             artistName = artistName.Trim(' ');
+
+            int trackNumber;
+            int.TryParse(matchCollection[0].Groups["trackNumber"].Value, out trackNumber);
 
             ParsedTrackInfo result = new ParsedTrackInfo();
 

@@ -35,10 +35,9 @@ namespace NzbDrone.Console
                     System.Console.WriteLine("NLog Exception: " + ex.ToString());
                     throw;
                 }
-
                 Bootstrap.Start(startupArgs, new ConsoleAlerts());
             }
-            catch (LidarrStartupException ex)
+            catch (GamearrStartupException ex)
             {
                 System.Console.WriteLine("");
                 System.Console.WriteLine("");
@@ -49,7 +48,7 @@ namespace NzbDrone.Console
             {
                 System.Console.WriteLine("");
                 System.Console.WriteLine("");
-                Logger.Fatal(ex.Message + ". This can happen if another instance of Lidarr is already running another application is using the same port (default: 8686) or the user has insufficient permissions");
+                Logger.Fatal(ex.Message + ". This can happen if another instance of Gamearr is already running another application is using the same port (default: 8383) or the user has insufficient permissions");
                 Exit(ExitCodes.RecoverableFailure);
             }
             catch (RemoteAccessException ex)
@@ -86,14 +85,11 @@ namespace NzbDrone.Console
                 if (exitCode == ExitCodes.NonRecoverableFailure)
                 {
                     System.Console.WriteLine("Non-recoverable failure, waiting for user intervention...");
-                    for (int i = 0; i < 3600; i++)
+                    for (int i = 0; i< 3600; i++)
                     {
                         System.Threading.Thread.Sleep(1000);
 
-                        if (!System.Console.IsInputRedirected && System.Console.KeyAvailable)
-                        {
-                            break;
-                        }
+                        if (System.Console.KeyAvailable) break;
                     }
                 }
 

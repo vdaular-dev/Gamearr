@@ -6,12 +6,6 @@ using NzbDrone.Common.EnvironmentInfo;
 using NzbDrone.Common.Messaging;
 using TinyIoC;
 
-#if NETCOREAPP
-using System.IO;
-using System.Runtime.InteropServices;
-using System.Runtime.Loader;
-#endif
-
 namespace NzbDrone.Common.Composition
 {
     public abstract class ContainerBuilderBase
@@ -24,69 +18,18 @@ namespace NzbDrone.Common.Composition
         {
             _loadedTypes = new List<Type>();
 
-            assemblies.Add(OsInfo.IsWindows ? "Lidarr.Windows" : "Lidarr.Mono");
-            assemblies.Add("Lidarr.Common");
+            assemblies.Add(OsInfo.IsWindows ? "Gamearr.Windows" : "Gamearr.Mono");
+            assemblies.Add("Gamearr.Common");
 
-#if !NETCOREAPP
             foreach (var assembly in assemblies)
             {
                 _loadedTypes.AddRange(Assembly.Load(assembly).GetTypes());
             }
-#else
-            var startupPath = AppDomain.CurrentDomain.BaseDirectory;
-
-            foreach (var assemblyName in assemblies)
-            {
-                _loadedTypes.AddRange(AssemblyLoadContext.Default.LoadFromAssemblyPath(Path.Combine(startupPath, $"{assemblyName}.dll")).GetTypes());
-            }
-
-            AppDomain.CurrentDomain.AssemblyResolve += new ResolveEventHandler(ContainerResolveEventHandler);
-            RegisterSQLiteResolver();
-#endif
 
             Container = new Container(new TinyIoCContainer(), _loadedTypes);
             AutoRegisterInterfaces();
             Container.Register(args);
-        }
-
-#if  NETCOREAPP
-        private static Assembly ContainerResolveEventHandler(object sender, ResolveEventArgs args)
-        {
-            var resolver = new AssemblyDependencyResolver(args.RequestingAssembly.Location);
-            var assemblyPath = resolver.ResolveAssemblyToPath(new AssemblyName(args.Name));
-
-            if (assemblyPath == null)
-            {
-                return null;
-            }
-
-            return AssemblyLoadContext.Default.LoadFromAssemblyPath(assemblyPath);
-        }
-
-        public static void RegisterSQLiteResolver()
-        {
-            // This ensures we look for sqlite3 using libsqlite3.so.0 on Linux and not libsqlite3.so which
-            // is less likely to exist.
-            var sqliteAssembly = AssemblyLoadContext.Default.LoadFromAssemblyPath(
-                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "System.Data.SQLite.dll"));
-
-            try
-            {
-                NativeLibrary.SetDllImportResolver(sqliteAssembly, LoadSqliteNativeLib);
-            }
-            catch (InvalidOperationException)
-            {
-                // This can only be set once per assembly
-                // Catch required for NzbDrone.Host tests
-            }
-        }
-
-        private static IntPtr LoadSqliteNativeLib(string libraryName, Assembly assembly, DllImportSearchPath? dllImportSearchPath)
-        {
-            var mappedName = OsInfo.IsLinux && libraryName == "sqlite3" ? "libsqlite3.so.0" : libraryName;
-            return NativeLibrary.Load(mappedName, assembly, dllImportSearchPath);
-        }
-#endif
+       }
 
         private void AutoRegisterInterfaces()
         {
@@ -116,7 +59,6 @@ namespace NzbDrone.Common.Composition
             {
                 return;
             }
-
             if (implementations.Count == 1)
             {
                 var impl = implementations.Single();

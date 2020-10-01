@@ -1,6 +1,6 @@
+using System.Linq;
 using NLog;
 using NzbDrone.Core.DecisionEngine;
-using NzbDrone.Core.Download;
 using NzbDrone.Core.Parser.Model;
 
 namespace NzbDrone.Core.MediaFiles.TrackImport.Specifications
@@ -14,14 +14,14 @@ namespace NzbDrone.Core.MediaFiles.TrackImport.Specifications
             _logger = logger;
         }
 
-        public Decision IsSatisfiedBy(LocalAlbumRelease item, DownloadClientItem downloadClientItem)
+        public Decision IsSatisfiedBy(LocalAlbumRelease localAlbumRelease)
         {
-            if (item.AlbumRelease.Monitored || item.AlbumRelease.Album.Value.AnyReleaseOk)
+            if (localAlbumRelease.AlbumRelease.Monitored || localAlbumRelease.AlbumRelease.Album.Value.AnyReleaseOk)
             {
                 return Decision.Accept();
             }
 
-            _logger.Debug("AlbumRelease {0} was not requested", item);
+            _logger.Debug("AlbumRelease {0} was not requested", localAlbumRelease);
             return Decision.Reject("Album release not requested");
         }
     }

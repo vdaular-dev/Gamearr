@@ -1,10 +1,10 @@
-using System.Collections.Generic;
 using FluentAssertions;
 using NUnit.Framework;
-using NzbDrone.Core.DecisionEngine.Specifications;
 using NzbDrone.Core.Profiles.Qualities;
 using NzbDrone.Core.Qualities;
+using NzbDrone.Core.DecisionEngine.Specifications;
 using NzbDrone.Core.Test.Framework;
+using System.Collections.Generic;
 
 namespace NzbDrone.Core.Test.DecisionEngineTests
 {
@@ -18,6 +18,7 @@ namespace NzbDrone.Core.Test.DecisionEngineTests
         {
             Subject.CutoffNotMet(
              new QualityProfile
+
              {
                  Cutoff = Quality.MP3_256.Id,
                  Items = Qualities.QualityFixture.GetDefaultQualities()
@@ -44,6 +45,7 @@ namespace NzbDrone.Core.Test.DecisionEngineTests
         {
             Subject.CutoffNotMet(
             new QualityProfile
+
             {
                 Cutoff = Quality.MP3_256.Id,
                 Items = Qualities.QualityFixture.GetDefaultQualities()
@@ -57,6 +59,7 @@ namespace NzbDrone.Core.Test.DecisionEngineTests
         {
             Subject.CutoffNotMet(
             new QualityProfile
+
             {
                 Cutoff = Quality.MP3_320.Id,
                 Items = Qualities.QualityFixture.GetDefaultQualities()
@@ -64,6 +67,7 @@ namespace NzbDrone.Core.Test.DecisionEngineTests
             new List<QualityModel> { new QualityModel(Quality.MP3_320, new Revision(version: 1)) },
             NoPreferredWordScore,
             new QualityModel(Quality.MP3_320, new Revision(version: 2))).Should().BeTrue();
+
         }
 
         [Test]
@@ -71,6 +75,7 @@ namespace NzbDrone.Core.Test.DecisionEngineTests
         {
             Subject.CutoffNotMet(
             new QualityProfile
+
             {
                 Cutoff = Quality.MP3_320.Id,
                 Items = Qualities.QualityFixture.GetDefaultQualities()
@@ -83,31 +88,32 @@ namespace NzbDrone.Core.Test.DecisionEngineTests
         [Test]
         public void should_return_true_if_cutoffs_are_met_and_score_is_higher()
         {
-            QualityProfile profile = new QualityProfile
+            QualityProfile _profile = new QualityProfile
             {
                 Cutoff = Quality.MP3_320.Id,
                 Items = Qualities.QualityFixture.GetDefaultQualities(),
             };
 
             Subject.CutoffNotMet(
-                profile,
+                _profile,
                 new List<QualityModel> { new QualityModel(Quality.MP3_320, new Revision(version: 2)) },
                 NoPreferredWordScore,
                 new QualityModel(Quality.FLAC, new Revision(version: 2)),
                 10).Should().BeTrue();
         }
 
+
         [Test]
         public void should_return_true_if_cutoffs_are_met_but_is_a_revision_upgrade()
         {
-            QualityProfile profile = new QualityProfile
+            QualityProfile _profile = new QualityProfile
             {
                 Cutoff = Quality.MP3_320.Id,
                 Items = Qualities.QualityFixture.GetDefaultQualities(),
             };
 
             Subject.CutoffNotMet(
-                profile,
+                _profile,
                 new List<QualityModel> { new QualityModel(Quality.FLAC, new Revision(version: 1)) },
                 NoPreferredWordScore,
                 new QualityModel(Quality.FLAC, new Revision(version: 2)),

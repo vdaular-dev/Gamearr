@@ -2,6 +2,8 @@ namespace NzbDrone.Common.EnvironmentInfo
 {
     public class OsVersionModel
     {
+
+
         public OsVersionModel(string name, string version, string fullName = null)
         {
             Name = Trim(name);

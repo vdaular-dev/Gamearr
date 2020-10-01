@@ -8,8 +8,7 @@ namespace NzbDrone.Core.Notifications.Pushover
         {
         }
 
-        public InvalidResponseException(string message)
-            : base(message)
+        public InvalidResponseException(string message) : base(message)
         {
         }
     }

@@ -6,22 +6,23 @@ namespace NzbDrone.Common.Expansive
     {
         public TreeNode<T> Parent;
 
-        public TreeNodeList(TreeNode<T> parent)
+        public TreeNodeList(TreeNode<T> Parent)
         {
-            Parent = parent;
+            this.Parent = Parent;
         }
 
-        public new TreeNode<T> Add(TreeNode<T> node)
+        public new TreeNode<T> Add(TreeNode<T> Node)
         {
-            base.Add(node);
-            node.Parent = Parent;
-            return node;
+            base.Add(Node);
+            Node.Parent = Parent;
+            return Node;
         }
 
-        public TreeNode<T> Add(T value)
+        public TreeNode<T> Add(T Value)
         {
-            return Add(new TreeNode<T>(value));
+            return Add(new TreeNode<T>(Value));
         }
+
 
         public override string ToString()
         {

@@ -1,8 +1,8 @@
-import classNames from 'classnames';
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import { DragSource, DropTarget } from 'react-dnd';
 import { findDOMNode } from 'react-dom';
+import { DragSource, DropTarget } from 'react-dnd';
+import classNames from 'classnames';
 import { DELAY_PROFILE } from 'Helpers/dragTypes';
 import DelayProfile from './DelayProfile';
 import styles from './DelayProfileDragSource.css';
@@ -137,6 +137,7 @@ DelayProfileDragSource.propTypes = {
   onDelayProfileDragEnd: PropTypes.func.isRequired
 };
 
+/* eslint-disable new-cap */
 export default DropTarget(
   DELAY_PROFILE,
   delayProfileDropTarget,
@@ -146,3 +147,4 @@ export default DropTarget(
   delayProfileDragSource,
   collectDragSource
 )(DelayProfileDragSource));
+/* eslint-enable new-cap */

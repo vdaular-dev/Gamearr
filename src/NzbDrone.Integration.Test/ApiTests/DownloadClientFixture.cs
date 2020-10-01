@@ -7,12 +7,10 @@ namespace NzbDrone.Integration.Test.ApiTests
     [TestFixture]
     public class DownloadClientFixture : IntegrationTest
     {
-        [Test]
-        [Order(0)]
+
+        [Test, Order(0)]
         public void add_downloadclient_without_name_should_return_badrequest()
         {
-            IgnoreOnMonoVersions("5.12", "5.14");
-
             EnsureNoDownloadClient();
 
             var schema = DownloadClients.Schema().First(v => v.Implementation == "UsenetBlackhole");
@@ -24,12 +22,9 @@ namespace NzbDrone.Integration.Test.ApiTests
             DownloadClients.InvalidPost(schema);
         }
 
-        [Test]
-        [Order(0)]
+        [Test, Order(0)]
         public void add_downloadclient_without_nzbfolder_should_return_badrequest()
         {
-            IgnoreOnMonoVersions("5.12", "5.14");
-
             EnsureNoDownloadClient();
 
             var schema = DownloadClients.Schema().First(v => v.Implementation == "UsenetBlackhole");
@@ -41,12 +36,9 @@ namespace NzbDrone.Integration.Test.ApiTests
             DownloadClients.InvalidPost(schema);
         }
 
-        [Test]
-        [Order(0)]
+        [Test, Order(0)]
         public void add_downloadclient_without_watchfolder_should_return_badrequest()
         {
-            IgnoreOnMonoVersions("5.12", "5.14");
-
             EnsureNoDownloadClient();
 
             var schema = DownloadClients.Schema().First(v => v.Implementation == "UsenetBlackhole");
@@ -58,8 +50,7 @@ namespace NzbDrone.Integration.Test.ApiTests
             DownloadClients.InvalidPost(schema);
         }
 
-        [Test]
-        [Order(1)]
+        [Test, Order(1)]
         public void add_downloadclient()
         {
             EnsureNoDownloadClient();
@@ -76,8 +67,7 @@ namespace NzbDrone.Integration.Test.ApiTests
             result.Enable.Should().BeTrue();
         }
 
-        [Test]
-        [Order(2)]
+        [Test, Order(2)]
         public void get_all_downloadclients()
         {
             EnsureDownloadClient();
@@ -87,8 +77,7 @@ namespace NzbDrone.Integration.Test.ApiTests
             clients.Should().NotBeNullOrEmpty();
         }
 
-        [Test]
-        [Order(2)]
+        [Test, Order(2)]
         public void get_downloadclient_by_id()
         {
             var client = EnsureDownloadClient();
@@ -101,13 +90,10 @@ namespace NzbDrone.Integration.Test.ApiTests
         [Test]
         public void get_downloadclient_by_unknown_id_should_return_404()
         {
-            IgnoreOnMonoVersions("5.12", "5.14");
-
             var result = DownloadClients.InvalidGet(1000000);
         }
 
-        [Test]
-        [Order(3)]
+        [Test, Order(3)]
         public void update_downloadclient()
         {
             EnsureNoDownloadClient();
@@ -119,8 +105,7 @@ namespace NzbDrone.Integration.Test.ApiTests
             result.Should().NotBeNull();
         }
 
-        [Test]
-        [Order(4)]
+        [Test, Order(4)]
         public void delete_downloadclient()
         {
             var client = EnsureDownloadClient();

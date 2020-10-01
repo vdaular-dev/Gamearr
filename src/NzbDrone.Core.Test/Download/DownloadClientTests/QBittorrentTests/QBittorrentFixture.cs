@@ -7,9 +7,9 @@ using NUnit.Framework;
 using NzbDrone.Common.Http;
 using NzbDrone.Core.Download;
 using NzbDrone.Core.Download.Clients.QBittorrent;
-using NzbDrone.Core.Exceptions;
 using NzbDrone.Core.MediaFiles.TorrentInfo;
 using NzbDrone.Test.Common;
+using NzbDrone.Core.Exceptions;
 
 namespace NzbDrone.Core.Test.Download.DownloadClientTests.QBittorrentTests
 {
@@ -59,11 +59,11 @@ namespace NzbDrone.Core.Test.Download.DownloadClientTests.QBittorrentTests
         protected void GivenRedirectToTorrent()
         {
             var httpHeader = new HttpHeader();
-            httpHeader["Location"] = "http://test.lidarr.audio/not-a-real-torrent.torrent";
+            httpHeader["Location"] = "http://test.gamearr.game/not-a-real-torrent.torrent";
 
             Mocker.GetMock<IHttpClient>()
                   .Setup(s => s.Get(It.Is<HttpRequest>(h => h.Url.FullUri == _downloadUrl)))
-                  .Returns<HttpRequest>(r => new HttpResponse(r, httpHeader, new byte[0], System.Net.HttpStatusCode.Found));
+                  .Returns<HttpRequest>(r => new HttpResponse(r, httpHeader, new Byte[0], System.Net.HttpStatusCode.Found));
         }
 
         protected void GivenFailedDownload()
@@ -171,6 +171,7 @@ namespace NzbDrone.Core.Test.Download.DownloadClientTests.QBittorrentTests
         [TestCase("queuedUP")]
         [TestCase("uploading")]
         [TestCase("stalledUP")]
+        [TestCase("checkingUP")]
         [TestCase("forcedUP")]
         public void completed_item_should_have_required_properties(string state)
         {
@@ -194,7 +195,6 @@ namespace NzbDrone.Core.Test.Download.DownloadClientTests.QBittorrentTests
 
         [TestCase("queuedDL")]
         [TestCase("checkingDL")]
-        [TestCase("checkingUP")]
         [TestCase("metaDL")]
         public void queued_item_should_have_required_properties(string state)
         {
@@ -259,27 +259,6 @@ namespace NzbDrone.Core.Test.Download.DownloadClientTests.QBittorrentTests
         }
 
         [Test]
-        public void missingFiles_item_should_have_required_properties()
-        {
-            var torrent = new QBittorrentTorrent
-            {
-                Hash = "HASH",
-                Name = _title,
-                Size = 1000,
-                Progress = 0.7,
-                Eta = 8640000,
-                State = "missingFiles",
-                Label = "",
-                SavePath = ""
-            };
-            GivenTorrents(new List<QBittorrentTorrent> { torrent });
-
-            var item = Subject.GetItems().Single();
-            VerifyWarning(item);
-            item.RemainingTime.Should().NotHaveValue();
-        }
-
-        [Test]
         public void Download_should_return_unique_id()
         {
             GivenSuccessfulDownload();
@@ -320,6 +299,7 @@ namespace NzbDrone.Core.Test.Download.DownloadClientTests.QBittorrentTests
         [Test]
         public void Download_should_accept_magnet_if_trackers_provided_and_dht_is_disabled()
         {
+
             Mocker.GetMock<IQBittorrentProxy>()
                   .Setup(s => s.GetConfig(It.IsAny<QBittorrentSettings>()))
                   .Returns(new QBittorrentPreferences { DhtEnabled = false });
@@ -328,7 +308,7 @@ namespace NzbDrone.Core.Test.Download.DownloadClientTests.QBittorrentTests
             remoteAlbum.Release.DownloadUrl = "magnet:?xt=urn:btih:ZPBPA2P6ROZPKRHK44D5OW6NHXU5Z6KR&tr=udp://abc";
 
             Assert.DoesNotThrow(() => Subject.Download(remoteAlbum));
-
+            
             Mocker.GetMock<IQBittorrentProxy>()
                   .Verify(s => s.AddTorrentFromUrl(It.IsAny<string>(), It.IsAny<QBittorrentSettings>()), Times.Once());
         }
@@ -437,10 +417,8 @@ namespace NzbDrone.Core.Test.Download.DownloadClientTests.QBittorrentTests
 
         protected virtual QBittorrentTorrent GivenCompletedTorrent(
             string state = "pausedUP",
-            float ratio = 0.1f,
-            float ratioLimit = -2,
-            int seedingTime = 1,
-            int seedingTimeLimit = -2)
+            float ratio = 0.1f, float ratioLimit = -2,
+            int seedingTime = 1, int seedingTimeLimit = -2)
         {
             var torrent = new QBittorrentTorrent
             {
@@ -524,6 +502,7 @@ namespace NzbDrone.Core.Test.Download.DownloadClientTests.QBittorrentTests
             item.CanMoveFiles.Should().BeFalse();
         }
 
+
         [Test]
         public void should_not_be_removable_and_should_not_allow_move_files_if_max_seedingtime_reached_and_not_paused()
         {
@@ -580,25 +559,9 @@ namespace NzbDrone.Core.Test.Download.DownloadClientTests.QBittorrentTests
         }
 
         [Test]
-        public void should_not_fetch_details_twice()
-        {
-            GivenGlobalSeedLimits(-1, 30);
-            GivenCompletedTorrent("pausedUP", ratio: 2.0f, seedingTime: 20);
-
-            var item = Subject.GetItems().Single();
-            item.CanBeRemoved.Should().BeFalse();
-            item.CanMoveFiles.Should().BeFalse();
-
-            var item2 = Subject.GetItems().Single();
-
-            Mocker.GetMock<IQBittorrentProxy>()
-                  .Verify(p => p.GetTorrentProperties(It.IsAny<string>(), It.IsAny<QBittorrentSettings>()), Times.Once());
-        }
-
-        [Test]
         public void should_get_category_from_the_category_if_set()
         {
-            const string category = "music-lidarr";
+            const string category = "music-gamearr";
             GivenGlobalSeedLimits(1.0f);
 
             var torrent = new QBittorrentTorrent
@@ -623,7 +586,7 @@ namespace NzbDrone.Core.Test.Download.DownloadClientTests.QBittorrentTests
         [Test]
         public void should_get_category_from_the_label_if_the_category_is_not_available()
         {
-            const string category = "music-lidarr";
+            const string category = "music-gamearr";
             GivenGlobalSeedLimits(1.0f);
 
             var torrent = new QBittorrentTorrent

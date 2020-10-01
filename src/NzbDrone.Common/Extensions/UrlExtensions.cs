@@ -28,6 +28,7 @@ namespace NzbDrone.Common.Extensions
             }
 
             return true;
+
         }
     }
 }

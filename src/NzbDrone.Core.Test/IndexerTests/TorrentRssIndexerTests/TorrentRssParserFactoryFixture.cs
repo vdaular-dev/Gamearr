@@ -1,11 +1,11 @@
-﻿using FluentAssertions;
-using Moq;
+﻿using Moq;
 using NUnit.Framework;
 using NzbDrone.Common.Cache;
-using NzbDrone.Core.Indexers;
-using NzbDrone.Core.Indexers.Exceptions;
 using NzbDrone.Core.Indexers.TorrentRss;
 using NzbDrone.Core.Test.Framework;
+using FluentAssertions;
+using NzbDrone.Core.Indexers.Exceptions;
+using NzbDrone.Core.Indexers;
 
 namespace NzbDrone.Core.Test.IndexerTests.TorrentRssIndexerTests
 {
@@ -118,7 +118,7 @@ namespace NzbDrone.Core.Test.IndexerTests.TorrentRssIndexerTests
 
             var detection2 = Subject.GetParser(_indexerSettings1);
 
-            detection1.Should().BeEquivalentTo(detection2);
+            detection1.ShouldBeEquivalentTo(detection2);
 
             VerifyDetectionCount(1);
         }

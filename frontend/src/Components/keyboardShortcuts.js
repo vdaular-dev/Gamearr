@@ -1,21 +1,11 @@
-import Mousetrap from 'mousetrap';
 import React, { Component } from 'react';
+import Mousetrap from 'mousetrap';
 import getDisplayName from 'Helpers/getDisplayName';
 
 export const shortcuts = {
   OPEN_KEYBOARD_SHORTCUTS_MODAL: {
     key: '?',
     name: 'Open This Modal'
-  },
-
-  CLOSE_MODAL: {
-    key: 'Esc',
-    name: 'Close Current Modal'
-  },
-
-  ACCEPT_CONFIRM_MODAL: {
-    key: 'Enter',
-    name: 'Accept Confirmation Modal'
   },
 
   ARTIST_SEARCH_INPUT: {
@@ -56,10 +46,8 @@ function keyboardShortcuts(WrappedComponent) {
     }
 
     unbindShortcut = (key) => {
-      if (this._mousetrap != null) {
-        delete this._mousetrapBindings[key];
-        this._mousetrap.unbind(key);
-      }
+      delete this._mousetrapBindings[key];
+      this._mousetrap.unbind(key);
     }
 
     unbindAllShortcuts = () => {

@@ -1,16 +1,16 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import Form from 'Components/Form/Form';
-import FormGroup from 'Components/Form/FormGroup';
-import FormInputGroup from 'Components/Form/FormInputGroup';
-import FormLabel from 'Components/Form/FormLabel';
+import { inputTypes, kinds } from 'Helpers/Props';
 import Button from 'Components/Link/Button';
 import SpinnerErrorButton from 'Components/Link/SpinnerErrorButton';
-import ModalBody from 'Components/Modal/ModalBody';
 import ModalContent from 'Components/Modal/ModalContent';
-import ModalFooter from 'Components/Modal/ModalFooter';
 import ModalHeader from 'Components/Modal/ModalHeader';
-import { inputTypes, kinds } from 'Helpers/Props';
+import ModalBody from 'Components/Modal/ModalBody';
+import ModalFooter from 'Components/Modal/ModalFooter';
+import Form from 'Components/Form/Form';
+import FormGroup from 'Components/Form/FormGroup';
+import FormLabel from 'Components/Form/FormLabel';
+import FormInputGroup from 'Components/Form/FormInputGroup';
 import styles from './EditReleaseProfileModalContent.css';
 
 // Tab, enter, and comma
@@ -30,13 +30,11 @@ function EditReleaseProfileModalContent(props) {
 
   const {
     id,
-    enabled,
     required,
     ignored,
     preferred,
     includePreferredWhenRenaming,
-    tags,
-    indexerId
+    tags
   } = item;
 
   return (
@@ -47,18 +45,6 @@ function EditReleaseProfileModalContent(props) {
 
       <ModalBody>
         <Form {...otherProps}>
-          <FormGroup>
-            <FormLabel>Enable Profile</FormLabel>
-
-            <FormInputGroup
-              type={inputTypes.CHECK}
-              name="enabled"
-              helpText="Check to enable release profile"
-              {...enabled}
-              onChange={onInputChange}
-            />
-          </FormGroup>
-
           <FormGroup>
             <FormLabel>Must Contain</FormLabel>
 
@@ -113,22 +99,8 @@ function EditReleaseProfileModalContent(props) {
             <FormInputGroup
               type={inputTypes.CHECK}
               name="includePreferredWhenRenaming"
-              helpText={indexerId.value === 0 ? 'Include in {Preferred Words} renaming format' : 'Only supported when Indexer is set to (All)'}
+              helpText="Include in {Preferred Words} renaming format"
               {...includePreferredWhenRenaming}
-              onChange={onInputChange}
-              isDisabled={indexerId.value !== 0}
-            />
-          </FormGroup>
-
-          <FormGroup>
-            <FormLabel>Indexer</FormLabel>
-
-            <FormInputGroup
-              type={inputTypes.INDEXER_SELECT}
-              name="indexerId"
-              helpText="Specify what indexer the profile applies to"
-              {...indexerId}
-              includeAny={true}
               onChange={onInputChange}
             />
           </FormGroup>

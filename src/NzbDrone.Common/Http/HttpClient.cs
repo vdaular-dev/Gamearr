@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Net;
 using NLog;
@@ -17,33 +18,32 @@ namespace NzbDrone.Common.Http
         HttpResponse Execute(HttpRequest request);
         void DownloadFile(string url, string fileName);
         HttpResponse Get(HttpRequest request);
-        HttpResponse<T> Get<T>(HttpRequest request)
-            where T : new();
+        HttpResponse<T> Get<T>(HttpRequest request) where T : new();
         HttpResponse Head(HttpRequest request);
         HttpResponse Post(HttpRequest request);
-        HttpResponse<T> Post<T>(HttpRequest request)
-            where T : new();
+        HttpResponse<T> Post<T>(HttpRequest request) where T : new();
     }
 
     public class HttpClient : IHttpClient
     {
-        private const int MaxRedirects = 5;
-
         private readonly Logger _logger;
         private readonly IRateLimitService _rateLimitService;
         private readonly ICached<CookieContainer> _cookieContainerCache;
         private readonly List<IHttpRequestInterceptor> _requestInterceptors;
         private readonly IHttpDispatcher _httpDispatcher;
+        private readonly IUserAgentBuilder _userAgentBuilder;
 
         public HttpClient(IEnumerable<IHttpRequestInterceptor> requestInterceptors,
             ICacheManager cacheManager,
             IRateLimitService rateLimitService,
             IHttpDispatcher httpDispatcher,
+            IUserAgentBuilder userAgentBuilder,
             Logger logger)
         {
             _requestInterceptors = requestInterceptors.ToList();
             _rateLimitService = rateLimitService;
             _httpDispatcher = httpDispatcher;
+            _userAgentBuilder = userAgentBuilder;
             _logger = logger;
 
             ServicePointManager.DefaultConnectionLimit = 12;
@@ -68,7 +68,7 @@ namespace NzbDrone.Common.Http
 
                     _logger.Trace("Redirected to {0}", request.Url);
 
-                    if (autoRedirectChain.Count > MaxRedirects)
+                    if (autoRedirectChain.Count > 3)
                     {
                         throw new WebException($"Too many automatic redirections were attempted for {autoRedirectChain.Join(" -> ")}", WebExceptionStatus.ProtocolError);
                     }
@@ -229,7 +229,33 @@ namespace NzbDrone.Common.Http
 
         public void DownloadFile(string url, string fileName)
         {
-            _httpDispatcher.DownloadFile(url, fileName);
+            try
+            {
+                var fileInfo = new FileInfo(fileName);
+                if (fileInfo.Directory != null && !fileInfo.Directory.Exists)
+                {
+                    fileInfo.Directory.Create();
+                }
+
+                _logger.Debug("Downloading [{0}] to [{1}]", url, fileName);
+
+                var stopWatch = Stopwatch.StartNew();
+                var webClient = new GZipWebClient();
+                webClient.Headers.Add(HttpRequestHeader.UserAgent, _userAgentBuilder.GetUserAgent());
+                webClient.DownloadFile(url, fileName);
+                stopWatch.Stop();
+                _logger.Debug("Downloading Completed. took {0:0}s", stopWatch.Elapsed.Seconds);
+            }
+            catch (WebException e)
+            {
+                _logger.Warn("Failed to get response from: {0} {1}", url, e.Message);
+                throw;
+            }
+            catch (Exception e)
+            {
+                _logger.Warn(e, "Failed to get response from: " + url);
+                throw;
+            }
         }
 
         public HttpResponse Get(HttpRequest request)
@@ -238,8 +264,7 @@ namespace NzbDrone.Common.Http
             return Execute(request);
         }
 
-        public HttpResponse<T> Get<T>(HttpRequest request)
-            where T : new()
+        public HttpResponse<T> Get<T>(HttpRequest request) where T : new()
         {
             var response = Get(request);
             CheckResponseContentType(response);
@@ -258,8 +283,7 @@ namespace NzbDrone.Common.Http
             return Execute(request);
         }
 
-        public HttpResponse<T> Post<T>(HttpRequest request)
-            where T : new()
+        public HttpResponse<T> Post<T>(HttpRequest request) where T : new()
         {
             var response = Post(request);
             CheckResponseContentType(response);

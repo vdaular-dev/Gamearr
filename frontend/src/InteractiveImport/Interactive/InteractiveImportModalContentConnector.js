@@ -3,16 +3,17 @@ import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
-import * as commandNames from 'Commands/commandNames';
-import { executeCommand } from 'Store/Actions/commandActions';
 import {
-  clearInteractiveImport,
   fetchInteractiveImportItems,
-  saveInteractiveImportItem,
-  setInteractiveImportMode,
   setInteractiveImportSort,
-  updateInteractiveImportItem } from 'Store/Actions/interactiveImportActions';
+  clearInteractiveImport,
+  setInteractiveImportMode,
+  updateInteractiveImportItem,
+  saveInteractiveImportItem
+} from 'Store/Actions/interactiveImportActions';
 import createClientSideCollectionSelector from 'Store/Selectors/createClientSideCollectionSelector';
+import { executeCommand } from 'Store/Actions/commandActions';
+import * as commandNames from 'Commands/commandNames';
 import InteractiveImportModalContent from './InteractiveImportModalContent';
 
 function createMapStateToProps() {
@@ -51,7 +52,6 @@ class InteractiveImportModalContentConnector extends Component {
 
   componentDidMount() {
     const {
-      artistId,
       downloadId,
       folder
     } = this.props;
@@ -62,7 +62,6 @@ class InteractiveImportModalContentConnector extends Component {
     } = this.state;
 
     this.props.fetchInteractiveImportItems({
-      artistId,
       downloadId,
       folder,
       filterExistingFiles,
@@ -79,13 +78,11 @@ class InteractiveImportModalContentConnector extends Component {
     if (prevState.filterExistingFiles !== filterExistingFiles ||
         prevState.replaceExistingFiles !== replaceExistingFiles) {
       const {
-        artistId,
         downloadId,
         folder
       } = this.props;
 
       this.props.fetchInteractiveImportItems({
-        artistId,
         downloadId,
         folder,
         filterExistingFiles,
@@ -207,7 +204,6 @@ class InteractiveImportModalContentConnector extends Component {
 }
 
 InteractiveImportModalContentConnector.propTypes = {
-  artistId: PropTypes.number.isRequired,
   downloadId: PropTypes.string,
   folder: PropTypes.string,
   filterExistingFiles: PropTypes.bool.isRequired,
@@ -223,7 +219,6 @@ InteractiveImportModalContentConnector.propTypes = {
 };
 
 InteractiveImportModalContentConnector.defaultProps = {
-  artistId: 0,
   filterExistingFiles: true,
   replaceExistingFiles: false
 };

@@ -26,11 +26,9 @@
 
  */
 
-#pragma warning disable SX1101, SA1108, SA1119, SA1124, SA1200, SA1208, SA1214, SA1314, SA1403, SA1503, SA1514, SA1515, SA1519, SX1309
-
 using System;
-using System.Collections.Generic;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace NzbDrone.Core.MediaFiles.TrackImport.Identification
 {
@@ -56,12 +54,12 @@ namespace NzbDrone.Core.MediaFiles.TrackImport.Identification
             n = C.GetLength(0);
             nrow_orig = costMatrix.GetLength(0);
             ncol_orig = costMatrix.GetLength(1);
-
+            
             C_orig = C.Clone() as double[,];
             RowCover = new int[n];
             ColCover = new int[n];
             M = new int[n, n];
-            path = new int[(2 * n) + 1, 2];
+            path = new int[2*n + 1, 2];
 
             step = 1;
         }
@@ -89,7 +87,6 @@ namespace NzbDrone.Core.MediaFiles.TrackImport.Identification
                         }
                     }
                 }
-
                 return value;
             }
         }
@@ -114,7 +111,6 @@ namespace NzbDrone.Core.MediaFiles.TrackImport.Identification
                     outp[row, col] = matrix[row, col];
                 }
             }
-
             return outp;
         }
 
@@ -134,18 +130,16 @@ namespace NzbDrone.Core.MediaFiles.TrackImport.Identification
                         min_in_row = C[r, c];
                     }
                 }
-
                 for (int c = 0; c < n; c++)
                 {
                     C[r, c] -= min_in_row;
                 }
             }
-
             step = 2;
         }
 
-        //Find a zero (Z) in the resulting matrix.  If there is no starred
-        //zero in its row or column, star Z. Repeat for each element in the
+        //Find a zero (Z) in the resulting matrix.  If there is no starred 
+        //zero in its row or column, star Z. Repeat for each element in the 
         //matrix. Go to Step 3.
         private void step_two(ref int step)
         {
@@ -161,22 +155,19 @@ namespace NzbDrone.Core.MediaFiles.TrackImport.Identification
                     }
                 }
             }
-
             for (int r = 0; r < n; r++)
             {
                 RowCover[r] = 0;
             }
-
             for (int c = 0; c < n; c++)
             {
                 ColCover[c] = 0;
             }
-
             step = 3;
         }
 
-        //Cover each column containing a starred zero.  If K columns are covered,
-        //the starred zeros describe a complete set of unique assignments.  In this
+        //Cover each column containing a starred zero.  If K columns are covered, 
+        //the starred zeros describe a complete set of unique assignments.  In this 
         //case, Go to DONE, otherwise, Go to Step 4.
         private void step_three(ref int step)
         {
@@ -200,7 +191,6 @@ namespace NzbDrone.Core.MediaFiles.TrackImport.Identification
                     colcount += 1;
                 }
             }
-
             if (colcount >= n)
             {
                 step = 7;
@@ -231,14 +221,12 @@ namespace NzbDrone.Core.MediaFiles.TrackImport.Identification
                         col = c;
                         done = true;
                     }
-
                     c += 1;
                     if (c >= n || done)
                     {
                         break;
                     }
                 }
-
                 r += 1;
                 if (r >= n)
                 {
@@ -257,7 +245,6 @@ namespace NzbDrone.Core.MediaFiles.TrackImport.Identification
                     tmp = true;
                 }
             }
-
             return tmp;
         }
 
@@ -273,10 +260,10 @@ namespace NzbDrone.Core.MediaFiles.TrackImport.Identification
             }
         }
 
-        //Find a noncovered zero and prime it.  If there is no starred zero
-        //in the row containing this primed zero, Go to Step 5.  Otherwise,
-        //cover this row and uncover the column containing the starred zero.
-        //Continue in this manner until there are no uncovered zeros left.
+        //Find a noncovered zero and prime it.  If there is no starred zero 
+        //in the row containing this primed zero, Go to Step 5.  Otherwise, 
+        //cover this row and uncover the column containing the starred zero. 
+        //Continue in this manner until there are no uncovered zeros left. 
         //Save the smallest uncovered value and Go to Step 6.
         private void step_four(ref int step)
         {
@@ -358,7 +345,6 @@ namespace NzbDrone.Core.MediaFiles.TrackImport.Identification
             {
                 RowCover[r] = 0;
             }
-
             for (int c = 0; c < n; c++)
             {
                 ColCover[c] = 0;
@@ -379,12 +365,13 @@ namespace NzbDrone.Core.MediaFiles.TrackImport.Identification
             }
         }
 
-        //Construct a series of alternating primed and starred zeros as follows.
-        //Let Z0 represent the uncovered primed zero found in Step 4.  Let Z1 denote
-        //the starred zero in the column of Z0 (if any). Let Z2 denote the primed zero
-        //in the row of Z1 (there will always be one).  Continue until the series
-        //terminates at a primed zero that has no starred zero in its column.
-        //Unstar each starred zero of the series, star each primed zero of the series,
+
+        //Construct a series of alternating primed and starred zeros as follows.  
+        //Let Z0 represent the uncovered primed zero found in Step 4.  Let Z1 denote 
+        //the starred zero in the column of Z0 (if any). Let Z2 denote the primed zero 
+        //in the row of Z1 (there will always be one).  Continue until the series 
+        //terminates at a primed zero that has no starred zero in its column.  
+        //Unstar each starred zero of the series, star each primed zero of the series, 
         //erase all primes and uncover every line in the matrix.  Return to Step 3.
         private void step_five(ref int step)
         {
@@ -409,7 +396,6 @@ namespace NzbDrone.Core.MediaFiles.TrackImport.Identification
                 {
                     done = true;
                 }
-
                 if (!done)
                 {
                     find_prime_in_row(path[path_count - 1, 0], ref c);
@@ -418,7 +404,6 @@ namespace NzbDrone.Core.MediaFiles.TrackImport.Identification
                     path[path_count - 1, 1] = c;
                 }
             }
-
             augment_path();
             clear_covers();
             erase_primes();
@@ -443,8 +428,8 @@ namespace NzbDrone.Core.MediaFiles.TrackImport.Identification
             }
         }
 
-        //Add the value found in Step 4 to every element of each covered row, and subtract
-        //it from every element of each uncovered column.  Return to Step 4 without
+        //Add the value found in Step 4 to every element of each covered row, and subtract 
+        //it from every element of each uncovered column.  Return to Step 4 without 
         //altering any stars, primes, or covered lines.
         private void step_six(ref int step)
         {
@@ -458,14 +443,12 @@ namespace NzbDrone.Core.MediaFiles.TrackImport.Identification
                     {
                         C[r, c] += minval;
                     }
-
                     if (ColCover[c] == 0)
                     {
                         C[r, c] -= minval;
                     }
                 }
             }
-
             step = 4;
         }
 

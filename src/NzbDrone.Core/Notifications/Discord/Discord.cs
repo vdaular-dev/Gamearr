@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using FluentValidation.Results;
 using NzbDrone.Common.Extensions;
-using NzbDrone.Core.Music;
 using NzbDrone.Core.Notifications.Discord.Payloads;
+using NzbDrone.Core.Music;
 using NzbDrone.Core.Validation;
 
 namespace NzbDrone.Core.Notifications.Discord
@@ -149,10 +149,11 @@ namespace NzbDrone.Core.Notifications.Discord
         {
             try
             {
-                var message = $"Test message from Lidarr posted at {DateTime.Now}";
+                var message = $"Test message from Gamearr posted at {DateTime.Now}";
                 var payload = CreatePayload(message);
 
                 _proxy.SendPayload(payload, Settings);
+
             }
             catch (DiscordException ex)
             {

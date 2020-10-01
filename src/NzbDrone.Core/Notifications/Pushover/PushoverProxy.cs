@@ -2,8 +2,8 @@ using System;
 using FluentValidation.Results;
 using NLog;
 using NzbDrone.Common.Extensions;
-using NzbDrone.Core.Rest;
 using RestSharp;
+using NzbDrone.Core.Rest;
 
 namespace NzbDrone.Core.Notifications.Pushover
 {
@@ -15,19 +15,17 @@ namespace NzbDrone.Core.Notifications.Pushover
 
     public class PushoverProxy : IPushoverProxy
     {
-        private const string URL = "https://api.pushover.net/1/messages.json";
-        private readonly IRestClientFactory _restClientFactory;
         private readonly Logger _logger;
+        private const string URL = "https://api.pushover.net/1/messages.json";
 
-        public PushoverProxy(IRestClientFactory restClientFactory, Logger logger)
+        public PushoverProxy(Logger logger)
         {
-            _restClientFactory = restClientFactory;
             _logger = logger;
         }
 
         public void SendNotification(string title, string message, PushoverSettings settings)
         {
-            var client = _restClientFactory.BuildClient(URL);
+            var client = RestClientFactory.BuildClient(URL);
             var request = new RestRequest(Method.POST);
             request.AddParameter("token", settings.ApiKey);
             request.AddParameter("user", settings.UserKey);
@@ -47,6 +45,7 @@ namespace NzbDrone.Core.Notifications.Pushover
                 request.AddParameter("sound", settings.Sound);
             }
 
+
             client.ExecuteAndValidate(request);
         }
 
@@ -55,7 +54,7 @@ namespace NzbDrone.Core.Notifications.Pushover
             try
             {
                 const string title = "Test Notification";
-                const string body = "This is a test message from Lidarr";
+                const string body = "This is a test message from Gamearr";
 
                 SendNotification(title, body, settings);
             }

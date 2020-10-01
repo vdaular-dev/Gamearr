@@ -27,12 +27,11 @@ namespace NzbDrone.Core.Indexers.Rarbg
 
         public string GetToken(RarbgSettings settings)
         {
-            return _tokenCache.Get(settings.BaseUrl,
-                () =>
+            return _tokenCache.Get(settings.BaseUrl, () =>
                 {
                     var requestBuilder = new HttpRequestBuilder(settings.BaseUrl.Trim('/'))
                         .WithRateLimit(3.0)
-                        .Resource("/pubapi_v2.php?get_token=get_token&app_id=Lidarr")
+                        .Resource("/pubapi_v2.php?get_token=get_token&app_id=Gamearr")
                         .Accept(HttpAccept.Json);
 
                     if (settings.CaptchaToken.IsNotNullOrWhiteSpace())
@@ -44,8 +43,7 @@ namespace NzbDrone.Core.Indexers.Rarbg
                     var response = _httpClient.Get<JObject>(requestBuilder.Build());
 
                     return response.Resource["token"].ToString();
-                },
-                TimeSpan.FromMinutes(14.0));
+                }, TimeSpan.FromMinutes(14.0));
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using NzbDrone.Core.Datastore;
 using NzbDrone.Core.Messaging.Events;
+using Marr.Data.QGen;
 using NzbDrone.Core.Music;
 
 namespace NzbDrone.Core.Blacklisting
@@ -14,31 +15,33 @@ namespace NzbDrone.Core.Blacklisting
 
     public class BlacklistRepository : BasicRepository<Blacklist>, IBlacklistRepository
     {
-        public BlacklistRepository(IMainDatabase database, IEventAggregator eventAggregator)
-            : base(database, eventAggregator)
+        public BlacklistRepository(IMainDatabase database, IEventAggregator eventAggregator) :
+            base(database, eventAggregator)
         {
         }
 
         public List<Blacklist> BlacklistedByTitle(int artistId, string sourceTitle)
         {
-            return Query(e => e.ArtistId == artistId && e.SourceTitle.Contains(sourceTitle));
+            return Query.Where(e => e.ArtistId == artistId)
+                        .AndWhere(e => e.SourceTitle.Contains(sourceTitle));
         }
 
         public List<Blacklist> BlacklistedByTorrentInfoHash(int artistId, string torrentInfoHash)
         {
-            return Query(e => e.ArtistId == artistId && e.TorrentInfoHash.Contains(torrentInfoHash));
+            return Query.Where(e => e.ArtistId == artistId)
+                        .AndWhere(e => e.TorrentInfoHash.Contains(torrentInfoHash));
         }
 
         public List<Blacklist> BlacklistedByArtist(int artistId)
         {
-            return Query(b => b.ArtistId == artistId);
+            return Query.Where(b => b.ArtistId == artistId);
         }
 
-        protected override SqlBuilder PagedBuilder() => new SqlBuilder().Join<Blacklist, Artist>((b, m) => b.ArtistId == m.Id);
-        protected override IEnumerable<Blacklist> PagedQuery(SqlBuilder builder) => _database.QueryJoined<Blacklist, Artist>(builder, (bl, artist) =>
-                    {
-                        bl.Artist = artist;
-                        return bl;
-                    });
+        protected override SortBuilder<Blacklist> GetPagedQuery(QueryBuilder<Blacklist> query, PagingSpec<Blacklist> pagingSpec)
+        {
+            var baseQuery = query.Join<Blacklist, Artist>(JoinType.Inner, h => h.Artist, (h, s) => h.ArtistId == s.Id);
+
+            return base.GetPagedQuery(baseQuery, pagingSpec);
+        }
     }
 }

@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Text.RegularExpressions;
 using FluentValidation;
+using FluentValidation.Results;
 using NzbDrone.Common.Extensions;
 using NzbDrone.Core.Annotations;
 using NzbDrone.Core.Indexers.Newznab;
@@ -29,12 +30,14 @@ namespace NzbDrone.Core.Indexers.Torznab
 
         public TorznabSettingsValidator()
         {
-            RuleFor(c => c).Custom((c, context) =>
+            Custom(newznab =>
             {
-                if (c.Categories.Empty())
+                if (newznab.Categories.Empty())
                 {
-                    context.AddFailure("'Categories' must be provided");
+                    return new ValidationFailure("", "'Categories' must be provided");
                 }
+
+                return null;
             });
 
             RuleFor(c => c.BaseUrl).ValidRootUrl();
@@ -60,7 +63,7 @@ namespace NzbDrone.Core.Indexers.Torznab
         public int MinimumSeeders { get; set; }
 
         [FieldDefinition(7)]
-        public SeedCriteriaSettings SeedCriteria { get; set; } = new SeedCriteriaSettings();
+        public SeedCriteriaSettings SeedCriteria { get; } = new SeedCriteriaSettings();
 
         public override NzbDroneValidationResult Validate()
         {

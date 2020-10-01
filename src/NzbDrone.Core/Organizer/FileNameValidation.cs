@@ -25,8 +25,7 @@ namespace NzbDrone.Core.Organizer
         {
             ruleBuilder.SetValidator(new NotEmptyValidator(null));
             return ruleBuilder.SetValidator(new RegularExpressionValidator(FileNameBuilder.AlbumTitleRegex)).WithMessage("Must contain Album title");
-
-            //.SetValidator(new RegularExpressionValidator(FileNameBuilder.ReleaseDateRegex)).WithMessage("Must contain Release year");
+                              //.SetValidator(new RegularExpressionValidator(FileNameBuilder.ReleaseDateRegex)).WithMessage("Must contain Release year");
         }
     }
 
@@ -35,6 +34,7 @@ namespace NzbDrone.Core.Organizer
         public ValidStandardTrackFormatValidator()
             : base("Must contain Track Title and Track numbers OR Original Title")
         {
+
         }
 
         protected override bool IsValid(PropertyValidatorContext context)

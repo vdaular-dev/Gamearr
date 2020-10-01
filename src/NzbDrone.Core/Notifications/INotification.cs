@@ -1,5 +1,5 @@
-using NzbDrone.Core.Music;
 using NzbDrone.Core.ThingiProvider;
+using NzbDrone.Core.Music;
 
 namespace NzbDrone.Core.Notifications
 {
@@ -14,7 +14,6 @@ namespace NzbDrone.Core.Notifications
         void OnDownloadFailure(DownloadFailedMessage message);
         void OnImportFailure(AlbumDownloadMessage message);
         void OnTrackRetag(TrackRetagMessage message);
-        void ProcessQueue();
         bool SupportsOnGrab { get; }
         bool SupportsOnReleaseImport { get; }
         bool SupportsOnUpgrade { get; }

@@ -1,19 +1,20 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading;
-using Newtonsoft.Json;
 using NLog;
-using NzbDrone.Common.Cache;
-using NzbDrone.Common.EnvironmentInfo;
-using NzbDrone.Common.Extensions;
-using NzbDrone.Common.Http;
-using NzbDrone.Common.Serializer;
 using NzbDrone.Core.Parser.Model;
+using System.Diagnostics;
+using System.Linq;
+using NzbDrone.Common.Http;
+using NzbDrone.Common.Extensions;
+using System.Collections.Generic;
+using System.IO.Compression;
+using System.Text;
+using NzbDrone.Common.Serializer;
+using System;
+using NzbDrone.Common.EnvironmentInfo;
+using System.Threading;
+using System.Text.RegularExpressions;
+using Newtonsoft.Json;
+using NzbDrone.Common.Cache;
 
 namespace NzbDrone.Core.Parser
 {
@@ -35,12 +36,12 @@ namespace NzbDrone.Core.Parser
         private const string _acoustIdUrl = "https://api.acoustid.org/v2/lookup";
         private const string _acoustIdApiKey = "QANd68ji1L";
         private const int _fingerprintingTimeout = 10000;
-
+        
         private readonly Logger _logger;
         private readonly IHttpClient _httpClient;
         private readonly IHttpRequestBuilderFactory _customerRequestBuilder;
         private readonly ICached<AcoustId> _cache;
-
+        
         private readonly string _fpcalcPath;
         private readonly Version _fpcalcVersion;
         private readonly string _fpcalcArgs;
@@ -55,7 +56,7 @@ namespace NzbDrone.Core.Parser
 
             _customerRequestBuilder = new HttpRequestBuilder(_acoustIdUrl).CreateFactory();
 
-            // An exception here will cause Lidarr to fail to start, so catch any errors
+            // An exception here will cause Gamearr to fail to start, so catch any errors
             try
             {
                 _fpcalcPath = GetFpcalcPath();
@@ -78,20 +79,6 @@ namespace NzbDrone.Core.Parser
         private string GetFpcalcPath()
         {
             string path = null;
-
-            // Take the fpcalc from the install directory if it exists
-            path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "fpcalc");
-            if (OsInfo.IsWindows)
-            {
-                path += ".exe";
-            }
-
-            if (File.Exists(path))
-            {
-                return path;
-            }
-
-            // Otherwise search path for a candidate and check it works
             if (OsInfo.IsLinux)
             {
                 // must be on users path on Linux
@@ -108,7 +95,6 @@ namespace NzbDrone.Core.Parser
                 try
                 {
                     p.Start();
-
                     // To avoid deadlocks, always read the output stream first and then wait.
                     string output = p.StandardOutput.ReadToEnd();
                     p.WaitForExit(1000);
@@ -118,15 +104,25 @@ namespace NzbDrone.Core.Parser
                     _logger.Debug("fpcalc not found");
                     return null;
                 }
-
-                return path;
             }
             else
             {
                 // on OSX / Windows, we have put fpcalc in the application folder
-                _logger.Warn("fpcalc missing from application directory");
-                return null;
+                path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "fpcalc");
+                if (OsInfo.IsWindows)
+                {
+                    path += ".exe";
+                }
+
+                if (!File.Exists(path))
+                {
+                    _logger.Warn("fpcalc missing from application directory");
+                    return null;
+                }
             }
+            
+            _logger.Debug($"fpcalc path: {path}");
+            return path;
         }
 
         private Version GetFpcalcVersion()
@@ -144,7 +140,6 @@ namespace NzbDrone.Core.Parser
             p.StartInfo.RedirectStandardOutput = true;
 
             p.Start();
-
             // To avoid deadlocks, always read the output stream first and then wait.
             string output = p.StandardOutput.ReadToEnd();
             p.WaitForExit(1000);
@@ -180,7 +175,7 @@ namespace NzbDrone.Core.Parser
             {
                 args = "-json";
             }
-
+            
             if (_fpcalcVersion >= new Version("1.4.3"))
             {
                 args += " -ignore-errors";
@@ -191,29 +186,28 @@ namespace NzbDrone.Core.Parser
 
         public AcoustId ParseFpcalcJsonOutput(string output)
         {
-            return Json.Deserialize<AcoustId>(output);
+             return Json.Deserialize<AcoustId>(output);
         }
 
         public AcoustId ParseFpcalcTextOutput(string output)
         {
-            var durationstring = Regex.Match(output, @"(?<=DURATION=)[\d\.]+(?=\s)").Value;
-            double duration;
-            if (durationstring.IsNullOrWhiteSpace() || !double.TryParse(durationstring, out duration))
-            {
-                return null;
-            }
+                var durationstring = Regex.Match(output, @"(?<=DURATION=)[\d\.]+(?=\s)").Value;
+                double duration;
+                if (durationstring.IsNullOrWhiteSpace() || !double.TryParse(durationstring, out duration))
+                {
+                    return null;
+                }
 
-            var fingerprint = Regex.Match(output, @"(?<=FINGERPRINT=)[^\s]+").Value;
-            if (fingerprint.IsNullOrWhiteSpace())
-            {
-                return null;
-            }
+                var fingerprint = Regex.Match(output, @"(?<=FINGERPRINT=)[^\s]+").Value;
+                if (fingerprint.IsNullOrWhiteSpace())
+                {
+                    return null;
+                }
 
-            return new AcoustId
-            {
-                Duration = duration,
-                Fingerprint = fingerprint
-            };
+                return new AcoustId {
+                    Duration = duration,
+                    Fingerprint = fingerprint
+                };
         }
 
         public AcoustId ParseFpcalcOutput(string output)
@@ -222,7 +216,7 @@ namespace NzbDrone.Core.Parser
             {
                 return null;
             }
-
+            
             if (_fpcalcArgs.Contains("-json"))
             {
                 return ParseFpcalcJsonOutput(output);
@@ -258,70 +252,81 @@ namespace NzbDrone.Core.Parser
                 // see https://stackoverflow.com/questions/139593/processstartinfo-hanging-on-waitforexit-why?lq=1
                 // this is most likely overkill...
                 using (AutoResetEvent outputWaitHandle = new AutoResetEvent(false))
-                {
-                    using (AutoResetEvent errorWaitHandle = new AutoResetEvent(false))
-                    {
-                        DataReceivedEventHandler outputHandler = (sender, e) =>
-                        {
-                            if (e.Data == null)
-                            {
-                                outputWaitHandle.Set();
-                            }
-                            else
-                            {
-                                output.AppendLine(e.Data);
-                            }
-                        };
+                 {
+                     using (AutoResetEvent errorWaitHandle = new AutoResetEvent(false))
+                     {
+                         DataReceivedEventHandler outputHandler = delegate(object sender, DataReceivedEventArgs e)
+                             {
+                                 if (e.Data == null)
+                                 {
+                                     outputWaitHandle.Set();
+                                 }
+                                 else
+                                 {
+                                     output.AppendLine(e.Data);
+                                 }
+                             };
 
-                        DataReceivedEventHandler errorHandler =  (sender, e) =>
-                        {
-                            if (e.Data == null)
-                            {
-                                errorWaitHandle.Set();
-                            }
-                            else
-                            {
-                                error.AppendLine(e.Data);
-                            }
-                        };
+                         DataReceivedEventHandler errorHandler = delegate(object sender, DataReceivedEventArgs e)
+                             {
+                                 if (e.Data == null)
+                                 {
+                                     errorWaitHandle.Set();
+                                 }
+                                 else
+                                 {
+                                     error.AppendLine(e.Data);
+                                 }
+                             };
+                         
+                         p.OutputDataReceived += outputHandler;
+                         p.ErrorDataReceived += errorHandler;
 
-                        p.OutputDataReceived += outputHandler;
-                        p.ErrorDataReceived += errorHandler;
+                         p.Start();
 
-                        p.Start();
+                         p.BeginOutputReadLine();
+                         p.BeginErrorReadLine();
 
-                        p.BeginOutputReadLine();
-                        p.BeginErrorReadLine();
-
-                        if (p.WaitForExit(_fingerprintingTimeout) &&
-                            outputWaitHandle.WaitOne(_fingerprintingTimeout) &&
-                            errorWaitHandle.WaitOne(_fingerprintingTimeout))
-                        {
-                            // Process completed.
-                            if (p.ExitCode != 0)
-                            {
-                                _logger.Warn($"fpcalc error: {error}");
-                                return null;
-                            }
-                            else
-                            {
-                                return ParseFpcalcOutput(output.ToString());
-                            }
-                        }
-                        else
-                        {
-                            // Timed out.  Remove handlers to avoid object disposed error
-                            p.OutputDataReceived -= outputHandler;
-                            p.ErrorDataReceived -= errorHandler;
-
-                            _logger.Warn($"fpcalc timed out. {error}");
-                            return null;
-                        }
-                    }
-                }
+                         if (p.WaitForExit(_fingerprintingTimeout) &&
+                             outputWaitHandle.WaitOne(_fingerprintingTimeout) &&
+                             errorWaitHandle.WaitOne(_fingerprintingTimeout))
+                         {
+                             // Process completed.
+                             if (p.ExitCode != 0)
+                             {
+                                 _logger.Warn($"fpcalc error: {error}");
+                                 return null;
+                             }
+                             else
+                             {
+                                 return ParseFpcalcOutput(output.ToString());
+                             }
+                         }
+                         else
+                         {
+                             // Timed out.  Remove handlers to avoid object disposed error
+                             p.OutputDataReceived -= outputHandler;
+                             p.ErrorDataReceived -= errorHandler;
+                             
+                             _logger.Warn($"fpcalc timed out. {error}");
+                             return null;
+                         }
+                     }
+                 }
             }
 
             return null;
+        }
+
+        private static byte[] Compress(byte[] data)
+        {
+            using (var compressedStream = new MemoryStream())
+            using (var zipStream = new GZipStream(compressedStream, CompressionMode.Compress))
+            {
+                zipStream.Write(data, 0, data.Length);
+                zipStream.Close();
+                return compressedStream.ToArray();
+            }
         }
 
         public void Lookup(List<LocalTrack> tracks, double threshold)
@@ -330,7 +335,7 @@ namespace NzbDrone.Core.Parser
             {
                 return;
             }
-
+            
             Lookup(tracks.Select(x => Tuple.Create(x, GetFingerprint(x.Path))).ToList(), threshold);
         }
 
@@ -342,13 +347,6 @@ namespace NzbDrone.Core.Parser
                 return;
             }
 
-            var request = GenerateRequest(toLookup);
-            var response = GetResponse(request);
-            ParseResponse(response, toLookup, threshold);
-        }
-
-        public HttpRequest GenerateRequest(List<Tuple<LocalTrack, AcoustId>> toLookup)
-        {
             var httpRequest = _customerRequestBuilder.Create()
                 .WithRateLimit(0.334)
                 .Build();
@@ -358,72 +356,50 @@ namespace NzbDrone.Core.Parser
             {
                 sb.Append($"&duration.{i}={toLookup[i].Item2.Duration:F0}&fingerprint.{i}={toLookup[i].Item2.Fingerprint}");
             }
-
+            
             // they prefer a gzipped body
-            httpRequest.SetContent(Encoding.UTF8.GetBytes(sb.ToString()).Compress());
+            httpRequest.SetContent(Compress(Encoding.UTF8.GetBytes(sb.ToString())));
             httpRequest.Headers.Add("Content-Encoding", "gzip");
             httpRequest.Headers.ContentType = "application/x-www-form-urlencoded";
             httpRequest.SuppressHttpError = true;
             httpRequest.RequestTimeout = TimeSpan.FromSeconds(5);
 
-            return httpRequest;
-        }
-
-        public LookupResponse GetResponse(HttpRequest request, int retry = 3)
-        {
             HttpResponse<LookupResponse> httpResponse;
 
             try
             {
-                httpResponse = _httpClient.Post<LookupResponse>(request);
+                httpResponse = _httpClient.Post<LookupResponse>(httpRequest);
             }
             catch (UnexpectedHtmlContentException e)
             {
                 _logger.Warn(e, "AcoustId API gave invalid response");
-                return retry > 0 ? GetResponse(request, retry - 1) : null;
+                return;
             }
             catch (Exception e)
             {
                 _logger.Warn(e, "AcoustId API lookup failed");
-                return null;
+                return;
             }
 
             var response = httpResponse.Resource;
 
+            // The API will give errors if fingerprint isn't found or is invalid.
+            // We don't want to stop the entire import because the fingerprinting failed
+            // so just log and return.
             if (httpResponse.HasHttpError || (response != null && response.Status != "ok"))
             {
-                if (response?.Error != null)
+                if (response != null && response.Error != null)
                 {
-                    if (response.Error.Code == AcoustIdErrorCode.TooManyRequests && retry > 0)
-                    {
-                        _logger.Trace($"Too many requests, retrying in 1s");
-                        Thread.Sleep(TimeSpan.FromSeconds(1));
-                        return GetResponse(request, retry - 1);
-                    }
-
                     _logger.Debug($"Webservice error {response.Error.Code}: {response.Error.Message}");
                 }
                 else
                 {
                     _logger.Warn("HTTP Error - {0}", httpResponse);
                 }
-
-                return null;
-            }
-
-            return response;
-        }
-
-        private void ParseResponse(LookupResponse response, List<Tuple<LocalTrack, AcoustId>> toLookup, double threshold)
-        {
-            if (response == null)
-            {
+                
                 return;
             }
 
-            // The API will give errors if fingerprint isn't found or is invalid.
-            // We don't want to stop the entire import because the fingerprinting failed
-            // so just log and return.
             foreach (var fileResponse in response.Fingerprints)
             {
                 if (fileResponse.Results.Count == 0)
@@ -445,10 +421,10 @@ namespace NzbDrone.Core.Parser
 
             _logger.Debug("Fingerprinting complete.");
 
-            var serializerSettings = Json.GetSerializerSettings();
-            serializerSettings.Formatting = Formatting.None;
+            var SerializerSettings = Json.GetSerializerSettings();
+            SerializerSettings.Formatting = Formatting.None;
             var output = new { Fingerprints = toLookup.Select(x => new { Path = x.Item1.Path, AcoustIdResults = x.Item1.AcoustIdResults }) };
-            _logger.Debug($"*** FingerprintingService TestCaseGenerator ***\n{JsonConvert.SerializeObject(output, serializerSettings)}");
+            _logger.Debug($"*** FingerprintingService TestCaseGenerator ***\n{JsonConvert.SerializeObject(output, SerializerSettings)}");
         }
 
         public class LookupResponse
@@ -458,33 +434,10 @@ namespace NzbDrone.Core.Parser
             public List<LookupResultListItem> Fingerprints { get; set; }
         }
 
-        public enum AcoustIdErrorCode
-        {
-            // https://github.com/acoustid/acoustid-server/blob/f671339ad9ab049c4d4361d3eadb6660a8fe4dda/acoustid/api/errors.py#L10
-            UnknownFormat = 1,
-            MissingParameter = 2,
-            InvalidFingerprint = 3,
-            InvalidApikey = 4,
-            Internal = 5,
-            InvalidUserApikey = 6,
-            InvalidUuid = 7,
-            InvalidDuration = 8,
-            InvalidBitrate = 9,
-            InvalidForeignid = 10,
-            InvalidMaxDurationDiff = 11,
-            NotAllowed = 12,
-            ServiceUnavailable = 13,
-            TooManyRequests = 14,
-            InvalidMusicbrainzAccessToken = 15,
-            InsecureRequest = 16,
-            UnknownApplication = 17,
-            FingerprintNotFound = 18
-        }
-
         public class LookupError
         {
             public string Message { get; set; }
-            public AcoustIdErrorCode Code { get; set; }
+            public int Code { get; set; }
         }
 
         public class LookupResultListItem

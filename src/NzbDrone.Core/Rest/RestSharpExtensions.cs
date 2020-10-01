@@ -1,5 +1,5 @@
-﻿using System.Linq;
-using System.Net;
+﻿using System.Net;
+using System.Linq;
 using NLog;
 using NzbDrone.Common.EnsureThat;
 using NzbDrone.Common.Instrumentation;
@@ -38,17 +38,14 @@ namespace NzbDrone.Core.Rest
                     {
                         return response;
                     }
-
                 case HttpStatusCode.NoContent:
                     {
                         return response;
                     }
-
                 case HttpStatusCode.Created:
                     {
                         return response;
                     }
-
                 default:
                     {
                         Logger.Warn("[{0}] [{1}] Failed. [{2}]", response.Request.Method, response.ResponseUri.ToString(), response.StatusCode);
@@ -57,8 +54,7 @@ namespace NzbDrone.Core.Rest
             }
         }
 
-        public static T Read<T>(this IRestResponse restResponse, IRestClient restClient)
-            where T : class, new()
+        public static T Read<T>(this IRestResponse restResponse, IRestClient restClient) where T : class, new()
         {
             restResponse.ValidateResponse(restClient);
 
@@ -70,8 +66,7 @@ namespace NzbDrone.Core.Rest
             return Json.Deserialize<T>(restResponse.Content);
         }
 
-        public static T ExecuteAndValidate<T>(this IRestClient client, IRestRequest request)
-            where T : class, new()
+        public static T ExecuteAndValidate<T>(this IRestClient client, IRestRequest request) where T : class, new()
         {
             return client.Execute(request).Read<T>(client);
         }
@@ -90,10 +85,7 @@ namespace NzbDrone.Core.Rest
         {
             var header = response.Headers.FirstOrDefault(v => v.Name == key);
 
-            if (header == null)
-            {
-                return null;
-            }
+            if (header == null) return null;
 
             return header.Value;
         }

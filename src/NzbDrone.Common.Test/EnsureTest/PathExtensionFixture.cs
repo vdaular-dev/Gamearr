@@ -15,10 +15,11 @@ namespace NzbDrone.Common.Test.EnsureTest
             Ensure.That(path, () => path).IsValidPath();
         }
 
+
         [TestCase(@"/var/user/file with, comma.mp3")]
         public void EnsureLinuxPath(string path)
         {
-            PosixOnly();
+            MonoOnly();
             Ensure.That(path, () => path).IsValidPath();
         }
     }

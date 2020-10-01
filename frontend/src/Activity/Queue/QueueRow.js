@@ -1,23 +1,21 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import ProtocolLabel from 'Activity/Queue/ProtocolLabel';
-import AlbumTitleLink from 'Album/AlbumTitleLink';
-import TrackQuality from 'Album/TrackQuality';
-import ArtistNameLink from 'Artist/ArtistNameLink';
-import Icon from 'Components/Icon';
+import { icons, kinds, tooltipPositions } from 'Helpers/Props';
 import IconButton from 'Components/Link/IconButton';
 import SpinnerIconButton from 'Components/Link/SpinnerIconButton';
 import ProgressBar from 'Components/ProgressBar';
+import TableRow from 'Components/Table/TableRow';
 import RelativeDateCellConnector from 'Components/Table/Cells/RelativeDateCellConnector';
 import TableRowCell from 'Components/Table/Cells/TableRowCell';
 import TableSelectCell from 'Components/Table/Cells/TableSelectCell';
-import TableRow from 'Components/Table/TableRow';
+import Icon from 'Components/Icon';
 import Popover from 'Components/Tooltip/Popover';
-import { icons, kinds, tooltipPositions } from 'Helpers/Props';
+import ProtocolLabel from 'Activity/Queue/ProtocolLabel';
 import InteractiveImportModal from 'InteractiveImport/InteractiveImportModal';
+import GameNameLink from 'Game/GameNameLink';
 import QueueStatusCell from './QueueStatusCell';
-import RemoveQueueItemModal from './RemoveQueueItemModal';
 import TimeleftCell from './TimeleftCell';
+import RemoveQueueItemModal from './RemoveQueueItemModal';
 import styles from './QueueRow.css';
 
 class QueueRow extends Component {
@@ -68,7 +66,6 @@ class QueueRow extends Component {
       title,
       status,
       trackedDownloadStatus,
-      trackedDownloadState,
       statusMessages,
       errorMessage,
       artist,
@@ -101,8 +98,8 @@ class QueueRow extends Component {
     } = this.state;
 
     const progress = 100 - (sizeleft / size * 100);
-    const showInteractiveImport = status === 'completed' && trackedDownloadStatus === 'warning';
-    const isPending = status === 'delay' || status === 'downloadClientUnavailable';
+    const showInteractiveImport = status === 'Completed' && trackedDownloadStatus === 'Warning';
+    const isPending = status === 'Delay' || status === 'DownloadClientUnavailable';
 
     return (
       <TableRow>
@@ -130,70 +127,22 @@ class QueueRow extends Component {
                   sourceTitle={title}
                   status={status}
                   trackedDownloadStatus={trackedDownloadStatus}
-                  trackedDownloadState={trackedDownloadState}
                   statusMessages={statusMessages}
                   errorMessage={errorMessage}
                 />
               );
             }
 
-            if (name === 'artists.sortName') {
+            if (name === 'artist.sortName') {
               return (
                 <TableRowCell key={name}>
                   {
                     artist ?
-                      <ArtistNameLink
+                      <GameNameLink
                         foreignArtistId={artist.foreignArtistId}
                         artistName={artist.artistName}
                       /> :
                       title
-                  }
-                </TableRowCell>
-              );
-            }
-
-            if (name === 'albums.title') {
-              return (
-                <TableRowCell key={name}>
-                  {
-                    album ?
-                      <AlbumTitleLink
-                        foreignAlbumId={album.foreignAlbumId}
-                        title={album.title}
-                        disambiguation={album.disambiguation}
-                      /> :
-                      '-'
-                  }
-                </TableRowCell>
-              );
-            }
-
-            if (name === 'album.releaseDate') {
-              if (album) {
-                return (
-                  <RelativeDateCellConnector
-                    key={name}
-                    date={album.releaseDate}
-                  />
-                );
-              }
-
-              return (
-                <TableRowCell key={name}>
-                  -
-                </TableRowCell>
-              );
-            }
-
-            if (name === 'quality') {
-              return (
-                <TableRowCell key={name}>
-                  {
-                    quality ?
-                      <TrackQuality
-                        quality={quality}
-                      /> :
-                      null
                   }
                 </TableRowCell>
               );
@@ -339,7 +288,6 @@ class QueueRow extends Component {
         <RemoveQueueItemModal
           isOpen={isRemoveQueueItemModalOpen}
           sourceTitle={title}
-          canIgnore={!!artist}
           onRemovePress={this.onRemoveQueueItemModalConfirmed}
           onModalClose={this.onRemoveQueueItemModalClose}
         />
@@ -355,7 +303,6 @@ QueueRow.propTypes = {
   title: PropTypes.string.isRequired,
   status: PropTypes.string.isRequired,
   trackedDownloadStatus: PropTypes.string,
-  trackedDownloadState: PropTypes.string,
   statusMessages: PropTypes.arrayOf(PropTypes.object),
   errorMessage: PropTypes.string,
   artist: PropTypes.object,

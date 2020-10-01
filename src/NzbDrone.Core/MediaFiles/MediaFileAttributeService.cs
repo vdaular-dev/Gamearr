@@ -52,6 +52,7 @@ namespace NzbDrone.Core.MediaFiles
                     }
                 }
             }
+
             else
             {
                 SetMonoPermissions(path, _configService.FileChmod);
@@ -86,9 +87,12 @@ namespace NzbDrone.Core.MediaFiles
             {
                 _diskProvider.SetPermissions(path, permissions, _configService.ChownUser, _configService.ChownGroup);
             }
+
             catch (Exception ex)
             {
+
                 _logger.Warn(ex, "Unable to apply permissions to: " + path);
+                _logger.Debug(ex, ex.Message);
             }
         }
     }

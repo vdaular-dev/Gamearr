@@ -4,10 +4,10 @@ using System.Linq;
 using System.Net;
 using FluentValidation.Results;
 using NLog;
+using RestSharp;
+using NzbDrone.Core.Rest;
 using NzbDrone.Common.Extensions;
 using NzbDrone.Common.Serializer;
-using NzbDrone.Core.Rest;
-using RestSharp;
 using RestSharp.Authenticators;
 
 namespace NzbDrone.Core.Notifications.PushBullet
@@ -21,14 +21,12 @@ namespace NzbDrone.Core.Notifications.PushBullet
 
     public class PushBulletProxy : IPushBulletProxy
     {
+        private readonly Logger _logger;
         private const string PUSH_URL = "https://api.pushbullet.com/v2/pushes";
         private const string DEVICE_URL = "https://api.pushbullet.com/v2/devices";
-        private readonly IRestClientFactory _restClientFactory;
-        private readonly Logger _logger;
 
-        public PushBulletProxy(IRestClientFactory restClientFactory, Logger logger)
+        public PushBulletProxy(Logger logger)
         {
-            _restClientFactory = restClientFactory;
             _logger = logger;
         }
 
@@ -98,7 +96,7 @@ namespace NzbDrone.Core.Notifications.PushBullet
         {
             try
             {
-                var client = _restClientFactory.BuildClient(DEVICE_URL);
+                var client = RestClientFactory.BuildClient(DEVICE_URL);
                 var request = new RestRequest(Method.GET);
 
                 client.Authenticator = new HttpBasicAuthenticator(settings.ApiKey, string.Empty);
@@ -122,8 +120,8 @@ namespace NzbDrone.Core.Notifications.PushBullet
         {
             try
             {
-                const string title = "Lidarr - Test Notification";
-                const string body = "This is a test message from Lidarr";
+                const string title = "Gamearr - Test Notification";
+                const string body = "This is a test message from Gamearr";
 
                 SendNotification(title, body, settings);
             }
@@ -156,6 +154,7 @@ namespace NzbDrone.Core.Notifications.PushBullet
             {
                 request.AddParameter("device_id", integerId);
             }
+
             else
             {
                 request.AddParameter("device_iden", deviceId);
@@ -176,7 +175,7 @@ namespace NzbDrone.Core.Notifications.PushBullet
         {
             try
             {
-                var client = _restClientFactory.BuildClient(PUSH_URL);
+                var client = RestClientFactory.BuildClient(PUSH_URL);
 
                 request.AddParameter("type", "note");
                 request.AddParameter("title", title);

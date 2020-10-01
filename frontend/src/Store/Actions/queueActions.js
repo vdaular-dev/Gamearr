@@ -1,16 +1,16 @@
 import _ from 'lodash';
 import { createAction } from 'redux-actions';
 import { batchActions } from 'redux-batched-actions';
-import { sortDirections } from 'Helpers/Props';
-import { createThunk, handleThunks } from 'Store/thunks';
 import createAjaxRequest from 'Utilities/createAjaxRequest';
 import serverSideCollectionHandlers from 'Utilities/serverSideCollectionHandlers';
-import { set, updateItem } from './baseActions';
+import { sortDirections } from 'Helpers/Props';
+import { createThunk, handleThunks } from 'Store/thunks';
+import createClearReducer from './Creators/Reducers/createClearReducer';
+import createSetTableOptionReducer from './Creators/Reducers/createSetTableOptionReducer';
 import createFetchHandler from './Creators/createFetchHandler';
 import createHandleActions from './Creators/createHandleActions';
 import createServerSideCollectionHandlers from './Creators/createServerSideCollectionHandlers';
-import createClearReducer from './Creators/Reducers/createClearReducer';
-import createSetTableOptionReducer from './Creators/Reducers/createSetTableOptionReducer';
+import { set, updateItem } from './baseActions';
 
 //
 // Variables
@@ -63,13 +63,13 @@ export const defaultState = {
         isModifiable: false
       },
       {
-        name: 'artists.sortName',
+        name: 'artist.sortName',
         label: 'Artist',
         isSortable: true,
         isVisible: true
       },
       {
-        name: 'albums.title',
+        name: 'album.title',
         label: 'Album Title',
         isSortable: true,
         isVisible: true
@@ -345,7 +345,6 @@ export const actionHandlers = handleThunks({
   [REMOVE_QUEUE_ITEM]: function(getState, payload, dispatch) {
     const {
       id,
-      remove,
       blacklist,
       skipredownload
     } = payload;
@@ -353,7 +352,7 @@ export const actionHandlers = handleThunks({
     dispatch(updateItem({ section: paged, id, isRemoving: true }));
 
     const promise = createAjaxRequest({
-      url: `/queue/${id}?removeFromClient=${remove}&blacklist=${blacklist}&skipredownload=${skipredownload}`,
+      url: `/queue/${id}?blacklist=${blacklist}&skipredownload=${skipredownload}`,
       method: 'DELETE'
     }).request;
 
@@ -369,7 +368,6 @@ export const actionHandlers = handleThunks({
   [REMOVE_QUEUE_ITEMS]: function(getState, payload, dispatch) {
     const {
       ids,
-      remove,
       blacklist,
       skipredownload
     } = payload;
@@ -387,7 +385,7 @@ export const actionHandlers = handleThunks({
     ]));
 
     const promise = createAjaxRequest({
-      url: `/queue/bulk?removeFromClient=${remove}&blacklist=${blacklist}&skipredownload=${skipredownload}`,
+      url: `/queue/bulk?blacklist=${blacklist}&skipredownload=${skipredownload}`,
       method: 'DELETE',
       dataType: 'json',
       data: JSON.stringify({ ids })

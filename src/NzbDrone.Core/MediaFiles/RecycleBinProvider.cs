@@ -7,6 +7,8 @@ using NzbDrone.Common.Extensions;
 using NzbDrone.Core.Configuration;
 using NzbDrone.Core.MediaFiles.Commands;
 using NzbDrone.Core.Messaging.Commands;
+using NzbDrone.Core.Messaging.Events;
+using NzbDrone.Core.Music.Events;
 
 namespace NzbDrone.Core.MediaFiles
 {
@@ -24,6 +26,7 @@ namespace NzbDrone.Core.MediaFiles
         private readonly IDiskProvider _diskProvider;
         private readonly IConfigService _configService;
         private readonly Logger _logger;
+
 
         public RecycleBinProvider(IDiskTransferService diskTransferService,
                                   IDiskProvider diskProvider,
@@ -47,6 +50,7 @@ namespace NzbDrone.Core.MediaFiles
                 _diskProvider.DeleteFolder(path, true);
                 _logger.Debug("Folder has been permanently deleted: {0}", path);
             }
+
             else
             {
                 var destination = Path.Combine(recyclingBin, new DirectoryInfo(path).Name);
@@ -82,6 +86,7 @@ namespace NzbDrone.Core.MediaFiles
                 _diskProvider.DeleteFile(path);
                 _logger.Debug("File has been permanently deleted: {0}", path);
             }
+
             else
             {
                 var fileInfo = new FileInfo(path);
@@ -162,7 +167,18 @@ namespace NzbDrone.Core.MediaFiles
 
             _logger.Info("Removing items older than {0} days from the recycling bin", cleanupDays);
 
-            foreach (var file in _diskProvider.GetFiles(_configService.RecycleBin, SearchOption.AllDirectories))
+            foreach (var folder in _diskProvider.GetDirectories(_configService.RecycleBin))
+            {
+                if (_diskProvider.FolderGetLastWrite(folder).AddDays(7) > DateTime.UtcNow)
+                {
+                    _logger.Debug("Folder hasn't expired yet, skipping: {0}", folder);
+                    continue;
+                }
+
+                _diskProvider.DeleteFolder(folder, true);
+            }
+
+            foreach (var file in _diskProvider.GetFiles(_configService.RecycleBin, SearchOption.TopDirectoryOnly))
             {
                 if (_diskProvider.FileGetLastWrite(file).AddDays(cleanupDays) > DateTime.UtcNow)
                 {
@@ -172,8 +188,6 @@ namespace NzbDrone.Core.MediaFiles
 
                 _diskProvider.DeleteFile(file);
             }
-
-            _diskProvider.RemoveEmptySubfolders(_configService.RecycleBin);
 
             _logger.Debug("Recycling Bin has been cleaned up.");
         }

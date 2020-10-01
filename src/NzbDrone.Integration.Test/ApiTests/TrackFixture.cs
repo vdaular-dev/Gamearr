@@ -1,8 +1,8 @@
-using System.Linq;
 using System.Threading;
 using FluentAssertions;
-using Lidarr.Api.V1.Artist;
 using NUnit.Framework;
+using Gamearr.Api.V1.Artist;
+using System.Linq;
 
 namespace NzbDrone.Integration.Test.ApiTests
 {
@@ -17,15 +17,13 @@ namespace NzbDrone.Integration.Test.ApiTests
             _artist = EnsureArtist("8ac6cc32-8ddf-43b1-9ac4-4b04f9053176", "Alien Ant Farm");
         }
 
-        [Test]
-        [Order(0)]
+        [Test, Order(0)]
         public void should_be_able_to_get_all_tracks_in_artist()
         {
             Tracks.GetTracksInArtist(_artist.Id).Count.Should().BeGreaterThan(0);
         }
 
-        [Test]
-        [Order(1)]
+        [Test, Order(1)]
         public void should_be_able_to_get_a_single_track()
         {
             var tracks = Tracks.GetTracksInArtist(_artist.Id);

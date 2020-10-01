@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
-import { deleteRemotePathMapping, fetchRemotePathMappings } from 'Store/Actions/settingsActions';
+import { fetchRemotePathMappings, deleteRemotePathMapping } from 'Store/Actions/settingsActions';
 import RemotePathMappings from './RemotePathMappings';
 
 function createMapStateToProps() {

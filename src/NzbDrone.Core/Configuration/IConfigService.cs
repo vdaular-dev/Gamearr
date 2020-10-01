@@ -1,8 +1,7 @@
 using System.Collections.Generic;
-using NzbDrone.Common.Http.Proxy;
 using NzbDrone.Core.MediaFiles;
+using NzbDrone.Common.Http.Proxy;
 using NzbDrone.Core.Qualities;
-using NzbDrone.Core.Security;
 
 namespace NzbDrone.Core.Configuration
 {
@@ -32,11 +31,9 @@ namespace NzbDrone.Core.Configuration
         bool DeleteEmptyFolders { get; set; }
         FileDateType FileDate { get; set; }
         bool SkipFreeSpaceCheckWhenImporting { get; set; }
-        int MinimumFreeSpaceWhenImporting { get; set; }
         bool CopyUsingHardlinks { get; set; }
         bool ImportExtraFiles { get; set; }
         string ExtraFileExtensions { get; set; }
-        bool WatchLibraryForChanges { get; set; }
         RescanAfterRefreshType RescanAfterRefresh { get; set; }
         AllowFingerprinting AllowFingerprinting { get; set; }
 
@@ -62,7 +59,7 @@ namespace NzbDrone.Core.Configuration
         string TimeFormat { get; set; }
         bool ShowRelativeDates { get; set; }
         bool EnableColorImpairedMode { get; set; }
-
+        
         bool ExpandAlbumByDefault { get; set; }
         bool ExpandSingleByDefault { get; set; }
         bool ExpandEPByDefault { get; set; }
@@ -100,6 +97,5 @@ namespace NzbDrone.Core.Configuration
         int BackupInterval { get; }
         int BackupRetention { get; }
 
-        CertificateValidationType CertificateValidation { get; }
     }
 }

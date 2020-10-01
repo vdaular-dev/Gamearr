@@ -11,8 +11,8 @@ using NzbDrone.Core.MediaCover;
 using NzbDrone.Core.MediaFiles;
 using NzbDrone.Core.MediaFiles.Events;
 using NzbDrone.Core.Messaging.Events;
-using NzbDrone.Core.Music;
 using NzbDrone.Core.Parser.Model;
+using NzbDrone.Core.Music;
 
 namespace NzbDrone.Core.Extras
 {
@@ -74,27 +74,9 @@ namespace NzbDrone.Core.Extras
                                                                      .Select(e => e.Trim(' ', '.'))
                                                                      .ToList();
 
-            var matchingFilenames = files.Where(f => Path.GetFileNameWithoutExtension(f).StartsWith(sourceFileName, StringComparison.InvariantCultureIgnoreCase)).ToList();
-            var filteredFilenames = new List<string>();
-            var hasNfo = false;
+            var matchingFilenames = files.Where(f => Path.GetFileNameWithoutExtension(f).StartsWith(sourceFileName, StringComparison.InvariantCultureIgnoreCase));
 
             foreach (var matchingFilename in matchingFilenames)
-            {
-                // Filter out duplicate NFO files
-                if (matchingFilename.EndsWith(".nfo", StringComparison.InvariantCultureIgnoreCase))
-                {
-                    if (hasNfo)
-                    {
-                        continue;
-                    }
-
-                    hasNfo = true;
-                }
-
-                filteredFilenames.Add(matchingFilename);
-            }
-
-            foreach (var matchingFilename in filteredFilenames)
             {
                 var matchingExtension = wantedExtensions.FirstOrDefault(e => matchingFilename.EndsWith(e));
 
@@ -173,7 +155,7 @@ namespace NzbDrone.Core.Extras
             foreach (var trackFile in trackFiles)
             {
                 var localTrackFile = trackFile;
-                trackFile.Tracks = tracks.Where(e => e.TrackFileId == localTrackFile.Id).ToList();
+                trackFile.Tracks = new LazyList<Track>(tracks.Where(e => e.TrackFileId == localTrackFile.Id));
             }
 
             return trackFiles;

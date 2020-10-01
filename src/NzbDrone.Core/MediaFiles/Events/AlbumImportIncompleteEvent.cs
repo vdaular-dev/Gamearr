@@ -1,5 +1,7 @@
+using System.Collections.Generic;
 using NzbDrone.Common.Messaging;
 using NzbDrone.Core.Download.TrackedDownloads;
+using NzbDrone.Core.Music;
 
 namespace NzbDrone.Core.MediaFiles.Events
 {

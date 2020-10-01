@@ -5,8 +5,7 @@ using NzbDrone.Core.Messaging.Events;
 
 namespace NzbDrone.Core.Extras.Files
 {
-    public interface IExtraFileRepository<TExtraFile> : IBasicRepository<TExtraFile>
-        where TExtraFile : ExtraFile, new()
+    public interface IExtraFileRepository<TExtraFile> : IBasicRepository<TExtraFile> where TExtraFile : ExtraFile, new()
     {
         void DeleteForArtist(int artistId);
         void DeleteForAlbum(int artistId, int albumId);
@@ -42,22 +41,22 @@ namespace NzbDrone.Core.Extras.Files
 
         public List<TExtraFile> GetFilesByArtist(int artistId)
         {
-            return Query(c => c.ArtistId == artistId);
+            return Query.Where(c => c.ArtistId == artistId);
         }
 
         public List<TExtraFile> GetFilesByAlbum(int artistId, int albumId)
         {
-            return Query(c => c.ArtistId == artistId && c.AlbumId == albumId);
+            return Query.Where(c => c.ArtistId == artistId && c.AlbumId == albumId);
         }
 
         public List<TExtraFile> GetFilesByTrackFile(int trackFileId)
         {
-            return Query(c => c.TrackFileId == trackFileId);
+            return Query.Where(c => c.TrackFileId == trackFileId);
         }
 
         public TExtraFile FindByPath(string path)
         {
-            return Query(c => c.RelativePath == path).SingleOrDefault();
+            return Query.Where(c => c.RelativePath == path).SingleOrDefault();
         }
     }
 }

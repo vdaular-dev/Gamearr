@@ -2,15 +2,17 @@ import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
-import { cloneQualityProfile, deleteQualityProfile, fetchQualityProfiles } from 'Store/Actions/settingsActions';
-import createSortedSectionSelector from 'Store/Selectors/createSortedSectionSelector';
-import sortByName from 'Utilities/Array/sortByName';
+import { fetchQualityProfiles, deleteQualityProfile, cloneQualityProfile } from 'Store/Actions/settingsActions';
 import QualityProfiles from './QualityProfiles';
 
 function createMapStateToProps() {
   return createSelector(
-    createSortedSectionSelector('settings.qualityProfiles', sortByName),
-    (qualityProfiles) => qualityProfiles
+    (state) => state.settings.qualityProfiles,
+    (qualityProfiles) => {
+      return {
+        ...qualityProfiles
+      };
+    }
   );
 }
 

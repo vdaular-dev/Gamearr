@@ -1,6 +1,6 @@
-﻿using NLog;
-using NzbDrone.Common.Http;
+﻿using NzbDrone.Common.Http;
 using NzbDrone.Core.Configuration;
+using NLog;
 using NzbDrone.Core.Parser;
 
 namespace NzbDrone.Core.Indexers.Waffles
@@ -15,6 +15,7 @@ namespace NzbDrone.Core.Indexers.Waffles
         public Waffles(IHttpClient httpClient, IIndexerStatusService indexerStatusService, IConfigService configService, IParsingService parsingService, Logger logger)
             : base(httpClient, indexerStatusService, configService, parsingService, logger)
         {
+
         }
 
         public override IIndexerRequestGenerator GetRequestGenerator()

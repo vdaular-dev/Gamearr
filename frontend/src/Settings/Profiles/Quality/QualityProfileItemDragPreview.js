@@ -1,9 +1,9 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { DragLayer } from 'react-dnd';
-import DragPreviewLayer from 'Components/DragPreviewLayer';
-import { QUALITY_PROFILE_ITEM } from 'Helpers/dragTypes';
 import dimensions from 'Styles/Variables/dimensions.js';
+import { QUALITY_PROFILE_ITEM } from 'Helpers/dragTypes';
+import DragPreviewLayer from 'Components/DragPreviewLayer';
 import QualityProfileItem from './QualityProfileItem';
 import styles from './QualityProfileItemDragPreview.css';
 
@@ -89,4 +89,6 @@ QualityProfileItemDragPreview.propTypes = {
   })
 };
 
+/* eslint-disable new-cap */
 export default DragLayer(collectDragLayer)(QualityProfileItemDragPreview);
+/* eslint-enable new-cap */

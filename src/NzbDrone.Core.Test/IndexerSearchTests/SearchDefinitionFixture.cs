@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using FluentAssertions;
 using NUnit.Framework;
 using NzbDrone.Core.IndexerSearch.Definitions;
@@ -5,7 +7,7 @@ using NzbDrone.Core.Music;
 using NzbDrone.Core.Test.Framework;
 
 namespace NzbDrone.Core.Test.IndexerSearchTests
-{
+{ 
     public class AlbumSearchDefinitionFixture : CoreTest<AlbumSearchCriteria>
     {
         [TestCase("Mötley Crüe", "Motley+Crue")]
@@ -27,7 +29,7 @@ namespace NzbDrone.Core.Test.IndexerSearchTests
             Subject.AlbumTitle = album;
             Subject.AlbumQuery.Should().Be(expected);
         }
-
+        
         [TestCase("+", "+")]
         public void should_not_replace_some_special_characters_if_result_empty_string(string album, string expected)
         {

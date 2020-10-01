@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
-import { clearPaths, fetchPaths } from 'Store/Actions/pathActions';
+import { fetchPaths, clearPaths } from 'Store/Actions/pathActions';
 import PathInput from './PathInput';
 
 function createMapStateToProps() {

@@ -11,7 +11,6 @@ namespace NzbDrone.Mono.Disk
                                                                                       { "afpfs", DriveType.Network },
                                                                                       { "apfs", DriveType.Fixed },
                                                                                       { "fuse.mergerfs", DriveType.Fixed },
-                                                                                      { "fuse.glusterfs", DriveType.Network },
                                                                                       { "zfs", DriveType.Fixed }
                                                                                   };
 

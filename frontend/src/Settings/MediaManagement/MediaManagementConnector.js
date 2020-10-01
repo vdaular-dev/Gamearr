@@ -3,10 +3,10 @@ import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
-import { clearPendingChanges } from 'Store/Actions/baseActions';
-import { fetchMediaManagementSettings, saveMediaManagementSettings, saveNamingSettings, setMediaManagementSettingsValue } from 'Store/Actions/settingsActions';
 import createSettingsSectionSelector from 'Store/Selectors/createSettingsSectionSelector';
 import createSystemStatusSelector from 'Store/Selectors/createSystemStatusSelector';
+import { fetchMediaManagementSettings, setMediaManagementSettingsValue, saveMediaManagementSettings, saveNamingSettings } from 'Store/Actions/settingsActions';
+import { clearPendingChanges } from 'Store/Actions/baseActions';
 import MediaManagement from './MediaManagement';
 
 const SECTION = 'mediaManagement';
@@ -22,7 +22,7 @@ function createMapStateToProps() {
         advancedSettings,
         ...sectionSettings,
         hasPendingChanges: !_.isEmpty(namingSettings.pendingChanges) || sectionSettings.hasPendingChanges,
-        isWindows: systemStatus.isWindows
+        isMono: systemStatus.isMono
       };
     }
   );
@@ -46,7 +46,7 @@ class MediaManagementConnector extends Component {
   }
 
   componentWillUnmount() {
-    this.props.clearPendingChanges({ section: `settings.${SECTION}` });
+    this.props.clearPendingChanges({ section: 'settings.mediaManagement' });
   }
 
   //

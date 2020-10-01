@@ -1,18 +1,28 @@
-import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import Autosuggest from 'react-autosuggest';
+import Fuse from 'fuse.js';
+import { icons } from 'Helpers/Props';
 import Icon from 'Components/Icon';
 import keyboardShortcuts, { shortcuts } from 'Components/keyboardShortcuts';
-import LoadingIndicator from 'Components/Loading/LoadingIndicator';
-import { icons } from 'Helpers/Props';
 import ArtistSearchResult from './ArtistSearchResult';
-import FuseWorker from './fuse.worker';
 import styles from './ArtistSearchInput.css';
 
-const LOADING_TYPE = 'suggestionsLoading';
 const ADD_NEW_TYPE = 'addNew';
-const workerInstance = new FuseWorker();
+
+const fuseOptions = {
+  shouldSort: true,
+  includeMatches: true,
+  threshold: 0.3,
+  location: 0,
+  distance: 100,
+  maxPatternLength: 32,
+  minMatchCharLength: 1,
+  keys: [
+    'artistName',
+    'tags.label'
+  ]
+};
 
 class ArtistSearchInput extends Component {
 
@@ -32,7 +42,6 @@ class ArtistSearchInput extends Component {
 
   componentDidMount() {
     this.props.bindShortcut(shortcuts.ARTIST_SEARCH_INPUT.key, this.focusInput);
-    workerInstance.addEventListener('message', this.onSuggestionsReceived, false);
   }
 
   //
@@ -60,7 +69,7 @@ class ArtistSearchInput extends Component {
   }
 
   getSuggestionValue({ title }) {
-    return title;
+    return title || '';
   }
 
   renderSuggestion(item, { query }) {
@@ -69,16 +78,6 @@ class ArtistSearchInput extends Component {
         <div className={styles.addNewArtistSuggestion}>
           Search for {query}
         </div>
-      );
-    }
-
-    if (item.type === LOADING_TYPE) {
-      return (
-        <LoadingIndicator
-          className={styles.loading}
-          rippleClassName={styles.ripple}
-          size={30}
-        />
       );
     }
 
@@ -114,7 +113,7 @@ class ArtistSearchInput extends Component {
   }
 
   onKeyDown = (event) => {
-    if (event.key !== 'Tab' && event.key !== 'Enter') {
+    if (event.key !== 'Tab' && event.key !== 'Enter' || event.key !== 'ArrowDown' || event.key !== 'ArrowUp') {
       return;
     }
 
@@ -128,8 +127,8 @@ class ArtistSearchInput extends Component {
       highlightedSuggestionIndex
     } = this._autosuggest.state;
 
-    if (!suggestions.length || highlightedSectionIndex) {
-      this.props.onGoToAddNewArtist(value);
+    if (!suggestions.length || highlightedSectionIndex && (event.key !== 'ArrowDown' || event.key !== 'ArrowUp')) {
+      this.props.onGoToAddNewGame(value);
       this._autosuggest.input.blur();
       this.reset();
 
@@ -139,7 +138,7 @@ class ArtistSearchInput extends Component {
     // If an suggestion is not selected go to the first artist,
     // otherwise go to the selected artist.
 
-    if (highlightedSuggestionIndex == null) {
+    if (highlightedSuggestionIndex == null && (event.key !== 'ArrowDown' || event.key !== 'ArrowUp')) {
       this.goToArtist(suggestions[0]);
     } else {
       this.goToArtist(suggestions[highlightedSuggestionIndex]);
@@ -154,30 +153,10 @@ class ArtistSearchInput extends Component {
   }
 
   onSuggestionsFetchRequested = ({ value }) => {
-    this.setState({
-      suggestions: [
-        {
-          type: LOADING_TYPE,
-          title: value
-        }
-      ]
-    });
-    this.requestSuggestions(value);
-  };
+    const fuse = new Fuse(this.props.artists, fuseOptions);
+    const suggestions = fuse.search(value).slice(0, 15);
 
-  requestSuggestions = _.debounce((value) => {
-    const payload = {
-      value,
-      artists: this.props.artists
-    };
-
-    workerInstance.postMessage(payload);
-  }, 250);
-
-  onSuggestionsReceived = (message) => {
-    this.setState({
-      suggestions: message.data
-    });
+    this.setState({ suggestions });
   }
 
   onSuggestionsClearRequested = () => {
@@ -188,7 +167,7 @@ class ArtistSearchInput extends Component {
 
   onSuggestionSelected = (event, { suggestion }) => {
     if (suggestion.type === ADD_NEW_TYPE) {
-      this.props.onGoToAddNewArtist(this.state.value);
+      this.props.onGoToAddNewGame(this.state.value);
     } else {
       this.goToArtist(suggestion);
     }
@@ -213,7 +192,7 @@ class ArtistSearchInput extends Component {
     }
 
     suggestionGroups.push({
-      title: 'Add New Item',
+      title: 'Add New Game',
       suggestions: [
         {
           type: ADD_NEW_TYPE,
@@ -273,7 +252,7 @@ class ArtistSearchInput extends Component {
 ArtistSearchInput.propTypes = {
   artists: PropTypes.arrayOf(PropTypes.object).isRequired,
   onGoToArtist: PropTypes.func.isRequired,
-  onGoToAddNewArtist: PropTypes.func.isRequired,
+  onGoToAddNewGame: PropTypes.func.isRequired,
   bindShortcut: PropTypes.func.isRequired
 };
 

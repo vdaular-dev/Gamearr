@@ -1,14 +1,14 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import FieldSet from 'Components/FieldSet';
+import { kinds, sizes } from 'Helpers/Props';
+import formatBytes from 'Utilities/Number/formatBytes';
 import LoadingIndicator from 'Components/Loading/LoadingIndicator';
-import ProgressBar from 'Components/ProgressBar';
-import TableRowCell from 'Components/Table/Cells/TableRowCell';
+import FieldSet from 'Components/FieldSet';
 import Table from 'Components/Table/Table';
 import TableBody from 'Components/Table/TableBody';
 import TableRow from 'Components/Table/TableRow';
-import { kinds, sizes } from 'Helpers/Props';
-import formatBytes from 'Utilities/Number/formatBytes';
+import TableRowCell from 'Components/Table/Cells/TableRowCell';
+import ProgressBar from 'Components/ProgressBar';
 import styles from './DiskSpace.css';
 
 const columns = [
@@ -64,7 +64,7 @@ class DiskSpace extends Component {
                       totalSpace
                     } = item;
 
-                    const diskUsage = Math.round(100 - freeSpace / totalSpace * 100);
+                    const diskUsage = (100 - freeSpace / totalSpace * 100);
                     let diskUsageKind = kinds.PRIMARY;
 
                     if (diskUsage > 90) {
@@ -97,8 +97,8 @@ class DiskSpace extends Component {
                             progress={diskUsage}
                             kind={diskUsageKind}
                             size={sizes.MEDIUM}
-                            showText={diskUsage >= 12}
-                            text={`${diskUsage}%`}
+                            progressText={diskUsage}
+                            showText={true}
                           />
                         </TableRowCell>
                       </TableRow>

@@ -2,27 +2,24 @@ import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
-import * as commandNames from 'Commands/commandNames';
-import withCurrentPage from 'Components/withCurrentPage';
-import { executeCommand } from 'Store/Actions/commandActions';
-import { clearQueueDetails, fetchQueueDetails } from 'Store/Actions/queueActions';
-import * as wantedActions from 'Store/Actions/wantedActions';
-import createCommandExecutingSelector from 'Store/Selectors/createCommandExecutingSelector';
+import { registerPagePopulator, unregisterPagePopulator } from 'Utilities/pagePopulator';
 import hasDifferentItems from 'Utilities/Object/hasDifferentItems';
 import selectUniqueIds from 'Utilities/Object/selectUniqueIds';
-import { registerPagePopulator, unregisterPagePopulator } from 'Utilities/pagePopulator';
+import withCurrentPage from 'Components/withCurrentPage';
+import createCommandExecutingSelector from 'Store/Selectors/createCommandExecutingSelector';
+import * as wantedActions from 'Store/Actions/wantedActions';
+import { executeCommand } from 'Store/Actions/commandActions';
+import { fetchQueueDetails, clearQueueDetails } from 'Store/Actions/queueActions';
+import * as commandNames from 'Commands/commandNames';
 import Missing from './Missing';
 
 function createMapStateToProps() {
   return createSelector(
     (state) => state.wanted.missing,
-    (state) => state.artist,
     createCommandExecutingSelector(commandNames.MISSING_ALBUM_SEARCH),
-    (missing, artist, isSearchingForMissingAlbums) => {
+    (missing, isSearchingForMissingAlbums) => {
 
       return {
-        isArtistFetching: artist.isFetching,
-        isArtistPopulated: artist.isPopulated,
         isSearchingForMissingAlbums,
         isSaving: missing.items.filter((m) => m.isSaving).length > 1,
         ...missing

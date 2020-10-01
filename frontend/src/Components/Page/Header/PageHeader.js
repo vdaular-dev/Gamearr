@@ -1,12 +1,12 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
+import { icons } from 'Helpers/Props';
 import keyboardShortcuts, { shortcuts } from 'Components/keyboardShortcuts';
 import IconButton from 'Components/Link/IconButton';
 import Link from 'Components/Link/Link';
-import { icons } from 'Helpers/Props';
 import ArtistSearchInputConnector from './ArtistSearchInputConnector';
-import KeyboardShortcutsModal from './KeyboardShortcutsModal';
 import PageHeaderActionsMenuConnector from './PageHeaderActionsMenuConnector';
+import KeyboardShortcutsModal from './KeyboardShortcutsModal';
 import styles from './PageHeader.css';
 
 class PageHeader extends Component {
@@ -53,14 +53,11 @@ class PageHeader extends Component {
         <div className={styles.logoContainer}>
           <Link
             className={styles.logoLink}
-            to={{
-              pathname: '/',
-              state: { restoreScrollPosition: true }
-            }}
+            to={`${window.Gamearr.urlBase}/`}
           >
             <img
               className={styles.logo}
-              src={`${window.Lidarr.urlBase}/Content/Images/logo.svg`}
+              src={`${window.Gamearr.urlBase}/Content/Images/logo.svg`}
             />
           </Link>
         </div>
@@ -79,7 +76,7 @@ class PageHeader extends Component {
           <IconButton
             className={styles.donate}
             name={icons.HEART}
-            to="https://opencollective.com/lidarr"
+            to="https://opencollective.com/gamearr"
             size={14}
           />
           <PageHeaderActionsMenuConnector

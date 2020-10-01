@@ -1,15 +1,16 @@
-using System;
-using System.Collections.Generic;
-using System.Net;
 using NLog;
 using NzbDrone.Common.Cache;
 using NzbDrone.Common.Extensions;
 using NzbDrone.Common.Http;
 using NzbDrone.Common.Serializer;
+using System;
+using System.Collections.Generic;
+using System.Net;
 
 namespace NzbDrone.Core.Download.Clients.QBittorrent
 {
     // API https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-Documentation
+
     public class QBittorrentProxyV1 : IQBittorrentProxy
     {
         private readonly IHttpClient _httpClient;
@@ -191,19 +192,6 @@ namespace NzbDrone.Core.Download.Clients.QBittorrent
             }
         }
 
-        public void AddLabel(string label, QBittorrentSettings settings)
-        {
-            var request = BuildRequest(settings).Resource("/command/addCategory")
-                                                .Post()
-                                                .AddFormParameter("category", label);
-            ProcessRequest(request, settings);
-        }
-
-        public Dictionary<string, QBittorrentLabel> GetLabels(QBittorrentSettings settings)
-        {
-            throw new NotSupportedException("qBittorrent api v1 does not support getting all torrent categories");
-        }
-
         public void SetTorrentSeedingConfiguration(string hash, TorrentSeedConfiguration seedConfiguration, QBittorrentSettings settings)
         {
             // Not supported on api v1
@@ -229,6 +217,7 @@ namespace NzbDrone.Core.Download.Clients.QBittorrent
 
                 throw;
             }
+
         }
 
         public void PauseTorrent(string hash, QBittorrentSettings settings)
@@ -253,16 +242,18 @@ namespace NzbDrone.Core.Download.Clients.QBittorrent
                                                 .Post()
                                                 .AddFormParameter("hashes", hash)
                                                 .AddFormParameter("value", enabled ? "true" : "false");
+
             ProcessRequest(request, settings);
         }
 
         private HttpRequestBuilder BuildRequest(QBittorrentSettings settings)
         {
-            var requestBuilder = new HttpRequestBuilder(settings.UseSsl, settings.Host, settings.Port, settings.UrlBase)
+            var requestBuilder = new HttpRequestBuilder(settings.UseSsl, settings.Host, settings.Port)
             {
                 LogResponseContent = true,
                 NetworkCredential = new NetworkCredential(settings.Username, settings.Password)
             };
+
             return requestBuilder;
         }
 
@@ -352,8 +343,7 @@ namespace NzbDrone.Core.Download.Clients.QBittorrent
                     throw new DownloadClientUnavailableException("Failed to connect to qBittorrent, please check your settings.", ex);
                 }
 
-                // returns "Fails." on bad login
-                if (response.Content != "Ok.")
+                if (response.Content != "Ok.") // returns "Fails." on bad login
                 {
                     _logger.Debug("qbitTorrent authentication failed.");
                     throw new DownloadClientAuthenticationException("Failed to authenticate with qBittorrent.");

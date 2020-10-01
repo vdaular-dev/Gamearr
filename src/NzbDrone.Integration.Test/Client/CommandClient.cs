@@ -1,12 +1,12 @@
-using System;
-using System.Linq;
-using System.Threading;
-using FluentAssertions;
-using Lidarr.Http.REST;
-using Newtonsoft.Json;
-using NUnit.Framework;
-using NzbDrone.Core.Messaging.Commands;
 using RestSharp;
+using NzbDrone.Core.Messaging.Commands;
+using FluentAssertions;
+using System.Threading;
+using NUnit.Framework;
+using System.Linq;
+using System;
+using Gamearr.Http.REST;
+using Newtonsoft.Json;
 
 namespace NzbDrone.Integration.Test.Client
 {
@@ -27,10 +27,7 @@ namespace NzbDrone.Integration.Test.Client
         [JsonIgnore]
         public Command Body { get; set; }
         [JsonProperty("body")]
-        public Command BodyReadOnly
-        {
-            get { return Body; }
-        }
+        public Command BodyReadOnly { get { return Body; } }
     }
 
     public class CommandClient : ClientBase<SimpleCommandResource>
@@ -40,11 +37,10 @@ namespace NzbDrone.Integration.Test.Client
         {
         }
 
-        public SimpleCommandResource PostAndWait<T>(T command)
-            where T : Command, new()
+        public SimpleCommandResource PostAndWait<T>(T command) where T : Command, new()
         {
             var request = BuildRequest();
-            request.AddJsonBody(command);
+            request.AddBody(command);
             var result = Post<SimpleCommandResource>(request);
             result.Id.Should().NotBe(0);
 
@@ -66,7 +62,7 @@ namespace NzbDrone.Integration.Test.Client
         public void WaitAll()
         {
             var resources = All();
-            for (var i = 0; i < 120; i++)
+            for (var i = 0; i < 50; i++)
             {
                 if (!resources.Any(v => v.Status == CommandStatus.Queued || v.Status == CommandStatus.Started))
                 {
@@ -76,7 +72,7 @@ namespace NzbDrone.Integration.Test.Client
                 Thread.Sleep(500);
                 resources = All();
             }
-
+            
             Assert.Fail("Commands still processing");
         }
     }

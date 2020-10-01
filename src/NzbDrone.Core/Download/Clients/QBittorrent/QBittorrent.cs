@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using FluentValidation.Results;
 using NLog;
-using NzbDrone.Common.Cache;
 using NzbDrone.Common.Disk;
 using NzbDrone.Common.Extensions;
 using NzbDrone.Common.Http;
@@ -18,13 +18,6 @@ namespace NzbDrone.Core.Download.Clients.QBittorrent
     public class QBittorrent : TorrentClientBase<QBittorrentSettings>
     {
         private readonly IQBittorrentProxySelector _proxySelector;
-        private readonly ICached<SeedingTimeCacheEntry> _seedingTimeCache;
-
-        private class SeedingTimeCacheEntry
-        {
-            public DateTime LastFetched { get; set; }
-            public long SeedingTime { get; set; }
-        }
 
         public QBittorrent(IQBittorrentProxySelector proxySelector,
                            ITorrentFileInfoReader torrentFileInfoReader,
@@ -32,35 +25,13 @@ namespace NzbDrone.Core.Download.Clients.QBittorrent
                            IConfigService configService,
                            IDiskProvider diskProvider,
                            IRemotePathMappingService remotePathMappingService,
-                           ICacheManager cacheManager,
                            Logger logger)
             : base(torrentFileInfoReader, httpClient, configService, diskProvider, remotePathMappingService, logger)
         {
             _proxySelector = proxySelector;
-
-            _seedingTimeCache = cacheManager.GetCache<SeedingTimeCacheEntry>(GetType(), "seedingTime");
         }
 
         private IQBittorrentProxy Proxy => _proxySelector.GetProxy(Settings);
-
-        public override void MarkItemAsImported(DownloadClientItem downloadClientItem)
-        {
-            // set post-import category
-            if (Settings.MusicImportedCategory.IsNotNullOrWhiteSpace() &&
-                Settings.MusicImportedCategory != Settings.MusicCategory)
-            {
-                try
-                {
-                    Proxy.SetTorrentLabel(downloadClientItem.DownloadId.ToLower(), Settings.MusicImportedCategory, Settings);
-                }
-                catch (DownloadClientException)
-                {
-                    _logger.Warn("Failed to set post-import torrent label \"{0}\" for {1} in qBittorrent. Does the label exist?",
-                        Settings.MusicImportedCategory,
-                        downloadClientItem.Title);
-                }
-            }
-        }
 
         protected override string AddFromMagnetLink(RemoteAlbum remoteAlbum, string hash, string magnetLink)
         {
@@ -71,10 +42,15 @@ namespace NzbDrone.Core.Download.Clients.QBittorrent
 
             Proxy.AddTorrentFromUrl(magnetLink, Settings);
 
+            if (Settings.MusicCategory.IsNotNullOrWhiteSpace())
+            {
+                Proxy.SetTorrentLabel(hash.ToLower(), Settings.MusicCategory, Settings);
+            }
+
             var isRecentAlbum = remoteAlbum.IsRecentAlbum();
 
-            if ((isRecentAlbum && Settings.RecentTvPriority == (int)QBittorrentPriority.First) ||
-                (!isRecentAlbum && Settings.OlderTvPriority == (int)QBittorrentPriority.First))
+            if (isRecentAlbum && Settings.RecentTvPriority == (int)QBittorrentPriority.First ||
+                !isRecentAlbum && Settings.OlderTvPriority == (int)QBittorrentPriority.First)
             {
                 Proxy.MoveTorrentToTopInQueue(hash.ToLower(), Settings);
             }
@@ -89,16 +65,28 @@ namespace NzbDrone.Core.Download.Clients.QBittorrent
             return hash;
         }
 
-        protected override string AddFromTorrentFile(RemoteAlbum remoteAlbum, string hash, string filename, byte[] fileContent)
+        protected override string AddFromTorrentFile(RemoteAlbum remoteAlbum, string hash, string filename, Byte[] fileContent)
         {
             Proxy.AddTorrentFromFile(filename, fileContent, Settings);
 
             try
             {
+                if (Settings.MusicCategory.IsNotNullOrWhiteSpace())
+                {
+                    Proxy.SetTorrentLabel(hash.ToLower(), Settings.MusicCategory, Settings);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.Warn(ex, "Failed to set the torrent label for {0}.", filename);
+            }
+
+            try
+            {
                 var isRecentAlbum = remoteAlbum.IsRecentAlbum();
 
-                if ((isRecentAlbum && Settings.RecentTvPriority == (int)QBittorrentPriority.First) ||
-                 (!isRecentAlbum && Settings.OlderTvPriority == (int)QBittorrentPriority.First))
+                if (isRecentAlbum && Settings.RecentTvPriority == (int)QBittorrentPriority.First ||
+                 !isRecentAlbum && Settings.OlderTvPriority == (int)QBittorrentPriority.First)
                 {
                     Proxy.MoveTorrentToTopInQueue(hash.ToLower(), Settings);
                 }
@@ -144,7 +132,7 @@ namespace NzbDrone.Core.Download.Clients.QBittorrent
 
                 // Avoid removing torrents that haven't reached the global max ratio.
                 // Removal also requires the torrent to be paused, in case a higher max ratio was set on the torrent itself (which is not exposed by the api).
-                item.CanMoveFiles = item.CanBeRemoved = torrent.State == "pausedUP" && HasReachedSeedLimit(torrent, config);
+                item.CanMoveFiles = item.CanBeRemoved = (torrent.State == "pausedUP" && HasReachedSeedLimit(torrent, config));
 
                 if (!item.OutputPath.IsEmpty && item.OutputPath.FileName != torrent.Name)
                 {
@@ -164,14 +152,14 @@ namespace NzbDrone.Core.Download.Clients.QBittorrent
 
                     case "queuedDL": // queuing is enabled and torrent is queued for download
                     case "checkingDL": // same as checkingUP, but torrent has NOT finished downloading
-                    case "checkingUP": // torrent has finished downloading and is being checked. Set when `recheck torrent on completion` is enabled. In the event the check fails we shouldn't treat it as completed.
                         item.Status = DownloadItemStatus.Queued;
                         break;
 
                     case "pausedUP": // torrent is paused and has finished downloading
-                    case "uploading": // torrent is being seeded and data is being transferred
+                    case "uploading": // torrent is being seeded and data is being transfered
                     case "stalledUP": // torrent is being seeded, but no connection were made
                     case "queuedUP": // queuing is enabled and torrent is queued for upload
+                    case "checkingUP": // torrent has finished downloading and is being checked
                     case "forcedUP": // torrent has finished downloading and is being forcibly seeded
                         item.Status = DownloadItemStatus.Completed;
                         item.RemainingTime = TimeSpan.Zero; // qBittorrent sends eta=8640000 for completed torrents
@@ -180,11 +168,6 @@ namespace NzbDrone.Core.Download.Clients.QBittorrent
                     case "stalledDL": // torrent is being downloaded, but no connection were made
                         item.Status = DownloadItemStatus.Warning;
                         item.Message = "The download is stalled with no connections";
-                        break;
-
-                    case "missingFiles": // torrent is being downloaded, but no connection were made
-                        item.Status = DownloadItemStatus.Warning;
-                        item.Message = "The download is missing files";
                         break;
 
                     case "metaDL": // torrent magnet is being downloaded
@@ -197,18 +180,10 @@ namespace NzbDrone.Core.Download.Clients.QBittorrent
                             item.Status = DownloadItemStatus.Warning;
                             item.Message = "qBittorrent cannot resolve magnet link with DHT disabled";
                         }
-
                         break;
 
-                    case "forcedDL": //torrent is being downloaded, and was forced started
-                    case "moving": // torrent is being moved from a folder
-                    case "downloading": // torrent is being downloaded and data is being transferred
-                        item.Status = DownloadItemStatus.Downloading;
-                        break;
-
+                    case "downloading": // torrent is being downloaded and data is being transfered
                     default: // new status in API? default to downloading
-                        item.Message = "Unknown download state: " + torrent.State;
-                        _logger.Info(item.Message);
                         item.Status = DownloadItemStatus.Downloading;
                         break;
                 }
@@ -240,12 +215,10 @@ namespace NzbDrone.Core.Download.Clients.QBittorrent
         protected override void Test(List<ValidationFailure> failures)
         {
             failures.AddIfNotNull(TestConnection());
-            if (failures.HasErrors())
+            if (failures.Any())
             {
                 return;
             }
-
-            failures.AddIfNotNull(TestCategory());
             failures.AddIfNotNull(TestPrioritySupport());
             failures.AddIfNotNull(TestGetTorrents());
         }
@@ -280,7 +253,7 @@ namespace NzbDrone.Core.Download.Clients.QBittorrent
                     return new NzbDroneValidationFailure("MusicCategory", "Category is recommended")
                     {
                         IsWarning = true,
-                        DetailedDescription = "Lidarr will not attempt to import completed downloads without a category."
+                        DetailedDescription = "Gamearr will not attempt to import completed downloads without a category."
                     };
                 }
 
@@ -288,9 +261,9 @@ namespace NzbDrone.Core.Download.Clients.QBittorrent
                 var config = Proxy.GetConfig(Settings);
                 if ((config.MaxRatioEnabled || config.MaxSeedingTimeEnabled) && config.RemoveOnMaxRatio)
                 {
-                    return new NzbDroneValidationFailure(string.Empty, "qBittorrent is configured to remove torrents when they reach their Share Ratio Limit")
+                    return new NzbDroneValidationFailure(String.Empty, "qBittorrent is configured to remove torrents when they reach their Share Ratio Limit")
                     {
-                        DetailedDescription = "Lidarr will be unable to perform Completed Download Handling as configured. You can fix this in qBittorrent ('Tools -> Options...' in the menu) by changing 'Options -> BitTorrent -> Share Ratio Limiting' from 'Remove them' to 'Pause them'."
+                        DetailedDescription = "Gamearr will be unable to perform Completed Download Handling as configured. You can fix this in qBittorrent ('Tools -> Options...' in the menu) by changing 'Options -> BitTorrent -> Share Ratio Limiting' from 'Remove them' to 'Pause them'."
                     };
                 }
             }
@@ -312,60 +285,12 @@ namespace NzbDrone.Core.Download.Clients.QBittorrent
                         DetailedDescription = "Please verify the hostname and port."
                     };
                 }
-
-                return new NzbDroneValidationFailure(string.Empty, "Unknown exception: " + ex.Message);
+                return new NzbDroneValidationFailure(String.Empty, "Unknown exception: " + ex.Message);
             }
             catch (Exception ex)
             {
                 _logger.Error(ex, "Unable to test qBittorrent");
-                return new NzbDroneValidationFailure(string.Empty, "Unknown exception: " + ex.Message);
-            }
-
-            return null;
-        }
-
-        private ValidationFailure TestCategory()
-        {
-            if (Settings.MusicCategory.IsNullOrWhiteSpace() && Settings.MusicImportedCategory.IsNullOrWhiteSpace())
-            {
-                return null;
-            }
-
-            // api v1 doesn't need to check/add categories as it's done on set
-            var version = _proxySelector.GetProxy(Settings, true).GetApiVersion(Settings);
-            if (version < Version.Parse("2.0"))
-            {
-                return null;
-            }
-
-            Dictionary<string, QBittorrentLabel> labels = Proxy.GetLabels(Settings);
-
-            if (Settings.MusicCategory.IsNotNullOrWhiteSpace() && !labels.ContainsKey(Settings.MusicCategory))
-            {
-                Proxy.AddLabel(Settings.MusicCategory, Settings);
-                labels = Proxy.GetLabels(Settings);
-
-                if (!labels.ContainsKey(Settings.MusicCategory))
-                {
-                    return new NzbDroneValidationFailure("MusicCategory", "Configuration of label failed")
-                    {
-                        DetailedDescription = "Lidarr was unable to add the label to qBittorrent."
-                    };
-                }
-            }
-
-            if (Settings.MusicImportedCategory.IsNotNullOrWhiteSpace() && !labels.ContainsKey(Settings.MusicImportedCategory))
-            {
-                Proxy.AddLabel(Settings.MusicImportedCategory, Settings);
-                labels = Proxy.GetLabels(Settings);
-
-                if (!labels.ContainsKey(Settings.MusicImportedCategory))
-                {
-                    return new NzbDroneValidationFailure("MusicImportedCategory", "Configuration of label failed")
-                    {
-                        DetailedDescription = "Lidarr was unable to add the label to qBittorrent."
-                    };
-                }
+                return new NzbDroneValidationFailure(String.Empty, "Unknown exception: " + ex.Message);
             }
 
             return null;
@@ -400,7 +325,7 @@ namespace NzbDrone.Core.Download.Clients.QBittorrent
             catch (Exception ex)
             {
                 _logger.Error(ex, "Failed to test qBittorrent");
-                return new NzbDroneValidationFailure(string.Empty, "Unknown exception: " + ex.Message);
+                return new NzbDroneValidationFailure(String.Empty, "Unknown exception: " + ex.Message);
             }
 
             return null;
@@ -415,7 +340,7 @@ namespace NzbDrone.Core.Download.Clients.QBittorrent
             catch (Exception ex)
             {
                 _logger.Error(ex, "Failed to get torrents");
-                return new NzbDroneValidationFailure(string.Empty, "Failed to get the list of torrents: " + ex.Message);
+                return new NzbDroneValidationFailure(String.Empty, "Failed to get the list of torrents: " + ex.Message);
             }
 
             return null;
@@ -477,73 +402,29 @@ namespace NzbDrone.Core.Download.Clients.QBittorrent
                 }
             }
 
-            if (HasReachedSeedingTimeLimit(torrent, config))
-            {
-                return true;
-            }
-
-            return false;
-        }
-
-        protected bool HasReachedSeedingTimeLimit(QBittorrentTorrent torrent, QBittorrentPreferences config)
-        {
-            long seedingTimeLimit;
-
             if (torrent.SeedingTimeLimit >= 0)
             {
-                seedingTimeLimit = torrent.SeedingTimeLimit;
+                if (!torrent.SeedingTime.HasValue)
+                {
+                    FetchTorrentDetails(torrent);
+                }
+
+                if (torrent.SeedingTime >= torrent.SeedingTimeLimit)
+                {
+                    return true;
+                }
             }
             else if (torrent.SeedingTimeLimit == -2 && config.MaxSeedingTimeEnabled)
             {
-                seedingTimeLimit = config.MaxSeedingTime;
-            }
-            else
-            {
-                return false;
-            }
-
-            if (torrent.SeedingTime.HasValue)
-            {
-                // SeedingTime can't be available here, but use it if the api starts to provide it.
-                return torrent.SeedingTime.Value >= seedingTimeLimit;
-            }
-
-            var cacheKey = Settings.Host + Settings.Port + torrent.Hash;
-            var cacheSeedingTime = _seedingTimeCache.Find(cacheKey);
-
-            if (cacheSeedingTime != null)
-            {
-                var togo = seedingTimeLimit - cacheSeedingTime.SeedingTime;
-                var elapsed = (DateTime.UtcNow - cacheSeedingTime.LastFetched).TotalSeconds;
-
-                if (togo <= 0)
+                if (!torrent.SeedingTime.HasValue)
                 {
-                    // Already reached the limit, keep the cache alive
-                    _seedingTimeCache.Set(cacheKey, cacheSeedingTime, TimeSpan.FromMinutes(5));
+                    FetchTorrentDetails(torrent);
+                }
+
+                if (torrent.SeedingTime >= config.MaxSeedingTime)
+                {
                     return true;
                 }
-                else if (togo > elapsed)
-                {
-                    // SeedingTime cannot have reached the required value since the last check, preserve the cache
-                    _seedingTimeCache.Set(cacheKey, cacheSeedingTime, TimeSpan.FromMinutes(5));
-                    return false;
-                }
-            }
-
-            FetchTorrentDetails(torrent);
-
-            cacheSeedingTime = new SeedingTimeCacheEntry
-            {
-                LastFetched = DateTime.UtcNow,
-                SeedingTime = torrent.SeedingTime.Value
-            };
-
-            _seedingTimeCache.Set(cacheKey, cacheSeedingTime, TimeSpan.FromMinutes(5));
-
-            if (cacheSeedingTime.SeedingTime >= seedingTimeLimit)
-            {
-                // Reached the limit, keep the cache alive
-                return true;
             }
 
             return false;

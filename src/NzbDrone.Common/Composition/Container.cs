@@ -24,14 +24,12 @@ namespace NzbDrone.Common.Composition
             _container.Register<TService, TImplementation>();
         }
 
-        public void Register<T>(T instance)
-            where T : class
+        public void Register<T>(T instance) where T : class
         {
             _container.Register<T>(instance);
         }
 
-        public T Resolve<T>()
-            where T : class
+        public T Resolve<T>() where T : class
         {
             return _container.Resolve<T>();
         }
@@ -46,8 +44,7 @@ namespace NzbDrone.Common.Composition
             _container.Register(serviceType, implementationType);
         }
 
-        public void Register<TService>(Func<IContainer, TService> factory)
-            where TService : class
+        public void Register<TService>(Func<IContainer, TService> factory) where TService : class
         {
             _container.Register((c, n) => factory(this));
         }
@@ -70,8 +67,7 @@ namespace NzbDrone.Common.Composition
             });
         }
 
-        public IEnumerable<T> ResolveAll<T>()
-            where T : class
+        public IEnumerable<T> ResolveAll<T>() where T : class
         {
             return _container.ResolveAll<T>();
         }
@@ -107,7 +103,8 @@ namespace NzbDrone.Common.Composition
                 .Where(implementation =>
                        contractType.IsAssignableFrom(implementation) &&
                        !implementation.IsInterface &&
-                       !implementation.IsAbstract);
+                       !implementation.IsAbstract
+                );
         }
     }
 }

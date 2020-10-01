@@ -4,9 +4,9 @@ using FizzWare.NBuilder;
 using FluentAssertions;
 using Moq;
 using NUnit.Framework;
-using NzbDrone.Core.Music;
 using NzbDrone.Core.Profiles.Releases;
 using NzbDrone.Core.Test.Framework;
+using NzbDrone.Core.Music;
 
 namespace NzbDrone.Core.Test.Profiles.Releases.PreferredWordService
 {
@@ -15,7 +15,7 @@ namespace NzbDrone.Core.Test.Profiles.Releases.PreferredWordService
     {
         private Artist _artist = null;
         private List<ReleaseProfile> _releaseProfiles = null;
-        private string _title = "Artist.Name-Album.Name-2018-Flac-Vinyl-Lidarr";
+        private string _title = "Artist.Name-Album.Name-2018-Flac-Vinyl-Gamearr";
 
         [SetUp]
         public void Setup()
@@ -35,15 +35,17 @@ namespace NzbDrone.Core.Test.Profiles.Releases.PreferredWordService
                                                  }
             });
 
+
             Mocker.GetMock<ITermMatcherService>()
                   .Setup(s => s.MatchingTerm(It.IsAny<string>(), _title))
                   .Returns<string, string>((term, title) => title.Contains(term) ? term : null);
         }
 
+
         private void GivenReleaseProfile()
         {
             Mocker.GetMock<IReleaseProfileService>()
-                  .Setup(s => s.EnabledForTags(It.IsAny<HashSet<int>>(), It.IsAny<int>()))
+                  .Setup(s => s.AllForTags(It.IsAny<HashSet<int>>()))
                   .Returns(_releaseProfiles);
         }
 
@@ -51,7 +53,7 @@ namespace NzbDrone.Core.Test.Profiles.Releases.PreferredWordService
         public void should_return_empty_list_when_there_are_no_release_profiles()
         {
             Mocker.GetMock<IReleaseProfileService>()
-                  .Setup(s => s.EnabledForTags(It.IsAny<HashSet<int>>(), It.IsAny<int>()))
+                  .Setup(s => s.AllForTags(It.IsAny<HashSet<int>>()))
                   .Returns(new List<ReleaseProfile>());
 
             Subject.GetMatchingPreferredWords(_artist, _title).Should().BeEmpty();

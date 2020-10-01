@@ -1,8 +1,8 @@
-using System;
-using System.IO;
 using NLog;
 using NLog.Config;
 using NLog.Targets;
+using System;
+using System.IO;
 using NUnit.Framework;
 using NUnit.Framework.Interfaces;
 using NzbDrone.Common.EnvironmentInfo;
@@ -25,8 +25,6 @@ namespace NzbDrone.Test.Common
 
                 var logOutput = TestLogOutput.Console;
                 Enum.TryParse<TestLogOutput>(Environment.GetEnvironmentVariable("LIDARR_TESTS_LOG_OUTPUT"), out logOutput);
-
-                RegisterSentryLogger();
 
                 switch (logOutput)
                 {
@@ -68,13 +66,6 @@ namespace NzbDrone.Test.Common
 
             LogManager.Configuration.AddTarget(fileTarget.GetType().Name, fileTarget);
             LogManager.Configuration.LoggingRules.Add(new LoggingRule("*", LogLevel.Trace, fileTarget));
-        }
-
-        private static void RegisterSentryLogger()
-        {
-            // Register a null target for sentry logs, so they aren't caught by other loggers.
-            var loggingRuleSentry = new LoggingRule("Sentry", LogLevel.Debug, new NullTarget()) { Final = true };
-            LogManager.Configuration.LoggingRules.Insert(0, loggingRuleSentry);
         }
 
         private static void RegisterExceptionVerification()

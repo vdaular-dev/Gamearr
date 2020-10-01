@@ -35,8 +35,7 @@ namespace NzbDrone.Common.Serializer
             return serializerSettings;
         }
 
-        public static T Deserialize<T>(string json)
-            where T : new()
+        public static T Deserialize<T>(string json) where T : new()
         {
             return JsonConvert.DeserializeObject<T>(json, SerializerSettings);
         }
@@ -46,8 +45,7 @@ namespace NzbDrone.Common.Serializer
             return JsonConvert.DeserializeObject(json, type, SerializerSettings);
         }
 
-        public static bool TryDeserialize<T>(string json, out T result)
-            where T : new()
+        public static bool TryDeserialize<T>(string json, out T result) where T : new()
         {
             try
             {

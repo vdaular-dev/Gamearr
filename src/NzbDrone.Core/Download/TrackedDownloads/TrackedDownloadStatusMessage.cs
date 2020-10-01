@@ -7,6 +7,7 @@ namespace NzbDrone.Core.Download.TrackedDownloads
         public string Title { get; set; }
         public List<string> Messages { get; set; }
 
+
         public TrackedDownloadStatusMessage(string title, List<string> messages)
         {
             Title = title;

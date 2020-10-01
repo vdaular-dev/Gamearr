@@ -1,8 +1,9 @@
-﻿using System;
-using NzbDrone.Common.Disk;
+﻿using NzbDrone.Common.Disk;
+using System;
 
 namespace NzbDrone.Core.Download.Clients.Blackhole
 {
+
     public class WatchFolderItem
     {
         public string DownloadId { get; set; }

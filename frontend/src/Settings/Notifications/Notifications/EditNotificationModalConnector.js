@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { clearPendingChanges } from 'Store/Actions/baseActions';
-import { cancelSaveNotification, cancelTestNotification } from 'Store/Actions/settingsActions';
+import { cancelTestNotification, cancelSaveNotification } from 'Store/Actions/settingsActions';
 import EditNotificationModal from './EditNotificationModal';
 
 function createMapDispatchToProps(dispatch, props) {

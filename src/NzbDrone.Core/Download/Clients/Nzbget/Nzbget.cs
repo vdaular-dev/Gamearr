@@ -9,7 +9,6 @@ using NzbDrone.Common.Disk;
 using NzbDrone.Common.Extensions;
 using NzbDrone.Common.Http;
 using NzbDrone.Core.Configuration;
-using NzbDrone.Core.Exceptions;
 using NzbDrone.Core.Parser.Model;
 using NzbDrone.Core.RemotePathMappings;
 using NzbDrone.Core.Validation;
@@ -20,7 +19,7 @@ namespace NzbDrone.Core.Download.Clients.Nzbget
     {
         private readonly INzbgetProxy _proxy;
         private readonly string[] _successStatus = { "SUCCESS", "NONE" };
-        private readonly string[] _deleteFailedStatus = { "HEALTH", "DUPE", "SCAN", "COPY" };
+        private readonly string[] _deleteFailedStatus =  { "HEALTH", "DUPE", "SCAN", "COPY" };
 
         public Nzbget(INzbgetProxy proxy,
                       IHttpClient httpClient,
@@ -37,14 +36,16 @@ namespace NzbDrone.Core.Download.Clients.Nzbget
         protected override string AddFromNzbFile(RemoteAlbum remoteAlbum, string filename, byte[] fileContent)
         {
             var category = Settings.MusicCategory;
+
             var priority = remoteAlbum.IsRecentAlbum() ? Settings.RecentTvPriority : Settings.OlderTvPriority;
 
             var addpaused = Settings.AddPaused;
+
             var response = _proxy.DownloadNzb(fileContent, filename, category, priority, addpaused, Settings);
 
             if (response == null)
             {
-                throw new DownloadClientRejectedReleaseException(remoteAlbum.Release, "NZBGet rejected the NZB for an unknown reason");
+                throw new DownloadClientException("Failed to add nzb {0}", filename);
             }
 
             return response;
@@ -76,7 +77,7 @@ namespace NzbDrone.Core.Download.Clients.Nzbget
                 queueItem.CanMoveFiles = true;
                 queueItem.CanBeRemoved = true;
 
-                if (globalStatus.DownloadPaused || (remainingSize == pausedSize && remainingSize != 0))
+                if (globalStatus.DownloadPaused || remainingSize == pausedSize && remainingSize != 0)
                 {
                     queueItem.Status = DownloadItemStatus.Paused;
                     queueItem.RemainingSize = remainingSize;
@@ -220,10 +221,7 @@ namespace NzbDrone.Core.Download.Clients.Nzbget
             {
                 var name = config.GetValueOrDefault("Category" + i + ".Name");
 
-                if (name == null)
-                {
-                    yield break;
-                }
+                if (name == null) yield break;
 
                 var destDir = config.GetValueOrDefault("Category" + i + ".DestDir");
 
@@ -273,7 +271,6 @@ namespace NzbDrone.Core.Download.Clients.Nzbget
                 {
                     return new ValidationFailure("Username", "Authentication failed");
                 }
-
                 _logger.Error(ex, "Unable to connect to NZBGet");
                 return new ValidationFailure("Host", "Unable to connect to NZBGet");
             }
@@ -309,7 +306,7 @@ namespace NzbDrone.Core.Download.Clients.Nzbget
                 return new NzbDroneValidationFailure(string.Empty, "NzbGet setting KeepHistory should be greater than 0")
                 {
                     InfoLink = _proxy.GetBaseUrl(Settings),
-                    DetailedDescription = "NzbGet setting KeepHistory is set to 0. Which prevents Lidarr from seeing completed downloads."
+                    DetailedDescription = "NzbGet setting KeepHistory is set to 0. Which prevents Gamearr from seeing completed downloads."
                 };
             }
             else if (value > 25000)
@@ -331,7 +328,7 @@ namespace NzbDrone.Core.Download.Clients.Nzbget
         {
             long result = high;
 
-            result = (result << 32) | low;
+            result = (result << 32) | (long)low;
 
             return result;
         }

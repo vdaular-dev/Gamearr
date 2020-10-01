@@ -1,8 +1,8 @@
-import classNames from 'classnames';
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import { DragSource, DropTarget } from 'react-dnd';
 import { findDOMNode } from 'react-dom';
+import { DragSource, DropTarget } from 'react-dnd';
+import classNames from 'classnames';
 import { QUALITY_PROFILE_ITEM } from 'Helpers/dragTypes';
 import QualityProfileItem from './QualityProfileItem';
 import QualityProfileItemGroup from './QualityProfileItemGroup';
@@ -230,6 +230,7 @@ QualityProfileItemDragSource.propTypes = {
   onQualityProfileItemDragEnd: PropTypes.func.isRequired
 };
 
+/* eslint-disable new-cap */
 export default DropTarget(
   QUALITY_PROFILE_ITEM,
   qualityProfileItemDropTarget,
@@ -239,3 +240,5 @@ export default DropTarget(
   qualityProfileItemDragSource,
   collectDragSource
 )(QualityProfileItemDragSource));
+/* eslint-enable new-cap */
+

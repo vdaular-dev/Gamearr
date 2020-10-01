@@ -1,12 +1,13 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import Card from 'Components/Card';
+import sortByName from 'Utilities/Array/sortByName';
+import { icons } from 'Helpers/Props';
 import FieldSet from 'Components/FieldSet';
+import Card from 'Components/Card';
 import Icon from 'Components/Icon';
 import PageSectionContent from 'Components/Page/PageSectionContent';
-import { icons } from 'Helpers/Props';
-import AddDownloadClientModal from './AddDownloadClientModal';
 import DownloadClient from './DownloadClient';
+import AddDownloadClientModal from './AddDownloadClientModal';
 import EditDownloadClientModalConnector from './EditDownloadClientModalConnector';
 import styles from './DownloadClients.css';
 
@@ -65,7 +66,7 @@ class DownloadClients extends Component {
         >
           <div className={styles.downloadClients}>
             {
-              items.map((item) => {
+              items.sort(sortByName).map((item) => {
                 return (
                   <DownloadClient
                     key={item.id}

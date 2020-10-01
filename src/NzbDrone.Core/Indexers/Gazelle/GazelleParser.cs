@@ -1,11 +1,11 @@
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using NzbDrone.Common.Cache;
-using NzbDrone.Common.Extensions;
 using NzbDrone.Common.Http;
 using NzbDrone.Core.Indexers.Exceptions;
 using NzbDrone.Core.Parser.Model;
+using System.Linq;
+using NzbDrone.Common.Cache;
+using NzbDrone.Common.Extensions;
 
 namespace NzbDrone.Core.Indexers.Gazelle
 {
@@ -47,6 +47,7 @@ namespace NzbDrone.Core.Indexers.Gazelle
                 return torrentInfos;
             }
 
+
             foreach (var result in jsonResponse.Resource.Response.Results)
             {
                 if (result.Torrents != null)
@@ -57,19 +58,12 @@ namespace NzbDrone.Core.Indexers.Gazelle
                         var artist = WebUtility.HtmlDecode(result.Artist);
                         var album = WebUtility.HtmlDecode(result.GroupName);
 
-                        var title = $"{result.Artist} - {result.GroupName} ({result.GroupYear}) [{torrent.Format} {torrent.Encoding}] [{torrent.Media}]";
-                        if (torrent.HasCue)
-                        {
-                            title += " [Cue]";
-                        }
-
                         torrentInfos.Add(new GazelleInfo()
                         {
                             Guid = string.Format("Gazelle-{0}", id),
                             Artist = artist,
-
                             // Splice Title from info to avoid calling API again for every torrent.
-                            Title = WebUtility.HtmlDecode(title),
+                            Title = WebUtility.HtmlDecode(result.Artist + " - " + result.GroupName + " (" + result.GroupYear +") [" + torrent.Format + " " + torrent.Encoding + "]"),
                             Album = album,
                             Container = torrent.Encoding,
                             Codec = torrent.Format,
@@ -85,11 +79,13 @@ namespace NzbDrone.Core.Indexers.Gazelle
                 }
             }
 
+            var torr = torrentInfos;
             // order by date
             return
                 torrentInfos
                     .OrderByDescending(o => o.PublishDate)
                     .ToArray();
+
         }
 
         private string GetDownloadUrl(int torrentId, string authKey, string passKey)

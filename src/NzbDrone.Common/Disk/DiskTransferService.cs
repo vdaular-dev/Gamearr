@@ -76,28 +76,20 @@ namespace NzbDrone.Common.Disk
             if (!_diskProvider.FolderExists(targetPath))
             {
                 _diskProvider.CreateFolder(targetPath);
-
-                _diskProvider.CopyPermissions(sourcePath, targetPath);
             }
 
             var result = mode;
 
             foreach (var subDir in _diskProvider.GetDirectoryInfos(sourcePath))
             {
-                if (ShouldIgnore(subDir))
-                {
-                    continue;
-                }
+                if (ShouldIgnore(subDir)) continue;
 
                 result &= TransferFolder(subDir.FullName, Path.Combine(targetPath, subDir.Name), mode, verificationMode);
             }
 
             foreach (var sourceFile in _diskProvider.GetFileInfos(sourcePath))
             {
-                if (ShouldIgnore(sourceFile))
-                {
-                    continue;
-                }
+                if (ShouldIgnore(sourceFile)) continue;
 
                 var destFile = Path.Combine(targetPath, sourceFile.Name);
 
@@ -131,20 +123,14 @@ namespace NzbDrone.Common.Disk
 
             foreach (var subDir in targetFolders.Where(v => !sourceFolders.Any(d => d.Name == v.Name)))
             {
-                if (ShouldIgnore(subDir))
-                {
-                    continue;
-                }
+                if (ShouldIgnore(subDir)) continue;
 
                 _diskProvider.DeleteFolder(subDir.FullName, true);
             }
 
             foreach (var subDir in sourceFolders)
             {
-                if (ShouldIgnore(subDir))
-                {
-                    continue;
-                }
+                if (ShouldIgnore(subDir)) continue;
 
                 filesCopied += MirrorFolder(subDir.FullName, Path.Combine(targetPath, subDir.Name));
             }
@@ -154,20 +140,14 @@ namespace NzbDrone.Common.Disk
 
             foreach (var targetFile in targetFiles.Where(v => !sourceFiles.Any(d => d.Name == v.Name)))
             {
-                if (ShouldIgnore(targetFile))
-                {
-                    continue;
-                }
+                if (ShouldIgnore(targetFile)) continue;
 
                 _diskProvider.DeleteFile(targetFile.FullName);
             }
 
             foreach (var sourceFile in sourceFiles)
             {
-                if (ShouldIgnore(sourceFile))
-                {
-                    continue;
-                }
+                if (ShouldIgnore(sourceFile)) continue;
 
                 var targetFile = Path.Combine(targetPath, sourceFile.Name);
 
@@ -300,38 +280,21 @@ namespace NzbDrone.Common.Disk
                 {
                     return TransferMode.HardLink;
                 }
-
                 if (!mode.HasFlag(TransferMode.Copy))
                 {
                     throw new IOException("Hardlinking from '" + sourcePath + "' to '" + targetPath + "' failed.");
                 }
             }
 
-            // Adjust the transfer mode depending on the filesystems
-            if (verificationMode == DiskTransferVerificationMode.TryTransactional)
+            // We force a transactional transfer if the transfer occurs between mounts and one of the mounts is cifs, it would be a copy anyway.
+            if (verificationMode == DiskTransferVerificationMode.TryTransactional && OsInfo.IsNotWindows)
             {
                 var sourceMount = _diskProvider.GetMount(sourcePath);
                 var targetMount = _diskProvider.GetMount(targetPath);
 
-                var isSameMount = sourceMount != null && targetMount != null && sourceMount.RootDirectory == targetMount.RootDirectory;
-
-                var sourceDriveFormat = sourceMount?.DriveFormat ?? string.Empty;
-                var targetDriveFormat = targetMount?.DriveFormat ?? string.Empty;
-
-                if (isSameMount)
+                if (sourceMount != null && targetMount != null && sourceMount.RootDirectory != targetMount.RootDirectory &&
+                    (sourceMount.DriveFormat == "cifs" || targetMount.DriveFormat == "cifs"))
                 {
-                    // No transaction needed for operations on same mount, force VerifyOnly
-                    verificationMode = DiskTransferVerificationMode.VerifyOnly;
-                }
-                else if (sourceDriveFormat.Contains("mergerfs") || sourceDriveFormat.Contains("rclone") ||
-                         targetDriveFormat.Contains("mergerfs") || targetDriveFormat.Contains("rclone"))
-                {
-                    // Cloud storage filesystems don't need any Transactional stuff and it hurts performance, force VerifyOnly
-                    verificationMode = DiskTransferVerificationMode.VerifyOnly;
-                }
-                else if ((sourceDriveFormat == "cifs" || targetDriveFormat == "cifs") && OsInfo.IsNotWindows)
-                {
-                    // Force Transactional on a cifs mount due to the likeliness of move failures on certain scenario's on mono
                     verificationMode = DiskTransferVerificationMode.Transactional;
                 }
             }
@@ -554,7 +517,6 @@ namespace NzbDrone.Common.Disk
                             {
                                 throw new IOException(string.Format("Temporary file '{0}' still exists, aborting.", tempTargetPath));
                             }
-
                             _logger.Trace("Hardlink move succeeded, deleting source.");
                             _diskProvider.DeleteFile(sourcePath);
                             return true;

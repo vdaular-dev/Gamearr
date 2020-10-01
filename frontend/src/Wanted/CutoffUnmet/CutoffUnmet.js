@@ -1,24 +1,24 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import LoadingIndicator from 'Components/Loading/LoadingIndicator';
-import FilterMenu from 'Components/Menu/FilterMenu';
-import ConfirmModal from 'Components/Modal/ConfirmModal';
-import PageContent from 'Components/Page/PageContent';
-import PageContentBody from 'Components/Page/PageContentBody';
-import PageToolbar from 'Components/Page/Toolbar/PageToolbar';
-import PageToolbarButton from 'Components/Page/Toolbar/PageToolbarButton';
-import PageToolbarSection from 'Components/Page/Toolbar/PageToolbarSection';
-import PageToolbarSeparator from 'Components/Page/Toolbar/PageToolbarSeparator';
-import Table from 'Components/Table/Table';
-import TableBody from 'Components/Table/TableBody';
-import TablePager from 'Components/Table/TablePager';
-import { align, icons, kinds } from 'Helpers/Props';
 import getFilterValue from 'Utilities/Filter/getFilterValue';
 import hasDifferentItems from 'Utilities/Object/hasDifferentItems';
 import getSelectedIds from 'Utilities/Table/getSelectedIds';
 import removeOldSelectedState from 'Utilities/Table/removeOldSelectedState';
 import selectAll from 'Utilities/Table/selectAll';
 import toggleSelected from 'Utilities/Table/toggleSelected';
+import { align, icons, kinds } from 'Helpers/Props';
+import LoadingIndicator from 'Components/Loading/LoadingIndicator';
+import Table from 'Components/Table/Table';
+import TableBody from 'Components/Table/TableBody';
+import TablePager from 'Components/Table/TablePager';
+import PageContent from 'Components/Page/PageContent';
+import PageContentBodyConnector from 'Components/Page/PageContentBodyConnector';
+import PageToolbar from 'Components/Page/Toolbar/PageToolbar';
+import PageToolbarSection from 'Components/Page/Toolbar/PageToolbarSection';
+import PageToolbarSeparator from 'Components/Page/Toolbar/PageToolbarSeparator';
+import PageToolbarButton from 'Components/Page/Toolbar/PageToolbarButton';
+import FilterMenu from 'Components/Menu/FilterMenu';
+import ConfirmModal from 'Components/Modal/ConfirmModal';
 import CutoffUnmetRowConnector from './CutoffUnmetRowConnector';
 
 function getMonitoredValue(props) {
@@ -113,8 +113,6 @@ class CutoffUnmet extends Component {
       isPopulated,
       error,
       items,
-      isArtistFetching,
-      isArtistPopulated,
       selectedFilterKey,
       filters,
       columns,
@@ -131,9 +129,6 @@ class CutoffUnmet extends Component {
       selectedState,
       isConfirmSearchAllCutoffUnmetModalOpen
     } = this.state;
-
-    const isAllPopulated = isPopulated && isArtistPopulated;
-    const isAnyFetching = isFetching || isArtistFetching;
 
     const itemsSelected = !!this.getSelectedIds().length;
     const isShowingMonitored = getMonitoredValue(this.props);
@@ -181,28 +176,28 @@ class CutoffUnmet extends Component {
           </PageToolbarSection>
         </PageToolbar>
 
-        <PageContentBody>
+        <PageContentBodyConnector>
           {
-            isAnyFetching && !isAllPopulated &&
+            isFetching && !isPopulated &&
               <LoadingIndicator />
           }
 
           {
-            !isAnyFetching && error &&
+            !isFetching && error &&
               <div>
                 Error fetching cutoff unmet
               </div>
           }
 
           {
-            isAllPopulated && !error && !items.length &&
+            isPopulated && !error && !items.length &&
               <div>
                 No cutoff unmet items
               </div>
           }
 
           {
-            isAllPopulated && !error && !!items.length &&
+            isPopulated && !error && !!items.length &&
               <div>
                 <Table
                   columns={columns}
@@ -245,7 +240,7 @@ class CutoffUnmet extends Component {
                         Are you sure you want to search for all {totalRecords} Cutoff Unmet albums?
                       </div>
                       <div>
-                        This cannot be cancelled once started without restarting Lidarr.
+                        This cannot be cancelled once started without restarting Gamearr.
                       </div>
                     </div>
                   }
@@ -255,7 +250,7 @@ class CutoffUnmet extends Component {
                 />
               </div>
           }
-        </PageContentBody>
+        </PageContentBodyConnector>
       </PageContent>
     );
   }
@@ -266,8 +261,6 @@ CutoffUnmet.propTypes = {
   isPopulated: PropTypes.bool.isRequired,
   error: PropTypes.object,
   items: PropTypes.arrayOf(PropTypes.object).isRequired,
-  isArtistFetching: PropTypes.bool.isRequired,
-  isArtistPopulated: PropTypes.bool.isRequired,
   selectedFilterKey: PropTypes.string.isRequired,
   filters: PropTypes.arrayOf(PropTypes.object).isRequired,
   columns: PropTypes.arrayOf(PropTypes.object).isRequired,

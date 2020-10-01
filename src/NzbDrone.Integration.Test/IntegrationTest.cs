@@ -1,40 +1,31 @@
-using System.Threading;
-using Lidarr.Http.ClientSchema;
 using NLog;
-using NUnit.Framework;
 using NzbDrone.Core.Indexers.Newznab;
 using NzbDrone.Test.Common;
+using Gamearr.Http.ClientSchema;
 
 namespace NzbDrone.Integration.Test
 {
-    [Parallelizable(ParallelScope.Fixtures)]
     public abstract class IntegrationTest : IntegrationTestBase
     {
-        protected static int StaticPort = 8686;
-
         protected NzbDroneRunner _runner;
 
         public override string ArtistRootFolder => GetTempDirectory("ArtistRootFolder");
 
-        protected int Port { get; private set; }
-
-        protected override string RootUrl => $"http://localhost:{Port}/";
+        protected override string RootUrl => "http://localhost:8383/";
 
         protected override string ApiKey => _runner.ApiKey;
 
         protected override void StartTestTarget()
         {
-            Port = Interlocked.Increment(ref StaticPort);
-
-            _runner = new NzbDroneRunner(LogManager.GetCurrentClassLogger(), Port);
-            _runner.Kill();
+            _runner = new NzbDroneRunner(LogManager.GetCurrentClassLogger());
+            _runner.KillAll();
 
             _runner.Start();
         }
 
         protected override void InitializeTestTarget()
         {
-            Indexers.Post(new Lidarr.Api.V1.Indexers.IndexerResource
+            Indexers.Post(new Gamearr.Api.V1.Indexers.IndexerResource
             {
                 EnableRss = false,
                 EnableInteractiveSearch = false,
@@ -54,7 +45,7 @@ namespace NzbDrone.Integration.Test
 
         protected override void StopTestTarget()
         {
-            _runner.Kill();
+            _runner.KillAll();
         }
     }
 }

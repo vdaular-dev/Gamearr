@@ -1,16 +1,16 @@
 import _ from 'lodash';
-import moment from 'moment';
 import { createAction } from 'redux-actions';
 import { batchActions } from 'redux-batched-actions';
-import * as calendarViews from 'Calendar/calendarViews';
-import * as commandNames from 'Commands/commandNames';
+import moment from 'moment';
+import createAjaxRequest from 'Utilities/createAjaxRequest';
 import { filterTypes } from 'Helpers/Props';
 import { createThunk, handleThunks } from 'Store/thunks';
-import createAjaxRequest from 'Utilities/createAjaxRequest';
+import * as calendarViews from 'Calendar/calendarViews';
+import * as commandNames from 'Commands/commandNames';
+import createClearReducer from './Creators/Reducers/createClearReducer';
+import createHandleActions from './Creators/createHandleActions';
 import { set, update } from './baseActions';
 import { executeCommandHelper } from './commandActions';
-import createHandleActions from './Creators/createHandleActions';
-import createClearReducer from './Creators/Reducers/createClearReducer';
 
 //
 // Variables

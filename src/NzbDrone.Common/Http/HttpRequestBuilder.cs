@@ -46,6 +46,7 @@ namespace NzbDrone.Common.Http
         public HttpRequestBuilder(bool useHttps, string host, int port, string urlBase = null)
             : this(BuildBaseUrl(useHttps, host, port, urlBase))
         {
+
         }
 
         public static string BuildBaseUrl(bool useHttps, string host, int port, string urlBase = null)
@@ -147,10 +148,7 @@ namespace NzbDrone.Common.Http
 
         protected virtual void ApplyFormData(HttpRequest request)
         {
-            if (FormData.Empty())
-            {
-                return;
-            }
+            if (FormData.Empty()) return;
 
             if (request.ContentData != null)
             {
@@ -175,22 +173,11 @@ namespace NzbDrone.Common.Http
                         writer.Write(partBoundary);
 
                         writer.Write("Content-Disposition: form-data");
-                        if (formData.Name.IsNotNullOrWhiteSpace())
-                        {
-                            writer.Write("; name=\"{0}\"", formData.Name);
-                        }
-
-                        if (formData.FileName.IsNotNullOrWhiteSpace())
-                        {
-                            writer.Write("; filename=\"{0}\"", formData.FileName);
-                        }
-
+                        if (formData.Name.IsNotNullOrWhiteSpace()) writer.Write("; name=\"{0}\"", formData.Name);
+                        if (formData.FileName.IsNotNullOrWhiteSpace()) writer.Write("; filename=\"{0}\"", formData.FileName);
                         writer.Write("\r\n");
 
-                        if (formData.ContentType.IsNotNullOrWhiteSpace())
-                        {
-                            writer.Write("Content-Type: {0}\r\n", formData.ContentType);
-                        }
+                        if (formData.ContentType.IsNotNullOrWhiteSpace()) writer.Write("Content-Type: {0}\r\n", formData.ContentType);
 
                         writer.Write("\r\n");
                         writer.Flush();
@@ -214,6 +201,7 @@ namespace NzbDrone.Common.Http
                 var body = bodyStream.ToArray();
 
                 // TODO: Scan through body to see if we have a boundary collision?
+
                 request.Headers.ContentType = "multipart/form-data; boundary=" + boundary;
                 request.SetContent(body);
 
@@ -391,4 +379,5 @@ namespace NzbDrone.Common.Http
             return this;
         }
     }
+
 }

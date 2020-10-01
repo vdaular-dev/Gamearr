@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using NzbDrone.Core.Datastore;
-using NzbDrone.Core.Music;
 using NzbDrone.Core.Qualities;
+using NzbDrone.Core.Music;
 
 namespace NzbDrone.Core.History
 {
@@ -28,6 +28,7 @@ namespace NzbDrone.Core.History
         public Dictionary<string, string> Data { get; set; }
 
         public string DownloadId { get; set; }
+
     }
 
     public enum HistoryEventType
@@ -41,7 +42,6 @@ namespace NzbDrone.Core.History
         TrackFileRenamed = 6,
         AlbumImportIncomplete = 7,
         DownloadImported = 8,
-        TrackFileRetagged = 9,
-        DownloadIgnored = 10
+        TrackFileRetagged = 9
     }
 }

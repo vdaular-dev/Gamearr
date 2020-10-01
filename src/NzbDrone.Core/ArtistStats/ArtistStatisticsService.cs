@@ -17,8 +17,6 @@ namespace NzbDrone.Core.ArtistStats
     public class ArtistStatisticsService : IArtistStatisticsService,
         IHandle<ArtistUpdatedEvent>,
         IHandle<ArtistDeletedEvent>,
-        IHandle<AlbumAddedEvent>,
-        IHandle<AlbumDeletedEvent>,
         IHandle<AlbumImportedEvent>,
         IHandle<AlbumEditedEvent>,
         IHandle<TrackFileDeletedEvent>
@@ -44,10 +42,7 @@ namespace NzbDrone.Core.ArtistStats
         {
             var stats = _cache.Get(artistId.ToString(), () => _artistStatisticsRepository.ArtistStatistics(artistId));
 
-            if (stats == null || stats.Count == 0)
-            {
-                return new ArtistStatistics();
-            }
+            if (stats == null || stats.Count == 0) return new ArtistStatistics();
 
             return MapArtistStatistics(stats);
         }
@@ -55,15 +50,15 @@ namespace NzbDrone.Core.ArtistStats
         private ArtistStatistics MapArtistStatistics(List<AlbumStatistics> albumStatistics)
         {
             var artistStatistics = new ArtistStatistics
-            {
-                AlbumStatistics = albumStatistics,
-                AlbumCount = albumStatistics.Count,
-                ArtistId = albumStatistics.First().ArtistId,
-                TrackFileCount = albumStatistics.Sum(s => s.TrackFileCount),
-                TrackCount = albumStatistics.Sum(s => s.TrackCount),
-                TotalTrackCount = albumStatistics.Sum(s => s.TotalTrackCount),
-                SizeOnDisk = albumStatistics.Sum(s => s.SizeOnDisk)
-            };
+                                   {
+                                       AlbumStatistics = albumStatistics,
+                                       AlbumCount = albumStatistics.Count,
+                                       ArtistId = albumStatistics.First().ArtistId,
+                                       TrackFileCount = albumStatistics.Sum(s => s.TrackFileCount),
+                                       TrackCount = albumStatistics.Sum(s => s.TrackCount),
+                                       TotalTrackCount = albumStatistics.Sum(s => s.TotalTrackCount),
+                                       SizeOnDisk = albumStatistics.Sum(s => s.SizeOnDisk)
+                                   };
 
             return artistStatistics;
         }
@@ -80,20 +75,6 @@ namespace NzbDrone.Core.ArtistStats
         {
             _cache.Remove("AllArtists");
             _cache.Remove(message.Artist.Id.ToString());
-        }
-
-        [EventHandleOrder(EventHandleOrder.First)]
-        public void Handle(AlbumAddedEvent message)
-        {
-            _cache.Remove("AllArtists");
-            _cache.Remove(message.Album.ArtistId.ToString());
-        }
-
-        [EventHandleOrder(EventHandleOrder.First)]
-        public void Handle(AlbumDeletedEvent message)
-        {
-            _cache.Remove("AllArtists");
-            _cache.Remove(message.Album.ArtistId.ToString());
         }
 
         [EventHandleOrder(EventHandleOrder.First)]

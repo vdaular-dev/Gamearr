@@ -12,11 +12,8 @@ namespace NzbDrone.Core.Validation
 
         protected override bool IsValid(PropertyValidatorContext context)
         {
-            if (context.PropertyValue == null)
-            {
-                return false;
-            }
-
+            if (context.PropertyValue == null) return false;
+            
             return Guid.TryParse(context.PropertyValue.ToString(), out Guid guidOutput);
         }
     }

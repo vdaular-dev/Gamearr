@@ -1,18 +1,19 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using FizzWare.NBuilder;
 using FluentAssertions;
 using Moq;
 using NUnit.Framework;
 using NzbDrone.Core.Configuration;
-using NzbDrone.Core.DecisionEngine.Specifications;
 using NzbDrone.Core.History;
-using NzbDrone.Core.Indexers;
-using NzbDrone.Core.MediaFiles;
-using NzbDrone.Core.Music;
 using NzbDrone.Core.Parser.Model;
 using NzbDrone.Core.Qualities;
+using NzbDrone.Core.Music;
+using NzbDrone.Core.DecisionEngine.Specifications;
+using NzbDrone.Core.Indexers;
 using NzbDrone.Core.Test.Framework;
+using NzbDrone.Core.MediaFiles;
 
 namespace NzbDrone.Core.Test.DecisionEngineTests
 {
@@ -20,7 +21,7 @@ namespace NzbDrone.Core.Test.DecisionEngineTests
     public class AlreadyImportedSpecificationFixture : CoreTest<AlreadyImportedSpecification>
     {
         private const int FIRST_ALBUM_ID = 1;
-        private const string TITLE = "Some.Artist-Some.Album-2018-320kbps-CD-Lidarr";
+        private const string TITLE = "Some.Artist-Some.Album-2018-320kbps-CD-Gamearr";
 
         private Artist _artist;
         private QualityModel _mp3;

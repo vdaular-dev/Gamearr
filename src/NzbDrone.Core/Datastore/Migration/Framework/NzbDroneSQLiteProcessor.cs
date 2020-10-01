@@ -1,29 +1,27 @@
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
-using System.Text.RegularExpressions;
+using FluentMigrator;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
+using FluentMigrator.Runner;
+using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Generators.SQLite;
-using FluentMigrator.Runner.Initialization;
-using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.SQLite;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
+using System.Text.RegularExpressions;
 
 namespace NzbDrone.Core.Datastore.Migration.Framework
 {
-    public class NzbDroneSQLiteProcessor : SQLiteProcessor
+    public class NzbDroneSqliteProcessor : SQLiteProcessor
     {
-        public NzbDroneSQLiteProcessor(SQLiteDbFactory factory,
-                                       SQLiteGenerator generator,
-                                       ILogger<NzbDroneSQLiteProcessor> logger,
-                                       IOptionsSnapshot<ProcessorOptions> options,
-                                       IConnectionStringAccessor connectionStringAccessor,
-                                       IServiceProvider serviceProvider)
-        : base(factory, generator, logger, options, connectionStringAccessor, serviceProvider)
+        public NzbDroneSqliteProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, FluentMigrator.Runner.Processors.IDbFactory factory)
+            : base(connection, generator, announcer, options, factory)
         {
+
         }
+
+        public override bool SupportsTransactions => true;
 
         public override void Process(AlterColumnExpression expression)
         {
@@ -79,7 +77,6 @@ namespace NzbDrone.Core.Datastore.Migration.Framework
             {
                 throw new ApplicationException(string.Format("Column {0} does not exist on table {1}.", expression.OldName, expression.TableName));
             }
-
             if (columnDefinitions.Any(c => c.Name == expression.NewName))
             {
                 throw new ApplicationException(string.Format("Column {0} already exists on table {1}.", expression.NewName, expression.TableName));
@@ -107,9 +104,10 @@ namespace NzbDrone.Core.Datastore.Migration.Framework
             ProcessAlterTable(tableDefinition, oldColumnDefinitions);
         }
 
+
         protected virtual TableDefinition GetTableSchema(string tableName)
         {
-            var schemaDumper = new SqliteSchemaDumper(this);
+            var schemaDumper = new SqliteSchemaDumper(this, Announcer);
             var schema = schemaDumper.ReadDbSchema();
 
             return schema.Single(v => v.Name == tableName);
@@ -130,6 +128,7 @@ namespace NzbDrone.Core.Datastore.Migration.Framework
             var quoter = new SQLiteQuoter();
             var columnsToInsert = string.Join(", ", tableDefinition.Columns.Select(c => quoter.QuoteColumnName(c.Name)));
             var columnsToFetch = string.Join(", ", (oldColumnDefinitions ?? tableDefinition.Columns).Select(c => quoter.QuoteColumnName(c.Name)));
+
 
             Process(new CreateTableExpression() { TableName = tempTableName, Columns = tableDefinition.Columns.ToList() });
 

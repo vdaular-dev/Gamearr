@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import FilterMenuItem from './FilterMenuItem';
 import MenuContent from './MenuContent';
+import FilterMenuItem from './FilterMenuItem';
 import MenuItem from './MenuItem';
 import MenuItemSeparator from './MenuItemSeparator';
 
@@ -61,7 +61,7 @@ class FilterMenuContent extends Component {
         {
           showCustomFilters &&
             <MenuItem onPress={onCustomFiltersPress}>
-              Custom Filters
+                Custom Filters
             </MenuItem>
         }
       </MenuContent>

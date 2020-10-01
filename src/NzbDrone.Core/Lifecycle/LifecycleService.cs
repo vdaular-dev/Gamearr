@@ -21,6 +21,7 @@ namespace NzbDrone.Core.Lifecycle
         private readonly IServiceProvider _serviceProvider;
         private readonly Logger _logger;
 
+
         public LifecycleService(IEventAggregator eventAggregator,
                                 IRuntimeInfo runtimeInfo,
                                 IServiceProvider serviceProvider,

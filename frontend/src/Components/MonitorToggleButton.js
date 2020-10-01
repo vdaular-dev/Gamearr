@@ -1,13 +1,13 @@
-import classNames from 'classnames';
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import SpinnerIconButton from 'Components/Link/SpinnerIconButton';
+import classNames from 'classnames';
 import { icons } from 'Helpers/Props';
+import SpinnerIconButton from 'Components/Link/SpinnerIconButton';
 import styles from './MonitorToggleButton.css';
 
 function getTooltip(monitored, isDisabled) {
   if (isDisabled) {
-    return 'Cannot toggle monitored state when artist is unmonitored';
+    return 'Cannot toogle monitored state when artist is unmonitored';
   }
 
   if (monitored) {

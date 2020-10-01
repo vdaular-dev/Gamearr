@@ -1,12 +1,12 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import { inputTypes } from 'Helpers/Props';
+import LoadingIndicator from 'Components/Loading/LoadingIndicator';
 import FieldSet from 'Components/FieldSet';
 import Form from 'Components/Form/Form';
 import FormGroup from 'Components/Form/FormGroup';
-import FormInputGroup from 'Components/Form/FormInputGroup';
 import FormLabel from 'Components/Form/FormLabel';
-import LoadingIndicator from 'Components/Loading/LoadingIndicator';
-import { inputTypes } from 'Helpers/Props';
+import FormInputGroup from 'Components/Form/FormInputGroup';
 
 function IndexerOptions(props) {
   const {
@@ -88,7 +88,7 @@ function IndexerOptions(props) {
                 unit="minutes"
                 helpText="Interval in minutes. Set to zero to disable (this will stop all automatic release grabbing)"
                 helpTextWarning="This will apply to all indexers, please follow the rules set forth by them"
-                helpLink="https://github.com/Lidarr/Lidarr/wiki/RSS-Sync"
+                helpLink="https://github.com/Gamearr/Gamearr/wiki/RSS-Sync"
                 onChange={onInputChange}
                 {...settings.rssSyncInterval}
               />

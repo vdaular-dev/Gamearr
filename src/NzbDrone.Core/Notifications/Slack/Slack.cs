@@ -2,9 +2,11 @@ using System;
 using System.Collections.Generic;
 using FluentValidation.Results;
 using NzbDrone.Common.Extensions;
-using NzbDrone.Core.Music;
 using NzbDrone.Core.Notifications.Slack.Payloads;
+using NzbDrone.Core.Rest;
+using NzbDrone.Core.Music;
 using NzbDrone.Core.Validation;
+
 
 namespace NzbDrone.Core.Notifications.Slack
 {
@@ -148,10 +150,11 @@ namespace NzbDrone.Core.Notifications.Slack
         {
             try
             {
-                var message = $"Test message from Lidarr posted at {DateTime.Now}";
+                var message = $"Test message from Gamearr posted at {DateTime.Now}";
                 var payload = CreatePayload(message);
 
                 _proxy.SendPayload(payload, Settings);
+
             }
             catch (SlackExeption ex)
             {
@@ -163,7 +166,7 @@ namespace NzbDrone.Core.Notifications.Slack
 
         private SlackPayload CreatePayload(string message, List<Attachment> attachments = null)
         {
-            var icon = Settings.Icon;
+            var icon = GetIcon();
             var channel = Settings.Channel;
 
             var payload = new SlackPayload
@@ -192,6 +195,11 @@ namespace NzbDrone.Core.Notifications.Slack
             }
 
             return payload;
+        }
+
+        private string GetIcon()
+        {
+            return Settings.Icon;
         }
     }
 }

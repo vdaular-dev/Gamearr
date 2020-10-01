@@ -1,10 +1,10 @@
+using NLog;
+using NzbDrone.Common.Http;
+using NzbDrone.Core.Configuration;
 using System;
 using System.Linq;
 using System.Net;
-using NLog;
 using NzbDrone.Common.Cloud;
-using NzbDrone.Common.Http;
-using NzbDrone.Core.Configuration;
 using NzbDrone.Core.Configuration.Events;
 
 namespace NzbDrone.Core.HealthCheck.Checks
@@ -18,7 +18,7 @@ namespace NzbDrone.Core.HealthCheck.Checks
 
         private readonly IHttpRequestBuilderFactory _cloudRequestBuilder;
 
-        public ProxyCheck(ILidarrCloudRequestBuilder cloudRequestBuilder, IConfigService configService, IHttpClient client, Logger logger)
+        public ProxyCheck(IGamearrCloudRequestBuilder cloudRequestBuilder, IConfigService configService, IHttpClient client, Logger logger)
         {
             _configService = configService;
             _client = client;

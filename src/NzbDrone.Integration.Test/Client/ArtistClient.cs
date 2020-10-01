@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Net;
-using Lidarr.Api.V1.Artist;
+using Gamearr.Api.V1.Artist;
 using RestSharp;
 
 namespace NzbDrone.Integration.Test.Client
@@ -14,15 +14,15 @@ namespace NzbDrone.Integration.Test.Client
 
         public List<ArtistResource> Lookup(string term)
         {
-            var request = BuildRequest("lookup");
-            request.AddQueryParameter("term", term);
+            var request = BuildRequest("lookup?term={term}");
+            request.AddUrlSegment("term", term);
             return Get<List<ArtistResource>>(request);
         }
 
         public List<ArtistResource> Editor(ArtistEditorResource artist)
         {
             var request = BuildRequest("editor");
-            request.AddJsonBody(artist);
+            request.AddBody(artist);
             return Put<List<ArtistResource>>(request);
         }
 
@@ -31,6 +31,7 @@ namespace NzbDrone.Integration.Test.Client
             var request = BuildRequest(slug);
             return Get<ArtistResource>(request, statusCode);
         }
+
     }
 
     public class SystemInfoClient : ClientBase<ArtistResource>

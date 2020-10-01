@@ -1,8 +1,8 @@
-import classNames from 'classnames';
 import PropTypes from 'prop-types';
 import React from 'react';
-import Icon from 'Components/Icon';
+import classNames from 'classnames';
 import { icons } from 'Helpers/Props';
+import Icon from 'Components/Icon';
 import styles from './Message.css';
 
 function getIconName(name) {
@@ -17,8 +17,6 @@ function getIconName(name) {
       return icons.SEARCH;
     case 'Housekeeping':
       return icons.HOUSEKEEPING;
-    case 'RescanFolders':
-      return icons.RESCAN;
     case 'RefreshArtist':
       return icons.REFRESH;
     case 'RssSync':

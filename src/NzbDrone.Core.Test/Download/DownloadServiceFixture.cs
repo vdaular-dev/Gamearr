@@ -10,9 +10,10 @@ using NzbDrone.Core.Download;
 using NzbDrone.Core.Download.Clients;
 using NzbDrone.Core.Exceptions;
 using NzbDrone.Core.Indexers;
-using NzbDrone.Core.Music;
 using NzbDrone.Core.Parser.Model;
 using NzbDrone.Core.Test.Framework;
+using NzbDrone.Core.Music;
+using NzbDrone.Test.Common;
 
 namespace NzbDrone.Core.Test.Download
 {
@@ -81,7 +82,7 @@ namespace NzbDrone.Core.Test.Download
         {
             var mock = WithUsenetClient();
             mock.Setup(s => s.Download(It.IsAny<RemoteAlbum>()));
-
+            
             Subject.DownloadReport(_parseResult);
 
             VerifyEventPublished<AlbumGrabbedEvent>();
@@ -92,7 +93,7 @@ namespace NzbDrone.Core.Test.Download
         {
             var mock = WithUsenetClient();
             mock.Setup(s => s.Download(It.IsAny<RemoteAlbum>()));
-
+            
             Subject.DownloadReport(_parseResult);
 
             mock.Verify(s => s.Download(It.IsAny<RemoteAlbum>()), Times.Once());
@@ -115,9 +116,8 @@ namespace NzbDrone.Core.Test.Download
         {
             var mock = WithUsenetClient();
             mock.Setup(s => s.Download(It.IsAny<RemoteAlbum>()))
-                .Callback<RemoteAlbum>(v =>
-                {
-                    throw new ReleaseDownloadException(v.Release, "Error", new WebException());
+                .Callback<RemoteAlbum>(v => {
+                    throw new ReleaseDownloadException(v.Release, "Error", new WebException()); 
                 });
 
             Assert.Throws<ReleaseDownloadException>(() => Subject.DownloadReport(_parseResult));
@@ -135,9 +135,8 @@ namespace NzbDrone.Core.Test.Download
 
             var mock = WithUsenetClient();
             mock.Setup(s => s.Download(It.IsAny<RemoteAlbum>()))
-                .Callback<RemoteAlbum>(v =>
-                {
-                    throw new ReleaseDownloadException(v.Release, "Error", new TooManyRequestsException(request, response));
+                .Callback<RemoteAlbum>(v => {
+                    throw new ReleaseDownloadException(v.Release, "Error", new TooManyRequestsException(request, response)); 
                 });
 
             Assert.Throws<ReleaseDownloadException>(() => Subject.DownloadReport(_parseResult));
@@ -164,7 +163,7 @@ namespace NzbDrone.Core.Test.Download
 
             Mocker.GetMock<IIndexerStatusService>()
                 .Verify(v => v.RecordFailure(It.IsAny<int>(),
-                    It.IsInRange<TimeSpan>(TimeSpan.FromMinutes(4.9), TimeSpan.FromMinutes(5.1), Moq.Range.Inclusive)), Times.Once());
+                    It.IsInRange<TimeSpan>(TimeSpan.FromMinutes(4.9), TimeSpan.FromMinutes(5.1), Range.Inclusive)), Times.Once());
         }
 
         [Test]
@@ -185,8 +184,7 @@ namespace NzbDrone.Core.Test.Download
         {
             var mock = WithUsenetClient();
             mock.Setup(s => s.Download(It.IsAny<RemoteAlbum>()))
-                .Callback<RemoteAlbum>(v =>
-                {
+                .Callback<RemoteAlbum>(v => {
                     throw new ReleaseUnavailableException(v.Release, "Error", new WebException());
                 });
 

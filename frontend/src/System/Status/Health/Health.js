@@ -1,16 +1,16 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import FieldSet from 'Components/FieldSet';
+import titleCase from 'Utilities/String/titleCase';
+import { icons, kinds } from 'Helpers/Props';
 import Icon from 'Components/Icon';
 import IconButton from 'Components/Link/IconButton';
 import SpinnerIconButton from 'Components/Link/SpinnerIconButton';
 import LoadingIndicator from 'Components/Loading/LoadingIndicator';
-import TableRowCell from 'Components/Table/Cells/TableRowCell';
+import FieldSet from 'Components/FieldSet';
 import Table from 'Components/Table/Table';
 import TableBody from 'Components/Table/TableBody';
 import TableRow from 'Components/Table/TableRow';
-import { icons, kinds } from 'Helpers/Props';
-import titleCase from 'Utilities/String/titleCase';
+import TableRowCell from 'Components/Table/Cells/TableRowCell';
 import styles from './Health.css';
 
 function getInternalLink(source) {
@@ -39,7 +39,7 @@ function getInternalLink(source) {
     case 'RootFolderCheck':
       return (
         <IconButton
-          name={icons.ARTIST_CONTINUING}
+          name={icons.GAME_CONTINUING}
           title="Artist Editor"
           to="/artisteditor"
         />

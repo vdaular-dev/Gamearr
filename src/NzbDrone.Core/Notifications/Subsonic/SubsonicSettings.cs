@@ -1,4 +1,5 @@
 using FluentValidation;
+using Newtonsoft.Json;
 using NzbDrone.Common.Extensions;
 using NzbDrone.Core.Annotations;
 using NzbDrone.Core.ThingiProvider;
@@ -27,7 +28,7 @@ namespace NzbDrone.Core.Notifications.Subsonic
 
         [FieldDefinition(0, Label = "Host")]
         public string Host { get; set; }
-
+        
         [FieldDefinition(1, Label = "Port")]
         public int Port { get; set; }
 

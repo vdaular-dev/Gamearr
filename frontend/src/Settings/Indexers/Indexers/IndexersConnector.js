@@ -2,22 +2,23 @@ import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
-import { cloneIndexer, deleteIndexer, fetchIndexers } from 'Store/Actions/settingsActions';
-import createSortedSectionSelector from 'Store/Selectors/createSortedSectionSelector';
-import sortByName from 'Utilities/Array/sortByName';
+import { fetchIndexers, deleteIndexer } from 'Store/Actions/settingsActions';
 import Indexers from './Indexers';
 
 function createMapStateToProps() {
   return createSelector(
-    createSortedSectionSelector('settings.indexers', sortByName),
-    (indexers) => indexers
+    (state) => state.settings.indexers,
+    (indexers) => {
+      return {
+        ...indexers
+      };
+    }
   );
 }
 
 const mapDispatchToProps = {
-  dispatchFetchIndexers: fetchIndexers,
-  dispatchDeleteIndexer: deleteIndexer,
-  dispatchCloneIndexer: cloneIndexer
+  fetchIndexers,
+  deleteIndexer
 };
 
 class IndexersConnector extends Component {
@@ -26,14 +27,14 @@ class IndexersConnector extends Component {
   // Lifecycle
 
   componentDidMount() {
-    this.props.dispatchFetchIndexers();
+    this.props.fetchIndexers();
   }
 
   //
   // Listeners
 
   onConfirmDeleteIndexer = (id) => {
-    this.props.dispatchDeleteIndexer({ id });
+    this.props.deleteIndexer({ id });
   }
 
   //
@@ -50,9 +51,8 @@ class IndexersConnector extends Component {
 }
 
 IndexersConnector.propTypes = {
-  dispatchFetchIndexers: PropTypes.func.isRequired,
-  dispatchDeleteIndexer: PropTypes.func.isRequired,
-  dispatchCloneIndexer: PropTypes.func.isRequired
+  fetchIndexers: PropTypes.func.isRequired,
+  deleteIndexer: PropTypes.func.isRequired
 };
 
 export default connect(createMapStateToProps, mapDispatchToProps)(IndexersConnector);

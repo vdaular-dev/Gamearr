@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using FizzWare.NBuilder;
 using FluentAssertions;
 using Moq;
 using NUnit.Framework;
@@ -8,6 +7,7 @@ using NzbDrone.Common.Disk;
 using NzbDrone.Core.RemotePathMappings;
 using NzbDrone.Core.Test.Framework;
 using NzbDrone.Test.Common;
+using FizzWare.NBuilder;
 
 namespace NzbDrone.Core.Test.RemotePathMappingsTests
 {
@@ -72,7 +72,7 @@ namespace NzbDrone.Core.Test.RemotePathMappingsTests
             Subject.Remove(1);
             Mocker.GetMock<IRemotePathMappingRepository>().Verify(c => c.Delete(1), Times.Once());
         }
-
+        
         [TestCase("my-server.localdomain", "/mnt/storage", @"D:\mountedstorage")]
         [TestCase("my-server.localdomain", "/mnt/storage", @"D:\mountedstorage2")]
         public void adding_duplicated_mapping_should_throw(string host, string remotePath, string localPath)
@@ -87,7 +87,6 @@ namespace NzbDrone.Core.Test.RemotePathMappingsTests
         }
 
         [TestCase("my-server.localdomain", "/mnt/storage/downloads/tv", @"D:\mountedstorage\downloads\tv")]
-        [TestCase("My-Server.localdomain", "/mnt/storage/downloads/tv", @"D:\mountedstorage\downloads\tv")]
         [TestCase("my-2server.localdomain", "/mnt/storage/downloads/tv", "/mnt/storage/downloads/tv")]
         [TestCase("my-server.localdomain", "/mnt/storageabc/downloads/tv", "/mnt/storageabc/downloads/tv")]
         public void should_remap_remote_to_local(string host, string remotePath, string expectedLocalPath)
@@ -102,7 +101,6 @@ namespace NzbDrone.Core.Test.RemotePathMappingsTests
         }
 
         [TestCase("my-server.localdomain", "/mnt/storage/downloads/tv", @"D:\mountedstorage\downloads\tv")]
-        [TestCase("My-Server.localdomain", "/mnt/storage/downloads/tv", @"D:\mountedstorage\downloads\tv")]
         [TestCase("my-server.localdomain", "/mnt/storage/", @"D:\mountedstorage")]
         [TestCase("my-2server.localdomain", "/mnt/storage/downloads/tv", "/mnt/storage/downloads/tv")]
         [TestCase("my-server.localdomain", "/mnt/storageabc/downloads/tv", "/mnt/storageabc/downloads/tv")]
@@ -128,7 +126,7 @@ namespace NzbDrone.Core.Test.RemotePathMappingsTests
             {
                 Host = "my-server.localdomain",
                 RemotePath = remotePath,
-                LocalPath = @"D:\mountedstorage\downloads\tv".AsOsAgnostic()
+                LocalPath = @"D:\mountedstorage\downloads\tv" .AsOsAgnostic()
             };
 
             var result = Subject.Add(mapping);

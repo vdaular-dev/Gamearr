@@ -1,8 +1,8 @@
-import classNames from 'classnames';
 import PropTypes from 'prop-types';
 import React from 'react';
-import Icon from 'Components/Icon';
+import classNames from 'classnames';
 import { icons } from 'Helpers/Props';
+import Icon from 'Components/Icon';
 import Button from './Button';
 import styles from './SpinnerButton.css';
 

@@ -1,10 +1,11 @@
+import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
 import { grabQueueItem, removeQueueItem } from 'Store/Actions/queueActions';
-import createAlbumSelector from 'Store/Selectors/createAlbumSelector';
 import createArtistSelector from 'Store/Selectors/createArtistSelector';
+import createAlbumSelector from 'Store/Selectors/createAlbumSelector';
 import createUISettingsSelector from 'Store/Selectors/createUISettingsSelector';
 import QueueRow from './QueueRow';
 
@@ -14,11 +15,11 @@ function createMapStateToProps() {
     createAlbumSelector(),
     createUISettingsSelector(),
     (artist, album, uiSettings) => {
-      const result = {
-        showRelativeDates: uiSettings.showRelativeDates,
-        shortDateFormat: uiSettings.shortDateFormat,
-        timeFormat: uiSettings.timeFormat
-      };
+      const result = _.pick(uiSettings, [
+        'showRelativeDates',
+        'shortDateFormat',
+        'timeFormat'
+      ]);
 
       result.artist = artist;
       result.album = album;
@@ -42,8 +43,8 @@ class QueueRowConnector extends Component {
     this.props.grabQueueItem({ id: this.props.id });
   }
 
-  onRemoveQueueItemPress = (payload) => {
-    this.props.removeQueueItem({ id: this.props.id, ...payload });
+  onRemoveQueueItemPress = (blacklist, skipredownload) => {
+    this.props.removeQueueItem({ id: this.props.id, blacklist, skipredownload });
   }
 
   //

@@ -1,13 +1,13 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import Card from 'Components/Card';
+import sortByName from 'Utilities/Array/sortByName';
+import { icons } from 'Helpers/Props';
 import FieldSet from 'Components/FieldSet';
+import Card from 'Components/Card';
 import Icon from 'Components/Icon';
 import PageSectionContent from 'Components/Page/PageSectionContent';
-import { icons, metadataProfileNames } from 'Helpers/Props';
-import sortByName from 'Utilities/Array/sortByName';
-import EditMetadataProfileModalConnector from './EditMetadataProfileModalConnector';
 import MetadataProfile from './MetadataProfile';
+import EditMetadataProfileModalConnector from './EditMetadataProfileModalConnector';
 import styles from './MetadataProfiles.css';
 
 class MetadataProfiles extends Component {
@@ -58,7 +58,7 @@ class MetadataProfiles extends Component {
         >
           <div className={styles.metadataProfiles}>
             {
-              items.filter((item) => item.name !== metadataProfileNames.NONE).sort(sortByName).map((item) => {
+              items.sort(sortByName).map((item) => {
                 return (
                   <MetadataProfile
                     key={item.id}

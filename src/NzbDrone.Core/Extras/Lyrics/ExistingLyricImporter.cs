@@ -4,9 +4,10 @@ using System.Linq;
 using NLog;
 using NzbDrone.Common.Extensions;
 using NzbDrone.Core.Extras.Files;
-using NzbDrone.Core.MediaFiles.TrackImport.Aggregation;
+using NzbDrone.Core.Parser;
 using NzbDrone.Core.Music;
 using NzbDrone.Core.Parser.Model;
+using NzbDrone.Core.MediaFiles.TrackImport.Aggregation;
 
 namespace NzbDrone.Core.Extras.Lyrics
 {
@@ -19,7 +20,7 @@ namespace NzbDrone.Core.Extras.Lyrics
         public ExistingLyricImporter(IExtraFileService<LyricFile> lyricFileService,
                                      IAugmentingService augmentingService,
                                      Logger logger)
-            : base(lyricFileService)
+            : base (lyricFileService)
         {
             _lyricFileService = lyricFileService;
             _augmentingService = augmentingService;
@@ -71,13 +72,13 @@ namespace NzbDrone.Core.Extras.Lyrics
                     }
 
                     var subtitleFile = new LyricFile
-                    {
-                        ArtistId = artist.Id,
-                        AlbumId = localTrack.Album.Id,
-                        TrackFileId = localTrack.Tracks.First().TrackFileId,
-                        RelativePath = artist.Path.GetRelativePath(possibleLyricFile),
-                        Extension = extension
-                    };
+                                       {
+                                           ArtistId = artist.Id,
+                                           AlbumId = localTrack.Album.Id,
+                                           TrackFileId = localTrack.Tracks.First().TrackFileId,
+                                           RelativePath = artist.Path.GetRelativePath(possibleLyricFile),
+                                           Extension = extension
+                                       };
 
                     subtitleFiles.Add(subtitleFile);
                 }
@@ -88,6 +89,7 @@ namespace NzbDrone.Core.Extras.Lyrics
 
             // Return files that were just imported along with files that were
             // previously imported so previously imported files aren't imported twice
+
             return subtitleFiles.Concat(filterResult.PreviouslyImported);
         }
     }

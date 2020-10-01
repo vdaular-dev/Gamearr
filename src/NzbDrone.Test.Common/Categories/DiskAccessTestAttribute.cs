@@ -7,6 +7,7 @@ namespace NzbDrone.Test.Common.Categories
         public DiskAccessTestAttribute()
             : base("DiskAccessTest")
         {
+
         }
     }
 }

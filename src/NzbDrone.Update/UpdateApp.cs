@@ -7,6 +7,7 @@ using NzbDrone.Common.EnvironmentInfo;
 using NzbDrone.Common.Extensions;
 using NzbDrone.Common.Instrumentation;
 using NzbDrone.Common.Processes;
+using NzbDrone.Common.Security;
 using NzbDrone.Update.UpdateEngine;
 
 namespace NzbDrone.Update
@@ -15,10 +16,9 @@ namespace NzbDrone.Update
     {
         private readonly IInstallUpdateService _installUpdateService;
         private readonly IProcessProvider _processProvider;
+        private static IContainer _container;
 
         private static readonly Logger Logger = NzbDroneLogger.GetLogger(typeof(UpdateApp));
-
-        private static IContainer _container;
 
         public UpdateApp(IInstallUpdateService installUpdateService, IProcessProvider processProvider)
         {
@@ -30,10 +30,13 @@ namespace NzbDrone.Update
         {
             try
             {
+                SecurityProtocolPolicy.Register();
+                X509CertificateValidationPolicy.Register();
+
                 var startupContext = new StartupContext(args);
                 NzbDroneLogger.Register(startupContext, true, true);
 
-                Logger.Info("Starting Lidarr Update Client");
+                Logger.Info("Starting Gamearr Update Client");
 
                 _container = UpdateContainerBuilder.Build(startupContext);
                 _container.Resolve<InitializeLogger>().Initialize();
@@ -101,7 +104,7 @@ namespace NzbDrone.Update
                 throw new ArgumentOutOfRangeException(nameof(arg), "Invalid process ID");
             }
 
-            Logger.Debug("Lidarr process ID: {0}", id);
+            Logger.Debug("Gamearr process ID: {0}", id);
             return id;
         }
 
@@ -115,6 +118,7 @@ namespace NzbDrone.Update
 
                 return exeFileInfo.DirectoryName;
             }
+
             else
             {
                 Logger.Debug("Using executing application: {0}", startupContext.ExecutingApplication);

@@ -14,5 +14,6 @@ namespace NzbDrone.Core.Test.OrganizerTests
         {
             FileNameBuilder.CleanFileName(name).Should().Be(expectedName);
         }
+
     }
 }

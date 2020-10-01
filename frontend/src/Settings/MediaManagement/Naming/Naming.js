@@ -1,13 +1,13 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
+import { inputTypes, sizes } from 'Helpers/Props';
+import LoadingIndicator from 'Components/Loading/LoadingIndicator';
+import FormInputButton from 'Components/Form/FormInputButton';
 import FieldSet from 'Components/FieldSet';
 import Form from 'Components/Form/Form';
 import FormGroup from 'Components/Form/FormGroup';
-import FormInputButton from 'Components/Form/FormInputButton';
-import FormInputGroup from 'Components/Form/FormInputGroup';
 import FormLabel from 'Components/Form/FormLabel';
-import LoadingIndicator from 'Components/Loading/LoadingIndicator';
-import { inputTypes, sizes } from 'Helpers/Props';
+import FormInputGroup from 'Components/Form/FormInputGroup';
 import NamingModal from './NamingModal';
 import styles from './Naming.css';
 
@@ -133,7 +133,7 @@ class Naming extends Component {
     }
 
     return (
-      <FieldSet legend="Track Naming">
+      <FieldSet legend="Game Naming">
         {
           isFetching &&
             <LoadingIndicator />
@@ -148,12 +148,12 @@ class Naming extends Component {
           hasSettings && !isFetching && !error &&
             <Form>
               <FormGroup size={sizes.MEDIUM}>
-                <FormLabel>Rename Tracks</FormLabel>
+                <FormLabel>Rename Games</FormLabel>
 
                 <FormInputGroup
                   type={inputTypes.CHECK}
                   name="renameTracks"
-                  helpText="Lidarr will use the existing file name if renaming is disabled"
+                  helpText="Gamearr will use the existing file name if renaming is disabled"
                   onChange={onInputChange}
                   {...settings.renameTracks}
                 />
@@ -211,7 +211,7 @@ class Naming extends Component {
                 advancedSettings={advancedSettings}
                 isAdvanced={true}
               >
-                <FormLabel>Artist Folder Format</FormLabel>
+                <FormLabel>Game Folder Format</FormLabel>
 
                 <FormInputGroup
                   inputClassName={styles.namingInput}
@@ -220,23 +220,8 @@ class Naming extends Component {
                   buttons={<FormInputButton onPress={this.onArtistFolderNamingModalOpenClick}>?</FormInputButton>}
                   onChange={onInputChange}
                   {...settings.artistFolderFormat}
-                  helpTexts={['Used when adding a new artist or moving an artist via the artist editor', ...artistFolderFormatHelpTexts]}
+                  helpTexts={['Used when adding a new game or moving an game via the game editor', ...artistFolderFormatHelpTexts]}
                   errors={[...artistFolderFormatErrors, ...settings.artistFolderFormat.errors]}
-                />
-              </FormGroup>
-
-              <FormGroup>
-                <FormLabel>Album Folder Format</FormLabel>
-
-                <FormInputGroup
-                  inputClassName={styles.namingInput}
-                  type={inputTypes.TEXT}
-                  name="albumFolderFormat"
-                  buttons={<FormInputButton onPress={this.onAlbumFolderNamingModalOpenClick}>?</FormInputButton>}
-                  onChange={onInputChange}
-                  {...settings.albumFolderFormat}
-                  helpTexts={albumFolderFormatHelpTexts}
-                  errors={[...albumFolderFormatErrors, ...settings.albumFolderFormat.errors]}
                 />
               </FormGroup>
 

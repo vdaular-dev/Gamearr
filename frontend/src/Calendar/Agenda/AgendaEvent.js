@@ -1,13 +1,13 @@
-import classNames from 'classnames';
 import moment from 'moment';
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import CalendarEventQueueDetails from 'Calendar/Events/CalendarEventQueueDetails';
+import classNames from 'classnames';
+import formatTime from 'Utilities/Date/formatTime';
+import { icons } from 'Helpers/Props';
 import getStatusStyle from 'Calendar/getStatusStyle';
 import Icon from 'Components/Icon';
 import Link from 'Components/Link/Link';
-import { icons } from 'Helpers/Props';
-import formatTime from 'Utilities/Date/formatTime';
+import CalendarEventQueueDetails from 'Calendar/Events/CalendarEventQueueDetails';
 import styles from './AgendaEvent.css';
 
 class AgendaEvent extends Component {

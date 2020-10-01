@@ -1,8 +1,8 @@
 using FizzWare.NBuilder;
 using FluentAssertions;
 using NUnit.Framework;
-using NzbDrone.Core.Music;
 using NzbDrone.Core.Organizer;
+using NzbDrone.Core.Music;
 using NzbDrone.Core.Test.Framework;
 using NzbDrone.Test.Common;
 
@@ -12,15 +12,15 @@ namespace NzbDrone.Core.Test.OrganizerTests
 
     public class BuildFilePathFixture : CoreTest<FileNameBuilder>
     {
-        private NamingConfig _namingConfig;
+        private NamingConfig namingConfig;
 
         [SetUp]
         public void Setup()
         {
-            _namingConfig = NamingConfig.Default;
+            namingConfig = NamingConfig.Default;
 
             Mocker.GetMock<INamingConfigService>()
-                  .Setup(c => c.GetConfig()).Returns(_namingConfig);
+                  .Setup(c => c.GetConfig()).Returns(namingConfig);
         }
 
         [Test]
@@ -39,7 +39,7 @@ namespace NzbDrone.Core.Test.OrganizerTests
                 .With(s => s.Title = "Fake: Album")
                 .Build();
 
-            _namingConfig.AlbumFolderFormat = "{Artist Name} {Album Title}";
+            namingConfig.AlbumFolderFormat = "{Artist Name} {Album Title}";
 
             Subject.BuildTrackFilePath(fakeArtist, fakeAlbum, filename, ".flac").Should().Be(expectedPath.AsOsAgnostic());
         }

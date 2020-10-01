@@ -1,10 +1,10 @@
-import classNames from 'classnames';
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { Manager, Popper, Reference } from 'react-popper';
-import Portal from 'Components/Portal';
-import { kinds, tooltipPositions } from 'Helpers/Props';
+import classNames from 'classnames';
 import { isMobile as isMobileUtil } from 'Utilities/mobile';
+import { kinds, tooltipPositions } from 'Helpers/Props';
+import Portal from 'Components/Portal';
 import styles from './Tooltip.css';
 
 class Tooltip extends Component {
@@ -54,9 +54,9 @@ class Tooltip extends Component {
     } else if ((/^bottom/).test(data.placement)) {
       data.styles.maxHeight = windowHeight - bottom - 20;
     } else if ((/^right/).test(data.placement)) {
-      data.styles.maxWidth = windowWidth - right - 35;
+      data.styles.maxWidth = windowWidth - right - 30;
     } else {
-      data.styles.maxWidth = left - 35;
+      data.styles.maxWidth = left - 30;
     }
 
     return data;

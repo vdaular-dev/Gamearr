@@ -4,13 +4,14 @@ using System.Linq;
 using NLog;
 using NzbDrone.Common.Extensions;
 using NzbDrone.Core.Download;
-using NzbDrone.Core.HealthCheck;
 using NzbDrone.Core.MediaFiles;
 using NzbDrone.Core.MediaFiles.Events;
 using NzbDrone.Core.Messaging.Events;
-using NzbDrone.Core.Music;
 using NzbDrone.Core.Qualities;
 using NzbDrone.Core.ThingiProvider;
+using NzbDrone.Core.Music;
+using NzbDrone.Core.HealthCheck;
+using System.IO;
 
 namespace NzbDrone.Core.Notifications
 {
@@ -21,9 +22,7 @@ namespace NzbDrone.Core.Notifications
           IHandle<HealthCheckFailedEvent>,
           IHandle<DownloadFailedEvent>,
           IHandle<AlbumImportIncompleteEvent>,
-          IHandle<TrackFileRetaggedEvent>,
-          IHandleAsync<RenameCompletedEvent>,
-          IHandleAsync<HealthCheckCompleteEvent>
+          IHandle<TrackFileRetaggedEvent>
     {
         private readonly INotificationFactory _notificationFactory;
         private readonly Logger _logger;
@@ -43,6 +42,7 @@ namespace NzbDrone.Core.Notifications
                 qualityString += " Proper";
             }
 
+
             var albumTitles = string.Join(" + ", albums.Select(e => e.Title));
 
             return string.Format("{0} - {1} - [{2}]",
@@ -61,7 +61,7 @@ namespace NzbDrone.Core.Notifications
 
         private string GetAlbumIncompleteImportMessage(string source)
         {
-            return string.Format("Lidarr failed to Import all tracks for {0}",
+            return string.Format("Gamearr failed to Import all tracks for {0}",
                 source);
         }
 
@@ -128,13 +128,10 @@ namespace NzbDrone.Core.Notifications
             {
                 try
                 {
-                    if (!ShouldHandleArtist(notification.Definition, message.Album.Artist))
-                    {
-                        continue;
-                    }
-
+                    if (!ShouldHandleArtist(notification.Definition, message.Album.Artist)) continue;
                     notification.OnGrab(grabMessage);
                 }
+
                 catch (Exception ex)
                 {
                     _logger.Error(ex, "Unable to send OnGrab notification to {0}", notification.Definition.Name);
@@ -150,6 +147,7 @@ namespace NzbDrone.Core.Notifications
             }
 
             var downloadMessage = new AlbumDownloadMessage
+
             {
                 Message = GetAlbumDownloadMessage(message.Artist, message.Album, message.ImportedTracks),
                 Artist = message.Artist,
@@ -173,6 +171,7 @@ namespace NzbDrone.Core.Notifications
                         }
                     }
                 }
+
                 catch (Exception ex)
                 {
                     _logger.Warn(ex, "Unable to send OnReleaseImport notification to: " + notification.Definition.Name);
@@ -191,6 +190,7 @@ namespace NzbDrone.Core.Notifications
                         notification.OnRename(message.Artist);
                     }
                 }
+
                 catch (Exception ex)
                 {
                     _logger.Warn(ex, "Unable to send OnRename notification to: " + notification.Definition.Name);
@@ -209,6 +209,7 @@ namespace NzbDrone.Core.Notifications
                         notification.OnHealthIssue(message.HealthCheck);
                     }
                 }
+
                 catch (Exception ex)
                 {
                     _logger.Warn(ex, "Unable to send OnHealthIssue notification to: " + notification.Definition.Name);
@@ -271,31 +272,6 @@ namespace NzbDrone.Core.Notifications
                 if (ShouldHandleArtist(notification.Definition, message.Artist))
                 {
                     notification.OnTrackRetag(retagMessage);
-                }
-            }
-        }
-
-        public void HandleAsync(RenameCompletedEvent message)
-        {
-            ProcessQueue();
-        }
-
-        public void HandleAsync(HealthCheckCompleteEvent message)
-        {
-            ProcessQueue();
-        }
-
-        private void ProcessQueue()
-        {
-            foreach (var notification in _notificationFactory.GetAvailableProviders())
-            {
-                try
-                {
-                    notification.ProcessQueue();
-                }
-                catch (Exception ex)
-                {
-                    _logger.Warn(ex, "Unable to process notification queue for " + notification.Definition.Name);
                 }
             }
         }

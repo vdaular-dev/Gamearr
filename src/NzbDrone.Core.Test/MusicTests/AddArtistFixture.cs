@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using FizzWare.NBuilder;
@@ -8,8 +9,8 @@ using Moq;
 using NUnit.Framework;
 using NzbDrone.Core.Exceptions;
 using NzbDrone.Core.MetadataSource;
-using NzbDrone.Core.Music;
 using NzbDrone.Core.Organizer;
+using NzbDrone.Core.Music;
 using NzbDrone.Core.Test.Framework;
 using NzbDrone.Test.Common;
 
@@ -30,10 +31,10 @@ namespace NzbDrone.Core.Test.MusicTests
             _fakeArtist.Albums = new List<Album>();
         }
 
-        private void GivenValidArtist(string lidarrId)
+        private void GivenValidArtist(string gamearrId)
         {
             Mocker.GetMock<IProvideArtistInfo>()
-                .Setup(s => s.GetArtistInfo(lidarrId, It.IsAny<int>()))
+                .Setup(s => s.GetArtistInfo(gamearrId, It.IsAny<int>()))
                 .Returns(_fakeArtist);
         }
 
@@ -60,7 +61,7 @@ namespace NzbDrone.Core.Test.MusicTests
             GivenValidArtist(newArtist.ForeignArtistId);
             GivenValidPath();
 
-            var artist = Subject.AddArtist(newArtist);
+            var artist = Subject.AddGame(newArtist);
 
             artist.Name.Should().Be(_fakeArtist.Name);
         }
@@ -69,15 +70,15 @@ namespace NzbDrone.Core.Test.MusicTests
         public void should_have_proper_path()
         {
             var newArtist = new Artist
-            {
-                ForeignArtistId = "ce09ea31-3d4a-4487-a797-e315175457a0",
-                RootFolderPath = @"C:\Test\Music"
-            };
+                            {
+                                ForeignArtistId = "ce09ea31-3d4a-4487-a797-e315175457a0",
+                                RootFolderPath = @"C:\Test\Music"
+                            };
 
             GivenValidArtist(newArtist.ForeignArtistId);
             GivenValidPath();
 
-            var artist = Subject.AddArtist(newArtist);
+            var artist = Subject.AddGame(newArtist);
 
             artist.Path.Should().Be(Path.Combine(newArtist.RootFolderPath, _fakeArtist.Name));
         }
@@ -100,7 +101,7 @@ namespace NzbDrone.Core.Test.MusicTests
                                                     new ValidationFailure("Path", "Test validation failure")
                                                 }));
 
-            Assert.Throws<ValidationException>(() => Subject.AddArtist(newArtist));
+            Assert.Throws<ValidationException>(() => Subject.AddGame(newArtist));
         }
 
         [Test]
@@ -123,95 +124,9 @@ namespace NzbDrone.Core.Test.MusicTests
                                                     new ValidationFailure("Path", "Test validation failure")
                                                 }));
 
-            Assert.Throws<ValidationException>(() => Subject.AddArtist(newArtist));
+            Assert.Throws<ValidationException>(() => Subject.AddGame(newArtist));
 
             ExceptionVerification.ExpectedErrors(1);
-        }
-
-        [Test]
-        public void should_disambiguate_if_artist_folder_exists()
-        {
-            var newArtist = new Artist
-            {
-                ForeignArtistId = "ce09ea31-3d4a-4487-a797-e315175457a0",
-                Path = @"C:\Test\Music\Name1",
-            };
-
-            _fakeArtist.Metadata = Builder<ArtistMetadata>.CreateNew().With(x => x.Disambiguation = "Disambiguation").Build();
-
-            GivenValidArtist(newArtist.ForeignArtistId);
-            GivenValidPath();
-
-            Mocker.GetMock<IArtistService>()
-                .Setup(x => x.ArtistPathExists(newArtist.Path))
-                .Returns(true);
-
-            var artist = Subject.AddArtist(newArtist);
-            artist.Path.Should().Be(newArtist.Path + " (Disambiguation)");
-        }
-
-        [Test]
-        public void should_disambiguate_with_numbers_if_artist_folder_still_exists()
-        {
-            var newArtist = new Artist
-            {
-                ForeignArtistId = "ce09ea31-3d4a-4487-a797-e315175457a0",
-                Path = @"C:\Test\Music\Name1",
-            };
-
-            _fakeArtist.Metadata = Builder<ArtistMetadata>.CreateNew().With(x => x.Disambiguation = "Disambiguation").Build();
-
-            GivenValidArtist(newArtist.ForeignArtistId);
-            GivenValidPath();
-
-            Mocker.GetMock<IArtistService>()
-                .Setup(x => x.ArtistPathExists(newArtist.Path))
-                .Returns(true);
-
-            Mocker.GetMock<IArtistService>()
-                .Setup(x => x.ArtistPathExists(newArtist.Path + " (Disambiguation)"))
-                .Returns(true);
-
-            Mocker.GetMock<IArtistService>()
-                .Setup(x => x.ArtistPathExists(newArtist.Path + " (Disambiguation) (1)"))
-                .Returns(true);
-
-            Mocker.GetMock<IArtistService>()
-                .Setup(x => x.ArtistPathExists(newArtist.Path + " (Disambiguation) (2)"))
-                .Returns(true);
-
-            var artist = Subject.AddArtist(newArtist);
-            artist.Path.Should().Be(newArtist.Path + " (Disambiguation) (3)");
-        }
-
-        [Test]
-        public void should_disambiguate_with_numbers_if_artist_folder_exists_and_no_disambiguation()
-        {
-            var newArtist = new Artist
-            {
-                ForeignArtistId = "ce09ea31-3d4a-4487-a797-e315175457a0",
-                Path = @"C:\Test\Music\Name1",
-            };
-
-            _fakeArtist.Metadata = Builder<ArtistMetadata>.CreateNew().With(x => x.Disambiguation = string.Empty).Build();
-
-            GivenValidArtist(newArtist.ForeignArtistId);
-            GivenValidPath();
-
-            Mocker.GetMock<IArtistService>()
-                .Setup(x => x.ArtistPathExists(newArtist.Path))
-                .Returns(true);
-
-            Mocker.GetMock<IArtistService>()
-                .Setup(x => x.ArtistPathExists(newArtist.Path + " (1)"))
-                .Returns(true);
-
-            Mocker.GetMock<IArtistService>()
-                .Setup(x => x.ArtistPathExists(newArtist.Path + " (2)"))
-                .Returns(true);
-
-            var artist = Subject.AddArtist(newArtist);
-            artist.Path.Should().Be(newArtist.Path + " (3)");
         }
     }
 }

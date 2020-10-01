@@ -1,17 +1,17 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import Alert from 'Components/Alert';
-import CheckInput from 'Components/Form/CheckInput';
-import Button from 'Components/Link/Button';
-import LoadingIndicator from 'Components/Loading/LoadingIndicator';
-import ModalBody from 'Components/Modal/ModalBody';
-import ModalContent from 'Components/Modal/ModalContent';
-import ModalFooter from 'Components/Modal/ModalFooter';
-import ModalHeader from 'Components/Modal/ModalHeader';
-import { kinds } from 'Helpers/Props';
 import getSelectedIds from 'Utilities/Table/getSelectedIds';
 import selectAll from 'Utilities/Table/selectAll';
 import toggleSelected from 'Utilities/Table/toggleSelected';
+import { kinds } from 'Helpers/Props';
+import Alert from 'Components/Alert';
+import Button from 'Components/Link/Button';
+import LoadingIndicator from 'Components/Loading/LoadingIndicator';
+import ModalContent from 'Components/Modal/ModalContent';
+import ModalHeader from 'Components/Modal/ModalHeader';
+import ModalBody from 'Components/Modal/ModalBody';
+import ModalFooter from 'Components/Modal/ModalFooter';
+import CheckInput from 'Components/Form/CheckInput';
 import RetagPreviewRow from './RetagPreviewRow';
 import styles from './RetagPreviewModalContent.css';
 
@@ -74,6 +74,7 @@ class RetagPreviewModalContent extends Component {
       isPopulated,
       error,
       items,
+      path,
       onModalClose
     } = this.props;
 
@@ -112,6 +113,12 @@ class RetagPreviewModalContent extends Component {
               <div>
                 <Alert>
                   <div>
+                    All paths are relative to:
+                    <span className={styles.path}>
+                      {path}
+                    </span>
+                  </div>
+                  <div>
                     MusicBrainz identifiers will also be added to the files; these are not shown below.
                   </div>
                 </Alert>
@@ -123,7 +130,7 @@ class RetagPreviewModalContent extends Component {
                         <RetagPreviewRow
                           key={item.trackFileId}
                           id={item.trackFileId}
-                          path={item.path}
+                          path={item.relativePath}
                           changes={item.changes}
                           isSelected={selectedState[item.trackFileId]}
                           onSelectedChange={this.onSelectedChange}

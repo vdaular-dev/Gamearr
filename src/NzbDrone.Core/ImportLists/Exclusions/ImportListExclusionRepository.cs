@@ -1,14 +1,12 @@
-using System.Collections.Generic;
-using System.Linq;
 using NzbDrone.Core.Datastore;
 using NzbDrone.Core.Messaging.Events;
+using System.Linq;
 
 namespace NzbDrone.Core.ImportLists.Exclusions
 {
     public interface IImportListExclusionRepository : IBasicRepository<ImportListExclusion>
     {
         ImportListExclusion FindByForeignId(string foreignId);
-        List<ImportListExclusion> FindByForeignId(List<string> ids);
     }
 
     public class ImportListExclusionRepository : BasicRepository<ImportListExclusion>, IImportListExclusionRepository
@@ -20,14 +18,7 @@ namespace NzbDrone.Core.ImportLists.Exclusions
 
         public ImportListExclusion FindByForeignId(string foreignId)
         {
-            return Query(m => m.ForeignId == foreignId).SingleOrDefault();
-        }
-
-        public List<ImportListExclusion> FindByForeignId(List<string> ids)
-        {
-            // Using Enumerable.Contains forces the builder to create an 'IN'
-            // and not a string 'LIKE' expression
-            return Query(x => Enumerable.Contains(ids, x.ForeignId));
+            return Query.Where<ImportListExclusion>(m => m.ForeignId == foreignId).SingleOrDefault();
         }
     }
 }

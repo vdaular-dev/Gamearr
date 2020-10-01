@@ -1,12 +1,13 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import Card from 'Components/Card';
+import sortByName from 'Utilities/Array/sortByName';
+import { icons } from 'Helpers/Props';
 import FieldSet from 'Components/FieldSet';
+import Card from 'Components/Card';
 import Icon from 'Components/Icon';
 import PageSectionContent from 'Components/Page/PageSectionContent';
-import { icons } from 'Helpers/Props';
-import EditQualityProfileModalConnector from './EditQualityProfileModalConnector';
 import QualityProfile from './QualityProfile';
+import EditQualityProfileModalConnector from './EditQualityProfileModalConnector';
 import styles from './QualityProfiles.css';
 
 class QualityProfiles extends Component {
@@ -57,7 +58,7 @@ class QualityProfiles extends Component {
         >
           <div className={styles.qualityProfiles}>
             {
-              items.map((item) => {
+              items.sort(sortByName).map((item) => {
                 return (
                   <QualityProfile
                     key={item.id}

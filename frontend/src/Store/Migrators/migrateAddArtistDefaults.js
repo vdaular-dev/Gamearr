@@ -1,5 +1,5 @@
 import { get } from 'lodash';
-import monitorOptions from 'Utilities/Artist/monitorOptions';
+import monitorOptions from 'Utilities/Game/monitorOptions';
 
 export default function migrateAddArtistDefaults(persistedState) {
   const monitor = get(persistedState, 'addArtist.defaults.monitor');

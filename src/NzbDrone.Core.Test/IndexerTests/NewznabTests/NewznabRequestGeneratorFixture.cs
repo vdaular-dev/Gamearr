@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using FluentAssertions;
 using Moq;
@@ -18,15 +19,16 @@ namespace NzbDrone.Core.Test.IndexerTests.NewznabTests
         {
             Subject.Settings = new NewznabSettings()
             {
-                BaseUrl = "http://127.0.0.1:1234/",
-                Categories = new[] { 1, 2 },
-                ApiKey = "abcd",
+                 BaseUrl = "http://127.0.0.1:1234/",
+                 Categories = new [] { 1, 2 },
+                 ApiKey = "abcd",
             };
 
             _singleAlbumSearchCriteria = new AlbumSearchCriteria
             {
                 Artist = new Music.Artist { Name = "Alien Ant Farm" },
                 AlbumTitle = "TruANT"
+
             };
 
             _capabilities = new NewznabCapabilities();
@@ -51,7 +53,7 @@ namespace NzbDrone.Core.Test.IndexerTests.NewznabTests
         [Test]
         public void should_search_by_artist_and_album_if_supported()
         {
-            _capabilities.SupportedAudioSearchParameters = new[] { "q", "artist", "album" };
+            _capabilities.SupportedAudioSearchParameters = new[] { "q", "artist", "album"};
 
             var results = Subject.GetSearchRequests(_singleAlbumSearchCriteria);
             results.GetTier(0).Should().HaveCount(1);

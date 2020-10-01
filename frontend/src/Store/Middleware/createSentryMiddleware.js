@@ -1,6 +1,5 @@
-import * as sentry from '@sentry/browser';
-import * as Integrations from '@sentry/integrations';
 import _ from 'lodash';
+import * as sentry from '@sentry/browser';
 import parseUrl from 'Utilities/String/parseUrl';
 
 function cleanseUrl(url) {
@@ -35,13 +34,6 @@ function identity(stuff) {
   return stuff;
 }
 
-function stripUrlBase(frame) {
-  if (frame.filename && window.Lidarr.urlBase) {
-    frame.filename = frame.filename.replace(window.Lidarr.urlBase, '');
-  }
-  return frame;
-}
-
 function createMiddleware() {
   return (store) => (next) => (action) => {
     try {
@@ -74,25 +66,21 @@ export default function createSentryMiddleware() {
     release,
     userHash,
     isProduction
-  } = window.Lidarr;
+  } = window.Gamearr;
 
   if (!analytics) {
     return;
   }
 
-  const dsn = isProduction ? 'https://9df0cbe9eedf4b8698e8bc94ec03c4ff@sentry.servarr.com/18' :
-    'https://aaa261a8c3e542f0a52c07bed78e8d13@sentry.servarr.com/19';
+  const dsn = isProduction ? 'https://c3a5b33e08de4e18b7d0505e942dbc95@sentry.io/216290' :
+    'https://baede6f14da54cf48ff431479e400adf@sentry.io/1249427';
 
   sentry.init({
     dsn,
     environment: branch,
     release,
     sendDefaultPii: true,
-    beforeSend: cleanseData,
-    integrations: [
-      new Integrations.RewriteFrames({ iteratee: stripUrlBase }),
-      new Integrations.Dedupe()
-    ]
+    beforeSend: cleanseData
   });
 
   sentry.configureScope((scope) => {

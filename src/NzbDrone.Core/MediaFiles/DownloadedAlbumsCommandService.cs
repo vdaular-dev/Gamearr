@@ -1,13 +1,15 @@
-using System;
 using System.Collections.Generic;
+using System;
 using System.Linq;
 using NLog;
 using NzbDrone.Common.Disk;
 using NzbDrone.Common.Extensions;
+using NzbDrone.Core.Configuration;
 using NzbDrone.Core.Download.TrackedDownloads;
 using NzbDrone.Core.MediaFiles.Commands;
-using NzbDrone.Core.MediaFiles.TrackImport;
 using NzbDrone.Core.Messaging.Commands;
+using NzbDrone.Core.MediaFiles.TrackImport;
+using NzbDrone.Common.Instrumentation.Extensions;
 
 namespace NzbDrone.Core.MediaFiles
 {

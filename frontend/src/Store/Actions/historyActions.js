@@ -1,13 +1,13 @@
 import { createAction } from 'redux-actions';
-import { filterTypes, sortDirections } from 'Helpers/Props';
-import { createThunk, handleThunks } from 'Store/thunks';
 import createAjaxRequest from 'Utilities/createAjaxRequest';
 import serverSideCollectionHandlers from 'Utilities/serverSideCollectionHandlers';
-import { updateItem } from './baseActions';
-import createHandleActions from './Creators/createHandleActions';
-import createServerSideCollectionHandlers from './Creators/createServerSideCollectionHandlers';
+import { filterTypes, sortDirections } from 'Helpers/Props';
+import { createThunk, handleThunks } from 'Store/thunks';
 import createClearReducer from './Creators/Reducers/createClearReducer';
 import createSetTableOptionReducer from './Creators/Reducers/createSetTableOptionReducer';
+import createHandleActions from './Creators/createHandleActions';
+import createServerSideCollectionHandlers from './Creators/createServerSideCollectionHandlers';
+import { updateItem } from './baseActions';
 
 //
 // Variables
@@ -34,13 +34,13 @@ export const defaultState = {
       isModifiable: false
     },
     {
-      name: 'artists.sortName',
+      name: 'artist.sortName',
       label: 'Artist',
       isSortable: true,
       isVisible: true
     },
     {
-      name: 'albums.title',
+      name: 'album.title',
       label: 'Album Title',
       isSortable: true,
       isVisible: true
@@ -176,17 +176,6 @@ export const defaultState = {
         {
           key: 'eventType',
           value: '9',
-          type: filterTypes.EQUAL
-        }
-      ]
-    },
-    {
-      key: 'ignored',
-      label: 'Ignored',
-      filters: [
-        {
-          key: 'eventType',
-          value: '7',
           type: filterTypes.EQUAL
         }
       ]

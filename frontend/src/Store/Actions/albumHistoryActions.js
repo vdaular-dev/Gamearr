@@ -1,10 +1,10 @@
 import { createAction } from 'redux-actions';
 import { batchActions } from 'redux-batched-actions';
-import { sortDirections } from 'Helpers/Props';
-import { createThunk, handleThunks } from 'Store/thunks';
 import createAjaxRequest from 'Utilities/createAjaxRequest';
-import { set, update } from './baseActions';
+import { createThunk, handleThunks } from 'Store/thunks';
+import { sortDirections } from 'Helpers/Props';
 import createHandleActions from './Creators/createHandleActions';
+import { set, update } from './baseActions';
 
 //
 // Variables

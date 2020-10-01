@@ -9,6 +9,7 @@ namespace NzbDrone.Core.Notifications.Synology
     {
         public SynologyIndexerSettingsValidator()
         {
+
         }
     }
 

@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { clearPendingChanges } from 'Store/Actions/baseActions';
-import { cancelSaveIndexer, cancelTestIndexer } from 'Store/Actions/settingsActions';
+import { cancelTestIndexer, cancelSaveIndexer } from 'Store/Actions/settingsActions';
 import EditIndexerModal from './EditIndexerModal';
 
 function createMapDispatchToProps(dispatch, props) {

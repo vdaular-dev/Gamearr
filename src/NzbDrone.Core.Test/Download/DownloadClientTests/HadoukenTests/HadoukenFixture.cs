@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using FluentAssertions;
 using Moq;
 using NUnit.Framework;
 using NzbDrone.Common.Http;
@@ -9,6 +5,10 @@ using NzbDrone.Core.Download;
 using NzbDrone.Core.Download.Clients.Hadouken;
 using NzbDrone.Core.Download.Clients.Hadouken.Models;
 using NzbDrone.Core.MediaFiles.TorrentInfo;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using FluentAssertions;
 using NzbDrone.Test.Common;
 
 namespace NzbDrone.Core.Test.Download.DownloadClientTests.HadoukenTests
@@ -37,7 +37,7 @@ namespace NzbDrone.Core.Test.Download.DownloadClientTests.HadoukenTests
                 DownloadedBytes = 0,
                 Progress = 0.0,
                 SavePath = "somepath",
-                Label = "lidarr-music"
+                Label = "gamearr-music"
             };
 
             _downloading = new HadoukenTorrent
@@ -50,7 +50,7 @@ namespace NzbDrone.Core.Test.Download.DownloadClientTests.HadoukenTests
                 DownloadedBytes = 100,
                 Progress = 10.0,
                 SavePath = "somepath",
-                Label = "lidarr-music"
+                Label = "gamearr-music"
             };
 
             _failed = new HadoukenTorrent
@@ -64,7 +64,7 @@ namespace NzbDrone.Core.Test.Download.DownloadClientTests.HadoukenTests
                 DownloadedBytes = 100,
                 Progress = 10.0,
                 SavePath = "somepath",
-                Label = "lidarr-music"
+                Label = "gamearr-music"
             };
 
             _completed = new HadoukenTorrent
@@ -77,11 +77,11 @@ namespace NzbDrone.Core.Test.Download.DownloadClientTests.HadoukenTests
                 DownloadedBytes = 1000,
                 Progress = 100.0,
                 SavePath = "somepath",
-                Label = "lidarr-music"
+                Label = "gamearr-music"
             };
 
             Mocker.GetMock<ITorrentFileInfoReader>()
-                  .Setup(s => s.GetHashFromTorrentFile(It.IsAny<byte[]>()))
+                  .Setup(s => s.GetHashFromTorrentFile(It.IsAny<Byte[]>()))
                   .Returns("CBC2F069FE8BB2F544EAE707D75BCD3DE9DCF951");
 
             Mocker.GetMock<IHttpClient>()
@@ -210,7 +210,7 @@ namespace NzbDrone.Core.Test.Download.DownloadClientTests.HadoukenTests
         [Test]
         public void should_return_status_with_outputdirs()
         {
-            var configItems = new Dictionary<string, object>();
+            var configItems = new Dictionary<String, Object>();
 
             configItems.Add("bittorrent.defaultSavePath", @"C:\Downloads\Downloading\deluge".AsOsAgnostic());
 
@@ -238,7 +238,7 @@ namespace NzbDrone.Core.Test.Download.DownloadClientTests.HadoukenTests
                 DownloadedBytes = 1000,
                 Progress = 100.0,
                 SavePath = "somepath",
-                Label = "lidarr-music"
+                Label = "gamearr-music"
             };
 
             var torrents = new HadoukenTorrent[] { torrent };
@@ -265,7 +265,7 @@ namespace NzbDrone.Core.Test.Download.DownloadClientTests.HadoukenTests
                 DownloadedBytes = 1000,
                 Progress = 100.0,
                 SavePath = "somepath",
-                Label = "lidarr-music-other"
+                Label = "gamearr-music-other"
             };
 
             var torrents = new HadoukenTorrent[] { torrent };
@@ -301,7 +301,7 @@ namespace NzbDrone.Core.Test.Download.DownloadClientTests.HadoukenTests
                .Returns("hash");
 
             var result = Subject.Download(remoteAlbum);
-
+            
             Assert.IsFalse(result.Any(c => char.IsLower(c)));
         }
 

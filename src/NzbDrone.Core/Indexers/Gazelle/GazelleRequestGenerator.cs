@@ -1,16 +1,17 @@
 using System;
 using System.Collections.Generic;
-using NLog;
-using NzbDrone.Common.Cache;
-using NzbDrone.Common.Extensions;
 using NzbDrone.Common.Http;
-using NzbDrone.Common.Serializer;
 using NzbDrone.Core.IndexerSearch.Definitions;
+using NzbDrone.Common.Cache;
+using NLog;
+using NzbDrone.Common.Extensions;
+using NzbDrone.Common.Serializer;
 
 namespace NzbDrone.Core.Indexers.Gazelle
 {
     public class GazelleRequestGenerator : IIndexerRequestGenerator
     {
+
         public GazelleSettings Settings { get; set; }
 
         public ICached<Dictionary<string, string>> AuthCookieCache { get; set; }
@@ -36,7 +37,7 @@ namespace NzbDrone.Core.Indexers.Gazelle
         public IndexerPageableRequestChain GetSearchRequests(ArtistSearchCriteria searchCriteria)
         {
             var pageableRequests = new IndexerPageableRequestChain();
-            pageableRequests.Add(GetRequest(string.Format("&artistname={0}", searchCriteria.ArtistQuery)));
+            pageableRequests.Add(GetRequest(string.Format("&artistname={0}",searchCriteria.ArtistQuery)));
             return pageableRequests;
         }
 
@@ -47,6 +48,7 @@ namespace NzbDrone.Core.Indexers.Gazelle
             var filter = "";
             if (searchParameters == null)
             {
+
             }
 
             var request =
@@ -63,7 +65,7 @@ namespace NzbDrone.Core.Indexers.Gazelle
             yield return request;
         }
 
-        private GazelleAuthResponse GetIndex(Dictionary<string, string> cookies)
+        private GazelleAuthResponse GetIndex(Dictionary<string,string> cookies)
         {
             var indexRequestBuilder = new HttpRequestBuilder($"{Settings.BaseUrl.Trim().TrimEnd('/')}")
             {
@@ -87,6 +89,7 @@ namespace NzbDrone.Core.Indexers.Gazelle
 
         private void Authenticate()
         {
+
             var requestBuilder = new HttpRequestBuilder($"{Settings.BaseUrl.Trim().TrimEnd('/')}")
             {
                 LogResponseContent = true
@@ -130,6 +133,7 @@ namespace NzbDrone.Core.Indexers.Gazelle
 
             Settings.AuthKey = index.Response.Authkey;
             Settings.PassKey = index.Response.Passkey;
-        }
+
+        }        
     }
 }

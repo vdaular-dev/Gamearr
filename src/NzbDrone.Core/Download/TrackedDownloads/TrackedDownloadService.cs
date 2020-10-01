@@ -4,12 +4,12 @@ using System.Linq;
 using NLog;
 using NzbDrone.Common.Cache;
 using NzbDrone.Common.Extensions;
-using NzbDrone.Common.Serializer;
 using NzbDrone.Core.History;
 using NzbDrone.Core.Messaging.Events;
 using NzbDrone.Core.Music;
-using NzbDrone.Core.Music.Events;
 using NzbDrone.Core.Parser;
+using NzbDrone.Common.Serializer;
+using NzbDrone.Core.Music.Events;
 
 namespace NzbDrone.Core.Download.TrackedDownloads
 {
@@ -28,7 +28,6 @@ namespace NzbDrone.Core.Download.TrackedDownloads
         private readonly IParsingService _parsingService;
         private readonly IHistoryService _historyService;
         private readonly IEventAggregator _eventAggregator;
-        private readonly ITrackedDownloadAlreadyImported _trackedDownloadAlreadyImported;
         private readonly Logger _logger;
         private readonly ICached<TrackedDownload> _cache;
 
@@ -36,13 +35,11 @@ namespace NzbDrone.Core.Download.TrackedDownloads
                                       ICacheManager cacheManager,
                                       IHistoryService historyService,
                                       IEventAggregator eventAggregator,
-                                      ITrackedDownloadAlreadyImported trackedDownloadAlreadyImported,
                                       Logger logger)
         {
             _parsingService = parsingService;
             _historyService = historyService;
             _eventAggregator = eventAggregator;
-            _trackedDownloadAlreadyImported = trackedDownloadAlreadyImported;
             _cache = cacheManager.GetCache<TrackedDownload>(GetType());
             _logger = logger;
         }
@@ -54,6 +51,7 @@ namespace NzbDrone.Core.Download.TrackedDownloads
 
         public void UpdateAlbumCache(int albumId)
         {
+
             var updateCacheItems = _cache.Values.Where(x => x.RemoteAlbum != null && x.RemoteAlbum.Albums.Any(a => a.Id == albumId)).ToList();
 
             foreach (var item in updateCacheItems)
@@ -96,7 +94,7 @@ namespace NzbDrone.Core.Download.TrackedDownloads
         {
             var existingItem = Find(downloadItem.DownloadId);
 
-            if (existingItem != null && existingItem.State != TrackedDownloadState.Downloading)
+            if (existingItem != null && existingItem.State != TrackedDownloadStage.Downloading)
             {
                 LogItemChange(existingItem, existingItem.DownloadItem, downloadItem);
 
@@ -117,9 +115,7 @@ namespace NzbDrone.Core.Download.TrackedDownloads
             try
             {
                 var parsedAlbumInfo = Parser.Parser.ParseAlbumTitle(trackedDownload.DownloadItem.Title);
-                var historyItems = _historyService.FindByDownloadId(downloadItem.DownloadId)
-                    .OrderByDescending(h => h.Date)
-                    .ToList();
+                var historyItems = _historyService.FindByDownloadId(downloadItem.DownloadId);
 
                 if (parsedAlbumInfo != null)
                 {
@@ -128,22 +124,8 @@ namespace NzbDrone.Core.Download.TrackedDownloads
 
                 if (historyItems.Any())
                 {
-                    var firstHistoryItem = historyItems.First();
-                    var state = GetStateFromHistory(firstHistoryItem);
-
-                    // One potential issue here is if the latest is imported, but other episodes are ignored or never imported.
-                    // It's unlikely that will happen, but could happen if additional episodes are added to season after it's already imported.
-                    if (state == TrackedDownloadState.Imported)
-                    {
-                        var allImported = _trackedDownloadAlreadyImported.IsImported(trackedDownload, historyItems);
-
-                        trackedDownload.State = allImported ? TrackedDownloadState.Imported : TrackedDownloadState.Downloading;
-                    }
-                    else
-                    {
-                        trackedDownload.State = state;
-                    }
-
+                    var firstHistoryItem = historyItems.OrderByDescending(h => h.Date).First();
+                    trackedDownload.State = GetStateFromHistory(firstHistoryItem);
                     if (firstHistoryItem.EventType == HistoryEventType.AlbumImportIncomplete)
                     {
                         var messages = Json.Deserialize<List<TrackedDownloadStatusMessage>>(firstHistoryItem?.Data["statusMessages"]).ToArray();
@@ -152,6 +134,7 @@ namespace NzbDrone.Core.Download.TrackedDownloads
 
                     var grabbedEvent = historyItems.FirstOrDefault(v => v.EventType == HistoryEventType.Grabbed);
                     trackedDownload.Indexer = grabbedEvent?.Data["indexer"];
+
 
                     if (parsedAlbumInfo == null ||
                         trackedDownload.RemoteAlbum == null ||
@@ -176,8 +159,7 @@ namespace NzbDrone.Core.Download.TrackedDownloads
                         {
                             parsedAlbumInfo =
                                 Parser.Parser.ParseAlbumTitleWithSearchCriteria(firstHistoryItem.SourceTitle,
-                                    historyArtist,
-                                    historyAlbums);
+                                    historyArtist, historyAlbums);
 
                             if (parsedAlbumInfo != null)
                             {
@@ -231,38 +213,36 @@ namespace NzbDrone.Core.Download.TrackedDownloads
                 existingItem.CanBeRemoved != downloadItem.CanBeRemoved ||
                 existingItem.CanMoveFiles != downloadItem.CanMoveFiles)
             {
-                _logger.Debug("Tracking '{0}:{1}': ClientState={2}{3} LidarrStage={4} Album='{5}' OutputPath={6}.",
-                    downloadItem.DownloadClient,
-                    downloadItem.Title,
-                    downloadItem.Status,
-                    downloadItem.CanBeRemoved ? "" : downloadItem.CanMoveFiles ? " (busy)" : " (readonly)",
+                _logger.Debug("Tracking '{0}:{1}': ClientState={2}{3} GamearrStage={4} Album='{5}' OutputPath={6}.",
+                    downloadItem.DownloadClient, downloadItem.Title,
+                    downloadItem.Status, downloadItem.CanBeRemoved ? "" :
+                                         downloadItem.CanMoveFiles ? " (busy)" : " (readonly)",
                     trackedDownload.State,
                     trackedDownload.RemoteAlbum?.ParsedAlbumInfo,
                     downloadItem.OutputPath);
             }
         }
 
-        private static TrackedDownloadState GetStateFromHistory(NzbDrone.Core.History.History history)
+
+        private static TrackedDownloadStage GetStateFromHistory(NzbDrone.Core.History.History history)
         {
             switch (history.EventType)
             {
                 case HistoryEventType.AlbumImportIncomplete:
-                    return TrackedDownloadState.ImportFailed;
+                    return TrackedDownloadStage.ImportFailed;
                 case HistoryEventType.DownloadImported:
-                    return TrackedDownloadState.Imported;
+                    return TrackedDownloadStage.Imported;
                 case HistoryEventType.DownloadFailed:
-                    return TrackedDownloadState.DownloadFailed;
-                case HistoryEventType.DownloadIgnored:
-                    return TrackedDownloadState.Ignored;
+                    return TrackedDownloadStage.DownloadFailed;
             }
 
             // Since DownloadComplete is a new event type, we can't assume it exists for old downloads
             if (history.EventType == HistoryEventType.TrackFileImported)
             {
-                return DateTime.UtcNow.Subtract(history.Date).TotalSeconds < 60 ? TrackedDownloadState.Importing : TrackedDownloadState.Imported;
+                return DateTime.UtcNow.Subtract(history.Date).TotalSeconds < 60 ? TrackedDownloadStage.Importing : TrackedDownloadStage.Imported;
             }
 
-            return TrackedDownloadState.Downloading;
+            return TrackedDownloadStage.Downloading;
         }
 
         public void Handle(AlbumDeletedEvent message)
@@ -271,3 +251,4 @@ namespace NzbDrone.Core.Download.TrackedDownloads
         }
     }
 }
+

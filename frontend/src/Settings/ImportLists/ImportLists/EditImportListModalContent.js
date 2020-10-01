@@ -1,22 +1,22 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import DescriptionList from 'Components/DescriptionList/DescriptionList';
-import DescriptionListItem from 'Components/DescriptionList/DescriptionListItem';
-import Form from 'Components/Form/Form';
-import FormGroup from 'Components/Form/FormGroup';
-import FormInputGroup from 'Components/Form/FormInputGroup';
-import FormLabel from 'Components/Form/FormLabel';
-import ProviderFieldFormGroup from 'Components/Form/ProviderFieldFormGroup';
+import { icons, inputTypes, kinds, tooltipPositions } from 'Helpers/Props';
 import Icon from 'Components/Icon';
 import Button from 'Components/Link/Button';
 import SpinnerErrorButton from 'Components/Link/SpinnerErrorButton';
 import LoadingIndicator from 'Components/Loading/LoadingIndicator';
-import ModalBody from 'Components/Modal/ModalBody';
 import ModalContent from 'Components/Modal/ModalContent';
-import ModalFooter from 'Components/Modal/ModalFooter';
 import ModalHeader from 'Components/Modal/ModalHeader';
+import ModalBody from 'Components/Modal/ModalBody';
+import ModalFooter from 'Components/Modal/ModalFooter';
+import Form from 'Components/Form/Form';
+import FormGroup from 'Components/Form/FormGroup';
+import FormLabel from 'Components/Form/FormLabel';
+import FormInputGroup from 'Components/Form/FormInputGroup';
 import Popover from 'Components/Tooltip/Popover';
-import { icons, inputTypes, kinds, tooltipPositions } from 'Helpers/Props';
+import ProviderFieldFormGroup from 'Components/Form/ProviderFieldFormGroup';
+import DescriptionList from 'Components/DescriptionList/DescriptionList';
+import DescriptionListItem from 'Components/DescriptionList/DescriptionListItem';
 import styles from './EditImportListModalContent.css';
 
 function ImportListMonitoringOptionsPopoverContent() {
@@ -115,7 +115,7 @@ function EditImportListModalContent(props) {
                 <FormInputGroup
                   type={inputTypes.CHECK}
                   name="enableAutomaticAdd"
-                  helpText={'Add artist/albums to Lidarr when syncs are performed via the UI or by Lidarr'}
+                  helpText={'Add artist/albums to Gamearr when syncs are performed via the UI or by Gamearr'}
                   {...enableAutomaticAdd}
                   onChange={onInputChange}
                 />
@@ -180,13 +180,12 @@ function EditImportListModalContent(props) {
                   name="metadataProfileId"
                   helpText={'Metadata Profile list items should be added with'}
                   {...metadataProfileId}
-                  includeNone={true}
                   onChange={onInputChange}
                 />
               </FormGroup>
 
               <FormGroup>
-                <FormLabel>Lidarr Tags</FormLabel>
+                <FormLabel>Gamearr Tags</FormLabel>
 
                 <FormInputGroup
                   type={inputTypes.TAG}
@@ -199,23 +198,23 @@ function EditImportListModalContent(props) {
 
               {
                 !!fields && !!fields.length &&
-                  <div>
-                    {
-                      fields.map((field) => {
-                        return (
-                          <ProviderFieldFormGroup
-                            key={field.name}
-                            advancedSettings={advancedSettings}
-                            provider="importList"
-                            providerData={item}
-                            section="settings.importLists"
-                            {...field}
-                            onChange={onFieldChange}
-                          />
-                        );
-                      })
-                    }
-                  </div>
+                <div>
+                  {
+                    fields.map((field) => {
+                      return (
+                        <ProviderFieldFormGroup
+                          key={field.name}
+                          advancedSettings={advancedSettings}
+                          provider="importList"
+                          providerData={item}
+                          section="settings.importLists"
+                          {...field}
+                          onChange={onFieldChange}
+                        />
+                      );
+                    })
+                  }
+                </div>
               }
 
             </Form>

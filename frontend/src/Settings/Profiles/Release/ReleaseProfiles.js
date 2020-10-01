@@ -1,12 +1,12 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import Card from 'Components/Card';
+import { icons } from 'Helpers/Props';
 import FieldSet from 'Components/FieldSet';
+import Card from 'Components/Card';
 import Icon from 'Components/Icon';
 import PageSectionContent from 'Components/Page/PageSectionContent';
-import { icons } from 'Helpers/Props';
-import EditReleaseProfileModalConnector from './EditReleaseProfileModalConnector';
 import ReleaseProfile from './ReleaseProfile';
+import EditReleaseProfileModalConnector from './EditReleaseProfileModalConnector';
 import styles from './ReleaseProfiles.css';
 
 class ReleaseProfiles extends Component {
@@ -40,7 +40,6 @@ class ReleaseProfiles extends Component {
     const {
       items,
       tagList,
-      indexerList,
       onConfirmDeleteReleaseProfile,
       ...otherProps
     } = this.props;
@@ -70,7 +69,6 @@ class ReleaseProfiles extends Component {
                   <ReleaseProfile
                     key={item.id}
                     tagList={tagList}
-                    indexerList={indexerList}
                     {...item}
                     onConfirmDeleteReleaseProfile={onConfirmDeleteReleaseProfile}
                   />
@@ -94,7 +92,6 @@ ReleaseProfiles.propTypes = {
   error: PropTypes.object,
   items: PropTypes.arrayOf(PropTypes.object).isRequired,
   tagList: PropTypes.arrayOf(PropTypes.object).isRequired,
-  indexerList: PropTypes.arrayOf(PropTypes.object).isRequired,
   onConfirmDeleteReleaseProfile: PropTypes.func.isRequired
 };
 

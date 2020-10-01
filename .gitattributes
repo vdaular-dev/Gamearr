@@ -1,10 +1,9 @@
 # Auto detect text files and perform LF normalization
-* text=auto
+*text eol=lf
 
 # Explicitly set bash scripts to have unix endings
 *.sh text eol=lf
-distribution/debian/* text eol=lf
-macOS/Lidarr text eol=lf
+macOS/Gamearr text eol=lf
 
 # Custom for Visual Studio
 *.cs     diff=csharp

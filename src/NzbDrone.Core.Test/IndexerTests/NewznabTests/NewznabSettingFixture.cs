@@ -7,6 +7,7 @@ namespace NzbDrone.Core.Test.IndexerTests.NewznabTests
 {
     public class NewznabSettingFixture : CoreTest
     {
+
         [TestCase("http://nzbs.org")]
         [TestCase("http:///www.nzbplanet.net")]
         public void requires_apikey(string url)
@@ -17,8 +18,10 @@ namespace NzbDrone.Core.Test.IndexerTests.NewznabTests
                 BaseUrl = url
             };
 
+
             setting.Validate().IsValid.Should().BeFalse();
             setting.Validate().Errors.Should().Contain(c => c.PropertyName == "ApiKey");
+
         }
 
         [TestCase("")]
@@ -32,10 +35,13 @@ namespace NzbDrone.Core.Test.IndexerTests.NewznabTests
                 BaseUrl = url
             };
 
+
             setting.Validate().IsValid.Should().BeFalse();
             setting.Validate().Errors.Should().NotContain(c => c.PropertyName == "ApiKey");
             setting.Validate().Errors.Should().Contain(c => c.PropertyName == "BaseUrl");
+
         }
+
 
         [TestCase("http://nzbs2.org")]
         public void doesnt_requires_apikey(string url)
@@ -45,6 +51,7 @@ namespace NzbDrone.Core.Test.IndexerTests.NewznabTests
                 ApiKey = "",
                 BaseUrl = url
             };
+
 
             setting.Validate().IsValid.Should().BeTrue();
         }

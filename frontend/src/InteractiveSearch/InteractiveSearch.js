@@ -1,12 +1,12 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import Icon from 'Components/Icon';
+import { align, icons, sortDirections } from 'Helpers/Props';
 import LoadingIndicator from 'Components/Loading/LoadingIndicator';
+import Icon from 'Components/Icon';
 import FilterMenu from 'Components/Menu/FilterMenu';
 import PageMenuButton from 'Components/Menu/PageMenuButton';
 import Table from 'Components/Table/Table';
 import TableBody from 'Components/Table/TableBody';
-import { align, icons, sortDirections } from 'Helpers/Props';
 import InteractiveSearchFilterModalConnector from './InteractiveSearchFilterModalConnector';
 import InteractiveSearchRow from './InteractiveSearchRow';
 import styles from './InteractiveSearch.css';
@@ -119,35 +119,33 @@ function InteractiveSearch(props) {
       </div>
 
       {
-        isFetching ? <LoadingIndicator /> : null
+        isFetching &&
+          <LoadingIndicator />
       }
 
       {
-        !isFetching && error ?
+        !isFetching && !!error &&
           <div>
             Unable to load results for this album search. Try again later
-          </div> :
-          null
+          </div>
       }
 
       {
-        !isFetching && isPopulated && !totalReleasesCount ?
+        !isFetching && isPopulated && !totalReleasesCount &&
           <div>
             No results found
-          </div> :
-          null
+          </div>
       }
 
       {
-        !!totalReleasesCount && isPopulated && !items.length ?
+        !!totalReleasesCount && isPopulated && !items.length &&
           <div>
             All results are hidden by the applied filter
-          </div> :
-          null
+          </div>
       }
 
       {
-        isPopulated && !!items.length ?
+        isPopulated && !!items.length &&
           <Table
             columns={columns}
             sortKey={sortKey}
@@ -170,16 +168,14 @@ function InteractiveSearch(props) {
                 })
               }
             </TableBody>
-          </Table> :
-          null
+          </Table>
       }
 
       {
-        totalReleasesCount !== items.length && !!items.length ?
+        totalReleasesCount !== items.length && !!items.length &&
           <div className={styles.filteredMessage}>
-            Some results are hidden by the applied filter
-          </div> :
-          null
+                Some results are hidden by the applied filter
+          </div>
       }
     </div>
   );

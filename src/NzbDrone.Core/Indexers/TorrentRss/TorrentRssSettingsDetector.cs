@@ -1,6 +1,7 @@
 using System;
-using System.IO;
 using System.Linq;
+using System.IO;
+using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.Linq;
 using NLog;
@@ -18,11 +19,11 @@ namespace NzbDrone.Core.Indexers.TorrentRss
 
     public class TorrentRssSettingsDetector : ITorrentRssSettingsDetector
     {
-        private const long ValidSizeThreshold = 2 * 1024 * 1024;
-
         protected readonly Logger _logger;
 
         private readonly IHttpClient _httpClient;
+
+        private const long ValidSizeThreshold = 2 * 1024 * 1024;
 
         public TorrentRssSettingsDetector(IHttpClient httpClient, Logger logger)
         {
@@ -147,7 +148,7 @@ namespace NzbDrone.Core.Indexers.TorrentRss
                 _logger.Trace("Feed doesn't have Seeders in Description, disabling option.");
                 parser.ParseSeedersInDescription = settings.ParseSeedersInDescription = false;
             }
-
+            
             if (!releases.Any(r => r.Size < ValidSizeThreshold))
             {
                 _logger.Trace("Feed has valid size in enclosure.");
@@ -182,7 +183,6 @@ namespace NzbDrone.Core.Indexers.TorrentRss
                 {
                     _logger.Debug("Feed {0} contains very small releases.", response.Request.Url);
                 }
-
                 _logger.Trace("Feed has valid size in description.");
                 return settings;
             }
@@ -244,6 +244,7 @@ namespace NzbDrone.Core.Indexers.TorrentRss
             {
                 var releases = parser.ParseResponse(response).Cast<TorrentInfo>().ToArray();
                 return releases;
+
             }
             catch (Exception ex)
             {
@@ -278,6 +279,7 @@ namespace NzbDrone.Core.Indexers.TorrentRss
 
             if (distinct.Length != total.Length)
             {
+
                 throw new UnsupportedFeedException("Feed contains releases with same guid, rejecting malformed rss feed.");
             }
         }

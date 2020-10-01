@@ -1,13 +1,13 @@
 using System;
 using System.Linq;
 using NLog;
-using NzbDrone.Common.Cache;
-using NzbDrone.Common.Extensions;
 using NzbDrone.Core.IndexerSearch.Definitions;
+using NzbDrone.Core.Parser.Model;
 using NzbDrone.Core.MediaFiles;
 using NzbDrone.Core.Music;
-using NzbDrone.Core.Parser.Model;
+using NzbDrone.Common.Cache;
 using NzbDrone.Core.Profiles.Releases;
+using NzbDrone.Common.Extensions;
 
 namespace NzbDrone.Core.DecisionEngine.Specifications
 {
@@ -19,7 +19,7 @@ namespace NzbDrone.Core.DecisionEngine.Specifications
         private readonly Logger _logger;
         private readonly ICached<bool> _missingFilesCache;
         private readonly IPreferredWordService _preferredWordServiceCalculator;
-
+        
         public CutoffSpecification(UpgradableSpecification upgradableSpecification,
                                    Logger logger,
                                    ICacheManager cacheManager,
@@ -44,9 +44,8 @@ namespace NzbDrone.Core.DecisionEngine.Specifications
 
             foreach (var album in subject.Albums)
             {
-                var tracksMissing = _missingFilesCache.Get(album.Id.ToString(),
-                    () => _trackService.TracksWithoutFiles(album.Id).Any(),
-                    TimeSpan.FromSeconds(30));
+                var tracksMissing = _missingFilesCache.Get(album.Id.ToString(), () => _trackService.TracksWithoutFiles(album.Id).Any(),
+                                                           TimeSpan.FromSeconds(30));
                 var trackFiles = _mediaFileService.GetFilesByAlbum(album.Id);
 
                 if (!tracksMissing && trackFiles.Any())
@@ -58,7 +57,7 @@ namespace NzbDrone.Core.DecisionEngine.Specifications
 
                     if (!_upgradableSpecification.CutoffNotMet(qualityProfile,
                                                                currentQualities,
-                                                               _preferredWordServiceCalculator.Calculate(subject.Artist, trackFiles[0].GetSceneOrFileName(), subject.Release.IndexerId),
+                                                               _preferredWordServiceCalculator.Calculate(subject.Artist, trackFiles[0].GetSceneOrFileName()),
                                                                subject.ParsedAlbumInfo.Quality,
                                                                subject.PreferredWordScore))
                     {
@@ -69,6 +68,7 @@ namespace NzbDrone.Core.DecisionEngine.Specifications
 
                         return Decision.Reject("Existing files meets cutoff: {0}", qualityCutoff);
                     }
+
                 }
             }
 

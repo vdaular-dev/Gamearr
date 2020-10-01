@@ -1,13 +1,13 @@
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import Form from 'Components/Form/Form';
-import LoadingIndicator from 'Components/Loading/LoadingIndicator';
-import ConfirmModal from 'Components/Modal/ConfirmModal';
-import PageContent from 'Components/Page/PageContent';
-import PageContentBody from 'Components/Page/PageContentBody';
 import { kinds } from 'Helpers/Props';
+import LoadingIndicator from 'Components/Loading/LoadingIndicator';
+import PageContent from 'Components/Page/PageContent';
+import PageContentBodyConnector from 'Components/Page/PageContentBodyConnector';
 import SettingsToolbarConnector from 'Settings/SettingsToolbarConnector';
+import Form from 'Components/Form/Form';
+import ConfirmModal from 'Components/Modal/ConfirmModal';
 import AnalyticSettings from './AnalyticSettings';
 import BackupSettings from './BackupSettings';
 import HostSettings from './HostSettings';
@@ -22,11 +22,11 @@ const requiresRestartKeys = [
   'urlBase',
   'enableSsl',
   'sslPort',
-  'sslCertPath',
-  'sslCertPassword',
+  'sslCertHash',
   'authenticationMethod',
   'username',
-  'password'
+  'password',
+  'apiKey'
 ];
 
 class GeneralSettings extends Component {
@@ -46,14 +46,8 @@ class GeneralSettings extends Component {
     const {
       settings,
       isSaving,
-      saveError,
-      isResettingApiKey
+      saveError
     } = this.props;
-
-    if (!isResettingApiKey && prevProps.isResettingApiKey) {
-      this.setState({ isRestartRequiredModalOpen: true });
-      return;
-    }
 
     if (isSaving || saveError || !prevProps.isSaving) {
       return;
@@ -102,11 +96,11 @@ class GeneralSettings extends Component {
       settings,
       hasSettings,
       isResettingApiKey,
+      isMono,
       isWindows,
       isWindowsService,
       isDocker,
       mode,
-      packageUpdateMechanism,
       onInputChange,
       onConfirmResetApiKey,
       ...otherProps
@@ -118,7 +112,7 @@ class GeneralSettings extends Component {
           {...otherProps}
         />
 
-        <PageContentBody>
+        <PageContentBodyConnector>
           {
             isFetching && !isPopulated &&
               <LoadingIndicator />
@@ -168,8 +162,7 @@ class GeneralSettings extends Component {
                 <UpdateSettings
                   advancedSettings={advancedSettings}
                   settings={settings}
-                  isWindows={isWindows}
-                  packageUpdateMechanism={packageUpdateMechanism}
+                  isMono={isMono}
                   isDocker={isDocker}
                   onInputChange={onInputChange}
                 />
@@ -181,14 +174,14 @@ class GeneralSettings extends Component {
                 />
               </Form>
           }
-        </PageContentBody>
+        </PageContentBodyConnector>
 
         <ConfirmModal
           isOpen={this.state.isRestartRequiredModalOpen}
           kind={kinds.DANGER}
-          title="Restart Lidarr"
+          title="Restart Gamearr"
           message={
-            `Lidarr requires a restart to apply changes, do you want to restart now? ${isWindowsService ? 'Depending which user is running the Lidarr service you may need to restart Lidarr as admin once before the service will start automatically.' : ''}`
+            `Gamearr requires a restart to apply changes, do you want to restart now? ${isWindowsService ? 'Depending which user is running the Gamearr service you may need to restart Gamearr as admin once before the service will start automatically.' : ''}`
           }
           cancelLabel="I'll restart later"
           confirmLabel="Restart Now"
@@ -211,11 +204,11 @@ GeneralSettings.propTypes = {
   settings: PropTypes.object.isRequired,
   isResettingApiKey: PropTypes.bool.isRequired,
   hasSettings: PropTypes.bool.isRequired,
+  isMono: PropTypes.bool.isRequired,
   isWindows: PropTypes.bool.isRequired,
   isWindowsService: PropTypes.bool.isRequired,
   isDocker: PropTypes.bool.isRequired,
   mode: PropTypes.string.isRequired,
-  packageUpdateMechanism: PropTypes.string.isRequired,
   onInputChange: PropTypes.func.isRequired,
   onConfirmResetApiKey: PropTypes.func.isRequired,
   onConfirmRestart: PropTypes.func.isRequired

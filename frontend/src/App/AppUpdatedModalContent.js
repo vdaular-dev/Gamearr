@@ -1,12 +1,12 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import Button from 'Components/Link/Button';
-import LoadingIndicator from 'Components/Loading/LoadingIndicator';
-import ModalBody from 'Components/Modal/ModalBody';
-import ModalContent from 'Components/Modal/ModalContent';
-import ModalFooter from 'Components/Modal/ModalFooter';
-import ModalHeader from 'Components/Modal/ModalHeader';
 import { kinds } from 'Helpers/Props';
+import LoadingIndicator from 'Components/Loading/LoadingIndicator';
+import Button from 'Components/Link/Button';
+import ModalContent from 'Components/Modal/ModalContent';
+import ModalHeader from 'Components/Modal/ModalHeader';
+import ModalBody from 'Components/Modal/ModalBody';
+import ModalFooter from 'Components/Modal/ModalFooter';
 import UpdateChanges from 'System/Updates/UpdateChanges';
 import styles from './AppUpdatedModalContent.css';
 
@@ -25,12 +25,12 @@ function AppUpdatedModalContent(props) {
   return (
     <ModalContent onModalClose={onModalClose}>
       <ModalHeader>
-        Lidarr Updated
+        Gamearr Updated
       </ModalHeader>
 
       <ModalBody>
         <div>
-          Version <span className={styles.version}>{version}</span> of Lidarr has been installed, in order to get the latest changes you'll need to reload Lidarr.
+          Version <span className={styles.version}>{version}</span> of Gamearr has been installed, in order to get the latest changes you'll need to reload Gamearr.
         </div>
 
         {

@@ -1,14 +1,14 @@
+using System.Linq;
 using NLog;
 using NzbDrone.Core.Configuration;
 using NzbDrone.Core.IndexerSearch;
-using NzbDrone.Core.Messaging;
 using NzbDrone.Core.Messaging.Commands;
 using NzbDrone.Core.Messaging.Events;
 using NzbDrone.Core.Music;
 
 namespace NzbDrone.Core.Download
 {
-    public class RedownloadFailedDownloadService : IHandle<DownloadFailedEvent>
+    public class RedownloadFailedDownloadService : IHandleAsync<DownloadFailedEvent>
     {
         private readonly IConfigService _configService;
         private readonly IAlbumService _albumService;
@@ -26,8 +26,7 @@ namespace NzbDrone.Core.Download
             _logger = logger;
         }
 
-        [EventHandleOrder(EventHandleOrder.Last)]
-        public void Handle(DownloadFailedEvent message)
+        public void HandleAsync(DownloadFailedEvent message)
         {
             if (message.SkipReDownload)
             {

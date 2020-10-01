@@ -1,19 +1,10 @@
+import _ from 'lodash';
+
 function hasDifferentItems(prevItems, currentItems, idProp = 'id') {
-  if (prevItems === currentItems) {
-    return false;
-  }
+  const diff1 = _.differenceBy(prevItems, currentItems, (item) => item[idProp]);
+  const diff2 = _.differenceBy(currentItems, prevItems, (item) => item[idProp]);
 
-  if (prevItems.length !== currentItems.length) {
-    return true;
-  }
-
-  const currentItemIds = new Set();
-
-  currentItems.forEach((currentItem) => {
-    currentItemIds.add(currentItem[idProp]);
-  });
-
-  return prevItems.some((prevItem) => !currentItemIds.has(prevItem[idProp]));
+  return diff1.length > 0 || diff2.length > 0;
 }
 
 export default hasDifferentItems;

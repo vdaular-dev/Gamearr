@@ -2,20 +2,20 @@ import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
+import { addRootFolder } from 'Store/Actions/rootFolderActions';
 import RootFolderSelectInput from './RootFolderSelectInput';
 
 const ADD_NEW_KEY = 'addNew';
 
 function createMapStateToProps() {
   return createSelector(
-    (state) => state.settings.rootFolders,
+    (state) => state.rootFolders,
     (state, { includeNoChange }) => includeNoChange,
     (rootFolders, includeNoChange) => {
       const values = rootFolders.items.map((rootFolder) => {
         return {
           key: rootFolder.path,
           value: rootFolder.path,
-          name: rootFolder.name,
           freeSpace: rootFolder.freeSpace
         };
       });
@@ -23,8 +23,7 @@ function createMapStateToProps() {
       if (includeNoChange) {
         values.unshift({
           key: 'noChange',
-          value: '',
-          name: 'No Change',
+          value: 'No Change',
           isDisabled: true
         });
       }
@@ -33,7 +32,6 @@ function createMapStateToProps() {
         values.push({
           key: '',
           value: '',
-          name: '',
           isDisabled: true,
           isHidden: true
         });
@@ -41,8 +39,7 @@ function createMapStateToProps() {
 
       values.push({
         key: ADD_NEW_KEY,
-        value: '',
-        name: 'Add a new path'
+        value: 'Add a new path'
       });
 
       return {
@@ -54,12 +51,20 @@ function createMapStateToProps() {
   );
 }
 
+function createMapDispatchToProps(dispatch, props) {
+  return {
+    dispatchAddRootFolder(path) {
+      dispatch(addRootFolder({ path }));
+    }
+  };
+}
+
 class RootFolderSelectInputConnector extends Component {
 
   //
   // Lifecycle
 
-  UNSAFE_componentWillMount() {
+  componentWillMount() {
     const {
       value,
       values,
@@ -91,10 +96,18 @@ class RootFolderSelectInputConnector extends Component {
   }
 
   //
+  // Listeners
+
+  onNewRootFolderSelect = (path) => {
+    this.props.dispatchAddRootFolder(path);
+  }
+
+  //
   // Render
 
   render() {
     const {
+      dispatchAddRootFolder,
       ...otherProps
     } = this.props;
 
@@ -112,11 +125,12 @@ RootFolderSelectInputConnector.propTypes = {
   value: PropTypes.string,
   values: PropTypes.arrayOf(PropTypes.object).isRequired,
   includeNoChange: PropTypes.bool.isRequired,
-  onChange: PropTypes.func.isRequired
+  onChange: PropTypes.func.isRequired,
+  dispatchAddRootFolder: PropTypes.func.isRequired
 };
 
 RootFolderSelectInputConnector.defaultProps = {
   includeNoChange: false
 };
 
-export default connect(createMapStateToProps)(RootFolderSelectInputConnector);
+export default connect(createMapStateToProps, createMapDispatchToProps)(RootFolderSelectInputConnector);

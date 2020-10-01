@@ -1,6 +1,8 @@
-using System;
 using FluentValidation.Results;
 using NLog;
+using NzbDrone.Common.Cache;
+using NzbDrone.Core.Music;
+using System;
 
 namespace NzbDrone.Core.Notifications.Subsonic
 {
@@ -21,6 +23,7 @@ namespace NzbDrone.Core.Notifications.Subsonic
         {
             _proxy = proxy;
             _logger = logger;
+            
         }
 
         public void Notify(SubsonicSettings settings, string message)

@@ -1,29 +1,28 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import Link from 'Components/Link/Link';
 import { inputTypes } from 'Helpers/Props';
-import AlbumReleaseSelectInputConnector from './AlbumReleaseSelectInputConnector';
+import Link from 'Components/Link/Link';
 import AutoCompleteInput from './AutoCompleteInput';
 import CaptchaInputConnector from './CaptchaInputConnector';
 import CheckInput from './CheckInput';
 import DeviceInputConnector from './DeviceInputConnector';
-import EnhancedSelectInput from './EnhancedSelectInput';
-import FormInputHelpText from './FormInputHelpText';
-import IndexerSelectInputConnector from './IndexerSelectInputConnector';
+import PlaylistInputConnector from './PlaylistInputConnector';
 import KeyValueListInput from './KeyValueListInput';
-import MetadataProfileSelectInputConnector from './MetadataProfileSelectInputConnector';
 import MonitorAlbumsSelectInput from './MonitorAlbumsSelectInput';
 import NumberInput from './NumberInput';
 import OAuthInputConnector from './OAuthInputConnector';
 import PasswordInput from './PasswordInput';
 import PathInputConnector from './PathInputConnector';
-import PlaylistInputConnector from './PlaylistInputConnector';
 import QualityProfileSelectInputConnector from './QualityProfileSelectInputConnector';
+import MetadataProfileSelectInputConnector from './MetadataProfileSelectInputConnector';
+import AlbumReleaseSelectInputConnector from './AlbumReleaseSelectInputConnector';
 import RootFolderSelectInputConnector from './RootFolderSelectInputConnector';
 import SeriesTypeSelectInput from './SeriesTypeSelectInput';
+import EnhancedSelectInput from './EnhancedSelectInput';
 import TagInputConnector from './TagInputConnector';
-import TextInput from './TextInput';
 import TextTagInputConnector from './TextTagInputConnector';
+import TextInput from './TextInput';
+import FormInputHelpText from './FormInputHelpText';
 import styles from './FormInputGroup.css';
 
 function getComponent(type) {
@@ -69,9 +68,6 @@ function getComponent(type) {
 
     case inputTypes.ALBUM_RELEASE_SELECT:
       return AlbumReleaseSelectInputConnector;
-
-    case inputTypes.INDEXER_SELECT:
-      return IndexerSelectInputConnector;
 
     case inputTypes.ROOT_FOLDER_SELECT:
       return RootFolderSelectInputConnector;

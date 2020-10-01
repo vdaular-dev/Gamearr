@@ -29,9 +29,11 @@ namespace NzbDrone.Core.Indexers.Omgwtfnzbs
         {
             var pageableRequests = new IndexerPageableRequestChain();
 
+
             pageableRequests.Add(GetPagedRequests(string.Format("{0}+{1}",
                 searchCriteria.ArtistQuery,
                 searchCriteria.AlbumQuery)));
+
 
             return pageableRequests;
         }
@@ -40,8 +42,10 @@ namespace NzbDrone.Core.Indexers.Omgwtfnzbs
         {
             var pageableRequests = new IndexerPageableRequestChain();
 
+
             pageableRequests.Add(GetPagedRequests(string.Format("{0}",
                 searchCriteria.ArtistQuery)));
+
 
             return pageableRequests;
         }

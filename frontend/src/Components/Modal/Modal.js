@@ -1,15 +1,14 @@
-import classNames from 'classnames';
-import elementClass from 'element-class';
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
-import FocusLock from 'react-focus-lock';
-import ErrorBoundary from 'Components/Error/ErrorBoundary';
-import { sizes } from 'Helpers/Props';
-import * as keyCodes from 'Utilities/Constants/keyCodes';
+import classNames from 'classnames';
+import elementClass from 'element-class';
 import getUniqueElememtId from 'Utilities/getUniqueElementId';
 import { isIOS } from 'Utilities/mobile';
 import { setScrollLock } from 'Utilities/scrollLock';
+import * as keyCodes from 'Utilities/Constants/keyCodes';
+import { sizes } from 'Helpers/Props';
+import ErrorBoundary from 'Components/Error/ErrorBoundary';
 import ModalError from './ModalError';
 import styles from './Modal.css';
 
@@ -182,33 +181,31 @@ class Modal extends Component {
     }
 
     return ReactDOM.createPortal(
-      <FocusLock disabled={false}>
+      <div
+        className={styles.modalContainer}
+      >
         <div
-          className={styles.modalContainer}
+          ref={this._setBackgroundRef}
+          className={backdropClassName}
+          onMouseDown={this.onBackdropBeginPress}
+          onMouseUp={this.onBackdropEndPress}
         >
           <div
-            ref={this._setBackgroundRef}
-            className={backdropClassName}
-            onMouseDown={this.onBackdropBeginPress}
-            onMouseUp={this.onBackdropEndPress}
+            className={classNames(
+              className,
+              styles[size]
+            )}
+            style={style}
           >
-            <div
-              className={classNames(
-                className,
-                styles[size]
-              )}
-              style={style}
+            <ErrorBoundary
+              errorComponent={ModalError}
+              onModalClose={onModalClose}
             >
-              <ErrorBoundary
-                errorComponent={ModalError}
-                onModalClose={onModalClose}
-              >
-                {children}
-              </ErrorBoundary>
-            </div>
+              {children}
+            </ErrorBoundary>
           </div>
         </div>
-      </FocusLock>,
+      </div>,
       this._node
     );
   }

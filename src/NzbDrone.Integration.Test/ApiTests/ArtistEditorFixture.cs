@@ -1,7 +1,7 @@
-using System.Linq;
 using FluentAssertions;
-using Lidarr.Api.V1.Artist;
 using NUnit.Framework;
+using Gamearr.Api.V1.Artist;
+using System.Linq;
 using NzbDrone.Test.Common;
 
 namespace NzbDrone.Integration.Test.ApiTests

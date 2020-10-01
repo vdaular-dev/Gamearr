@@ -1,13 +1,14 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import Card from 'Components/Card';
+import sortByName from 'Utilities/Array/sortByName';
+import { icons } from 'Helpers/Props';
 import FieldSet from 'Components/FieldSet';
+import Card from 'Components/Card';
 import Icon from 'Components/Icon';
 import PageSectionContent from 'Components/Page/PageSectionContent';
-import { icons } from 'Helpers/Props';
+import Indexer from './Indexer';
 import AddIndexerModal from './AddIndexerModal';
 import EditIndexerModalConnector from './EditIndexerModalConnector';
-import Indexer from './Indexer';
 import styles from './Indexers.css';
 
 class Indexers extends Component {
@@ -31,11 +32,6 @@ class Indexers extends Component {
     this.setState({ isAddIndexerModalOpen: true });
   }
 
-  onCloneIndexerPress = (id) => {
-    this.props.dispatchCloneIndexer({ id });
-    this.setState({ isEditIndexerModalOpen: true });
-  }
-
   onAddIndexerModalClose = ({ indexerSelected = false } = {}) => {
     this.setState({
       isAddIndexerModalOpen: false,
@@ -53,7 +49,6 @@ class Indexers extends Component {
   render() {
     const {
       items,
-      dispatchCloneIndexer,
       onConfirmDeleteIndexer,
       ...otherProps
     } = this.props;
@@ -63,8 +58,6 @@ class Indexers extends Component {
       isEditIndexerModalOpen
     } = this.state;
 
-    const showPriority = items.some((index) => index.priority !== 25);
-
     return (
       <FieldSet legend="Indexers">
         <PageSectionContent
@@ -73,13 +66,11 @@ class Indexers extends Component {
         >
           <div className={styles.indexers}>
             {
-              items.map((item) => {
+              items.sort(sortByName).map((item) => {
                 return (
                   <Indexer
                     key={item.id}
                     {...item}
-                    showPriority={showPriority}
-                    onCloneIndexerPress={this.onCloneIndexerPress}
                     onConfirmDeleteIndexer={onConfirmDeleteIndexer}
                   />
                 );
@@ -118,7 +109,6 @@ Indexers.propTypes = {
   isFetching: PropTypes.bool.isRequired,
   error: PropTypes.object,
   items: PropTypes.arrayOf(PropTypes.object).isRequired,
-  dispatchCloneIndexer: PropTypes.func.isRequired,
   onConfirmDeleteIndexer: PropTypes.func.isRequired
 };
 

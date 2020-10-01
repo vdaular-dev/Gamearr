@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import Scroller from 'Components/Scroller/Scroller';
 import { scrollDirections } from 'Helpers/Props';
+import Scroller from 'Components/Scroller/Scroller';
 import styles from './ModalBody.css';
 
 class ModalBody extends Component {

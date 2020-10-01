@@ -5,22 +5,20 @@ using FizzWare.NBuilder;
 using Moq;
 using NUnit.Framework;
 using NzbDrone.Common.Disk;
-using NzbDrone.Core.Messaging.Events;
-using NzbDrone.Core.Music;
-using NzbDrone.Core.Music.Commands;
-using NzbDrone.Core.Music.Events;
 using NzbDrone.Core.Organizer;
 using NzbDrone.Core.Test.Framework;
+using NzbDrone.Core.Music;
+using NzbDrone.Core.Music.Commands;
 using NzbDrone.Test.Common;
 
 namespace NzbDrone.Core.Test.MusicTests
 {
     [TestFixture]
-    public class MoveArtistServiceFixture : CoreTest<MoveArtistService>
+    public class MoveGameServiceFixture : CoreTest<MoveGameService>
     {
         private Artist _artist;
-        private MoveArtistCommand _command;
-        private BulkMoveArtistCommand _bulkCommand;
+        private MoveGameCommand _command;
+        private BulkMoveGameCommand _bulkCommand;
 
         [SetUp]
         public void Setup()
@@ -29,26 +27,24 @@ namespace NzbDrone.Core.Test.MusicTests
                 .CreateNew()
                 .Build();
 
-            _command = new MoveArtistCommand
+            _command = new MoveGameCommand
             {
-                ArtistId = _artist.Id,
+                ArtistId = 1,
                 SourcePath = @"C:\Test\Music\Artist".AsOsAgnostic(),
-                DestinationPath = @"C:\Test\Music2\Artist".AsOsAgnostic(),
-                MoveFiles = true
+                DestinationPath = @"C:\Test\Music2\Artist".AsOsAgnostic()
             };
 
-            _bulkCommand = new BulkMoveArtistCommand
+            _bulkCommand = new BulkMoveGameCommand
             {
-                Artist = new List<BulkMoveArtist>
+                Artist = new List<BulkMoveGame>
                 {
-                    new BulkMoveArtist
+                    new BulkMoveGame
                     {
-                        ArtistId = _artist.Id,
+                        ArtistId = 1,
                         SourcePath = @"C:\Test\Music\Artist".AsOsAgnostic()
                     }
                 },
-                DestinationRootFolder = @"C:\Test\Music2".AsOsAgnostic(),
-                MoveFiles = true
+                DestinationRootFolder = @"C:\Test\Music2".AsOsAgnostic()
             };
 
             Mocker.GetMock<IArtistService>()
@@ -93,15 +89,13 @@ namespace NzbDrone.Core.Test.MusicTests
         [Test]
         public void should_use_destination_path()
         {
+
             Subject.Execute(_command);
 
             Mocker.GetMock<IDiskTransferService>()
                 .Verify(
-                    v => v.TransferFolder(_command.SourcePath,
-                                          _command.DestinationPath,
-                                          TransferMode.Move,
-                                          It.IsAny<bool>()),
-                    Times.Once());
+                    v => v.TransferFolder(_command.SourcePath, _command.DestinationPath, TransferMode.Move,
+                        It.IsAny<bool>()), Times.Once());
 
             Mocker.GetMock<IBuildFileNames>()
                 .Verify(v => v.GetArtistFolder(It.IsAny<Artist>(), null), Times.Never());
@@ -113,6 +107,7 @@ namespace NzbDrone.Core.Test.MusicTests
             var artistFolder = "Artist";
             var expectedPath = Path.Combine(_bulkCommand.DestinationRootFolder, artistFolder);
 
+
             Mocker.GetMock<IBuildFileNames>()
                 .Setup(s => s.GetArtistFolder(It.IsAny<Artist>(), null))
                 .Returns(artistFolder);
@@ -121,11 +116,8 @@ namespace NzbDrone.Core.Test.MusicTests
 
             Mocker.GetMock<IDiskTransferService>()
                 .Verify(
-                    v => v.TransferFolder(_bulkCommand.Artist.First().SourcePath,
-                                          expectedPath,
-                                          TransferMode.Move,
-                                          It.IsAny<bool>()),
-                    Times.Once());
+                    v => v.TransferFolder(_bulkCommand.Artist.First().SourcePath, expectedPath, TransferMode.Move,
+                        It.IsAny<bool>()), Times.Once());
         }
 
         [Test]
@@ -135,45 +127,17 @@ namespace NzbDrone.Core.Test.MusicTests
                 .Setup(s => s.FolderExists(It.IsAny<string>()))
                 .Returns(false);
 
+
             Subject.Execute(_command);
 
             Mocker.GetMock<IDiskTransferService>()
                 .Verify(
-                    v => v.TransferFolder(_command.SourcePath,
-                        _command.DestinationPath,
-                        TransferMode.Move,
+                    v => v.TransferFolder(_command.SourcePath, _command.DestinationPath, TransferMode.Move,
                         It.IsAny<bool>()), Times.Never());
 
             Mocker.GetMock<IBuildFileNames>()
                 .Verify(v => v.GetArtistFolder(It.IsAny<Artist>(), null), Times.Never());
-        }
 
-        [Test]
-        public void should_raise_artist_moved_event_when_move_files_false()
-        {
-            _command.MoveFiles = false;
-            Subject.Execute(_command);
-
-            Mocker.GetMock<IEventAggregator>()
-                .Verify(v => v.PublishEvent(It.Is<ArtistMovedEvent>(c => c.Artist.Id == _artist.Id)), Times.Once());
-        }
-
-        [Test]
-        public void should_raise_artist_moved_event_when_move_files_false_bulk()
-        {
-            _bulkCommand.MoveFiles = false;
-
-            var artistFolder = "Artist";
-            var expectedPath = Path.Combine(_bulkCommand.DestinationRootFolder, artistFolder);
-
-            Mocker.GetMock<IBuildFileNames>()
-                .Setup(s => s.GetArtistFolder(It.IsAny<Artist>(), null))
-                .Returns(artistFolder);
-
-            Subject.Execute(_bulkCommand);
-
-            Mocker.GetMock<IEventAggregator>()
-                .Verify(v => v.PublishEvent(It.Is<ArtistMovedEvent>(c => c.Artist.Id == _artist.Id)), Times.Once());
         }
     }
 }

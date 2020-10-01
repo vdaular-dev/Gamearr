@@ -1,7 +1,7 @@
-import classNames from 'classnames';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
+import classNames from 'classnames';
 import { kinds } from 'Helpers/Props';
 import tagShape from 'Helpers/Props/Shapes/tagShape';
 import AutoSuggestInput from './AutoSuggestInput';
@@ -100,9 +100,9 @@ class TagInput extends Component {
       suggestions
     } = this.state;
 
-    const key = event.key;
+    const keyCode = event.keyCode;
 
-    if (key === 'Backspace' && !value.length) {
+    if (keyCode === 8 && !value.length) {
       const index = tags.length - 1;
 
       if (index >= 0) {
@@ -116,7 +116,7 @@ class TagInput extends Component {
       event.preventDefault();
     }
 
-    if (delimiters.includes(key)) {
+    if (delimiters.includes(keyCode)) {
       const selectedIndex = this._autosuggestRef.highlightedSuggestionIndex;
       const tag = getTag(value, selectedIndex, suggestions, allowNew);
 
@@ -210,8 +210,6 @@ class TagInput extends Component {
     const {
       className,
       inputContainerClassName,
-      hasError,
-      hasWarning,
       ...otherProps
     } = this.props;
 
@@ -228,9 +226,7 @@ class TagInput extends Component {
         className={styles.internalInput}
         inputContainerClassName={classNames(
           inputContainerClassName,
-          isFocused && styles.isFocused,
-          hasError && styles.hasError,
-          hasWarning && styles.hasWarning
+          isFocused && styles.isFocused
         )}
         value={value}
         suggestions={suggestions}
@@ -260,7 +256,7 @@ TagInput.propTypes = {
   allowNew: PropTypes.bool.isRequired,
   kind: PropTypes.oneOf(kinds.all).isRequired,
   placeholder: PropTypes.string.isRequired,
-  delimiters: PropTypes.arrayOf(PropTypes.string).isRequired,
+  delimiters: PropTypes.arrayOf(PropTypes.number).isRequired,
   minQueryLength: PropTypes.number.isRequired,
   hasError: PropTypes.bool,
   hasWarning: PropTypes.bool,
@@ -275,7 +271,8 @@ TagInput.defaultProps = {
   allowNew: true,
   kind: kinds.INFO,
   placeholder: '',
-  delimiters: ['Tab', 'Enter', ' ', ','],
+  // Tab, enter, space and comma
+  delimiters: [9, 13, 32, 188],
   minQueryLength: 1,
   tagComponent: TagInputTag
 };

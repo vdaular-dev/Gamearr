@@ -10,18 +10,15 @@ namespace NzbDrone.Core.MediaFiles.TrackImport
         {
         }
 
-        public RootFolderNotFoundException(string message)
-            : base(message)
+        public RootFolderNotFoundException(string message) : base(message)
         {
         }
 
-        public RootFolderNotFoundException(string message, Exception innerException)
-            : base(message, innerException)
+        public RootFolderNotFoundException(string message, Exception innerException) : base(message, innerException)
         {
         }
 
-        protected RootFolderNotFoundException(SerializationInfo info, StreamingContext context)
-            : base(info, context)
+        protected RootFolderNotFoundException(SerializationInfo info, StreamingContext context) : base(info, context)
         {
         }
     }

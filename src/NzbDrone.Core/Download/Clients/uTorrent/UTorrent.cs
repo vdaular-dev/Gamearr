@@ -1,18 +1,18 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using FluentValidation.Results;
-using NLog;
-using NzbDrone.Common.Cache;
+using System.Collections.Generic;
 using NzbDrone.Common.Disk;
 using NzbDrone.Common.Extensions;
 using NzbDrone.Common.Http;
 using NzbDrone.Core.Configuration;
 using NzbDrone.Core.MediaFiles.TorrentInfo;
+using NLog;
+using NzbDrone.Core.Validation;
+using FluentValidation.Results;
+using System.Net;
 using NzbDrone.Core.Parser.Model;
 using NzbDrone.Core.RemotePathMappings;
-using NzbDrone.Core.Validation;
+using NzbDrone.Common.Cache;
 
 namespace NzbDrone.Core.Download.Clients.UTorrent
 {
@@ -36,36 +36,16 @@ namespace NzbDrone.Core.Download.Clients.UTorrent
             _torrentCache = cacheManager.GetCache<UTorrentTorrentCache>(GetType(), "differentialTorrents");
         }
 
-        public override void MarkItemAsImported(DownloadClientItem downloadClientItem)
-        {
-            // set post-import category
-            if (Settings.MusicImportedCategory.IsNotNullOrWhiteSpace() &&
-                Settings.MusicImportedCategory != Settings.MusicCategory)
-            {
-                _proxy.SetTorrentLabel(downloadClientItem.DownloadId.ToLower(), Settings.MusicImportedCategory, Settings);
-
-                // old label must be explicitly removed
-                if (Settings.MusicCategory.IsNotNullOrWhiteSpace())
-                {
-                    _proxy.RemoveTorrentLabel(downloadClientItem.DownloadId.ToLower(), Settings.MusicCategory, Settings);
-                }
-            }
-        }
-
         protected override string AddFromMagnetLink(RemoteAlbum remoteAlbum, string hash, string magnetLink)
         {
             _proxy.AddTorrentFromUrl(magnetLink, Settings);
+            _proxy.SetTorrentLabel(hash, Settings.MusicCategory, Settings);
             _proxy.SetTorrentSeedingConfiguration(hash, remoteAlbum.SeedConfiguration, Settings);
-
-            if (Settings.MusicCategory.IsNotNullOrWhiteSpace())
-            {
-                _proxy.SetTorrentLabel(hash, Settings.MusicCategory, Settings);
-            }
 
             var isRecentAlbum = remoteAlbum.IsRecentAlbum();
 
-            if ((isRecentAlbum && Settings.RecentTvPriority == (int)UTorrentPriority.First) ||
-                (!isRecentAlbum && Settings.OlderTvPriority == (int)UTorrentPriority.First))
+            if (isRecentAlbum && Settings.RecentTvPriority == (int)UTorrentPriority.First ||
+                !isRecentAlbum && Settings.OlderTvPriority == (int)UTorrentPriority.First)
             {
                 _proxy.MoveTorrentToTopInQueue(hash, Settings);
             }
@@ -78,17 +58,13 @@ namespace NzbDrone.Core.Download.Clients.UTorrent
         protected override string AddFromTorrentFile(RemoteAlbum remoteAlbum, string hash, string filename, byte[] fileContent)
         {
             _proxy.AddTorrentFromFile(filename, fileContent, Settings);
+            _proxy.SetTorrentLabel(hash, Settings.MusicCategory, Settings);
             _proxy.SetTorrentSeedingConfiguration(hash, remoteAlbum.SeedConfiguration, Settings);
-
-            if (Settings.MusicCategory.IsNotNullOrWhiteSpace())
-            {
-                _proxy.SetTorrentLabel(hash, Settings.MusicCategory, Settings);
-            }
 
             var isRecentAlbum = remoteAlbum.IsRecentAlbum();
 
-            if ((isRecentAlbum && Settings.RecentTvPriority == (int)UTorrentPriority.First) ||
-                (!isRecentAlbum && Settings.OlderTvPriority == (int)UTorrentPriority.First))
+            if (isRecentAlbum && Settings.RecentTvPriority == (int)UTorrentPriority.First ||
+                !isRecentAlbum && Settings.OlderTvPriority == (int)UTorrentPriority.First)
             {
                 _proxy.MoveTorrentToTopInQueue(hash, Settings);
             }
@@ -248,11 +224,7 @@ namespace NzbDrone.Core.Download.Clients.UTorrent
         protected override void Test(List<ValidationFailure> failures)
         {
             failures.AddIfNotNull(TestConnection());
-            if (failures.HasErrors())
-            {
-                return;
-            }
-
+            if (failures.Any()) return;
             failures.AddIfNotNull(TestGetTorrents());
         }
 
@@ -285,7 +257,6 @@ namespace NzbDrone.Core.Download.Clients.UTorrent
                         DetailedDescription = "Please verify the hostname and port."
                     };
                 }
-
                 return new NzbDroneValidationFailure(string.Empty, "Unknown exception: " + ex.Message);
             }
             catch (Exception ex)

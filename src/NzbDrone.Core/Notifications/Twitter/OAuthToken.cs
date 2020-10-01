@@ -1,3 +1,4 @@
+
 namespace NzbDrone.Core.Notifications.Twitter
 {
     public class OAuthToken

@@ -5,14 +5,10 @@ function createArtistCountSelector() {
   return createSelector(
     createAllArtistSelector(),
     (state) => state.artist.error,
-    (state) => state.artist.isFetching,
-    (state) => state.artist.isPopulated,
-    (artists, error, isFetching, isPopulated) => {
+    (artists, error) => {
       return {
         count: artists.length,
-        error,
-        isFetching,
-        isPopulated
+        error
       };
     }
   );

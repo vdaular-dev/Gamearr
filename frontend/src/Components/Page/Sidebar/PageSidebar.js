@@ -1,14 +1,14 @@
-import classNames from 'classnames';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
-import QueueStatusConnector from 'Activity/Queue/Status/QueueStatusConnector';
-import OverlayScroller from 'Components/Scroller/OverlayScroller';
-import Scroller from 'Components/Scroller/Scroller';
+import classNames from 'classnames';
 import { icons } from 'Helpers/Props';
 import locationShape from 'Helpers/Props/Shapes/locationShape';
 import dimensions from 'Styles/Variables/dimensions';
+import OverlayScroller from 'Components/Scroller/OverlayScroller';
+import Scroller from 'Components/Scroller/Scroller';
+import QueueStatusConnector from 'Activity/Queue/Status/QueueStatusConnector';
 import HealthStatusConnector from 'System/Status/Health/HealthStatusConnector';
 import MessagesConnector from './Messages/MessagesConnector';
 import PageSidebarItem from './PageSidebarItem';
@@ -19,22 +19,22 @@ const SIDEBAR_WIDTH = parseInt(dimensions.sidebarWidth);
 
 const links = [
   {
-    iconName: icons.ARTIST_CONTINUING,
+    iconName: icons.GAME_CONTINUING,
     title: 'Library',
     to: '/',
     alias: '/artist',
     children: [
       {
         title: 'Add New',
-        to: '/add/search'
+        to: '/add/new'
+      },
+      {
+        title: 'Import',
+        to: '/add/import'
       },
       {
         title: 'Mass Editor',
         to: '/artisteditor'
-      },
-      {
-        title: 'Album Studio',
-        to: '/albumstudio'
       },
       {
         title: 'Unmapped Files',
@@ -96,14 +96,6 @@ const links = [
         to: '/settings/mediamanagement'
       },
       {
-        title: 'Profiles',
-        to: '/settings/profiles'
-      },
-      {
-        title: 'Quality',
-        to: '/settings/quality'
-      },
-      {
         title: 'Indexers',
         to: '/settings/indexers'
       },
@@ -118,14 +110,6 @@ const links = [
       {
         title: 'Connect',
         to: '/settings/connect'
-      },
-      {
-        title: 'Metadata',
-        to: '/settings/metadata'
-      },
-      {
-        title: 'Tags',
-        to: '/settings/tags'
       },
       {
         title: 'General',
@@ -430,7 +414,7 @@ class PageSidebar extends Component {
       transform
     } = this.state;
 
-    const urlBase = window.Lidarr.urlBase;
+    const urlBase = window.Gamearr.urlBase;
     const pathname = urlBase ? location.pathname.substr(urlBase.length) || '/' : location.pathname;
     const activeParent = getActiveParent(pathname);
 

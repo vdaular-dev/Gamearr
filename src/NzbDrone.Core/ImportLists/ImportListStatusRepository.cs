@@ -9,6 +9,7 @@ namespace NzbDrone.Core.ImportLists
     }
 
     public class ImportListStatusRepository : ProviderStatusRepository<ImportListStatus>, IImportListStatusRepository
+
     {
         public ImportListStatusRepository(IMainDatabase database, IEventAggregator eventAggregator)
             : base(database, eventAggregator)

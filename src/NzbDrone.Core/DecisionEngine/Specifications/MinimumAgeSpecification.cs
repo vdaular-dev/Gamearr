@@ -38,6 +38,7 @@ namespace NzbDrone.Core.DecisionEngine.Specifications
                 return Decision.Accept();
             }
 
+
             _logger.Debug("Checking if report meets minimum age requirements. {0}", ageRounded);
 
             if (age < minimumAge)

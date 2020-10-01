@@ -11,18 +11,16 @@ namespace NzbDrone.Integration.Test
         [Test]
         public void should_log_on_error()
         {
-            IgnoreOnMonoVersions("5.12", "5.14");
-
             var config = HostConfig.Get(1);
             config.LogLevel = "Trace";
             HostConfig.Put(config);
 
             var resultGet = Artist.All();
 
-            var logFile = "Lidarr.trace.txt";
+            var logFile = "Gamearr.trace.txt";
             var logLines = Logs.GetLogFileLines(logFile);
 
-            var result = Artist.InvalidPost(new Lidarr.Api.V1.Artist.ArtistResource());
+            var result = Artist.InvalidPost(new Gamearr.Api.V1.Artist.ArtistResource());
 
             // Skip 2 and 1 to ignore the logs endpoint
             logLines = Logs.GetLogFileLines(logFile).Skip(logLines.Length + 2).ToArray();

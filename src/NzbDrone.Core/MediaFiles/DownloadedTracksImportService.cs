@@ -5,7 +5,6 @@ using System.IO.Abstractions;
 using System.Linq;
 using NLog;
 using NzbDrone.Common.Disk;
-using NzbDrone.Common.EnvironmentInfo;
 using NzbDrone.Core.DecisionEngine;
 using NzbDrone.Core.Download;
 using NzbDrone.Core.MediaFiles.Events;
@@ -33,7 +32,6 @@ namespace NzbDrone.Core.MediaFiles
         private readonly IMakeImportDecision _importDecisionMaker;
         private readonly IImportApprovedTracks _importApprovedTracks;
         private readonly IEventAggregator _eventAggregator;
-        private readonly IRuntimeInfo _runtimeInfo;
         private readonly Logger _logger;
 
         public DownloadedTracksImportService(IDiskProvider diskProvider,
@@ -43,7 +41,6 @@ namespace NzbDrone.Core.MediaFiles
                                              IMakeImportDecision importDecisionMaker,
                                              IImportApprovedTracks importApprovedTracks,
                                              IEventAggregator eventAggregator,
-                                             IRuntimeInfo runtimeInfo,
                                              Logger logger)
         {
             _diskProvider = diskProvider;
@@ -53,7 +50,6 @@ namespace NzbDrone.Core.MediaFiles
             _importDecisionMaker = importDecisionMaker;
             _importApprovedTracks = importApprovedTracks;
             _eventAggregator = eventAggregator;
-            _runtimeInfo = runtimeInfo;
             _logger = logger;
         }
 
@@ -78,8 +74,6 @@ namespace NzbDrone.Core.MediaFiles
 
         public List<ImportResult> ProcessPath(string path, ImportMode importMode = ImportMode.Auto, Artist artist = null, DownloadClientItem downloadClientItem = null)
         {
-            _logger.Debug("Processing path: {0}", path);
-
             if (_diskProvider.FolderExists(path))
             {
                 var directoryInfo = _diskProvider.GetDirectoryInfo(path);
@@ -104,46 +98,38 @@ namespace NzbDrone.Core.MediaFiles
                 return ProcessFile(fileInfo, importMode, artist, downloadClientItem);
             }
 
-            LogInaccessiblePathError(path);
+            _logger.Error("Import failed, path does not exist or is not accessible by Gamearr: {0}", path);
             _eventAggregator.PublishEvent(new TrackImportFailedEvent(null, null, true, downloadClientItem));
-
+            
             return new List<ImportResult>();
         }
 
         public bool ShouldDeleteFolder(IDirectoryInfo directoryInfo, Artist artist)
         {
-            try
+            var audioFiles = _diskScanService.GetAudioFiles(directoryInfo.FullName);
+            var rarFiles = _diskProvider.GetFiles(directoryInfo.FullName, SearchOption.AllDirectories).Where(f => Path.GetExtension(f).Equals(".rar", StringComparison.OrdinalIgnoreCase));
+
+            foreach (var audioFile in audioFiles)
             {
-                var audioFiles = _diskScanService.GetAudioFiles(directoryInfo.FullName);
-                var rarFiles = _diskProvider.GetFiles(directoryInfo.FullName, SearchOption.AllDirectories).Where(f => Path.GetExtension(f).Equals(".rar", StringComparison.OrdinalIgnoreCase));
+                var albumParseResult = Parser.Parser.ParseMusicTitle(audioFile.Name);
 
-                foreach (var audioFile in audioFiles)
+                if (albumParseResult == null)
                 {
-                    var albumParseResult = Parser.Parser.ParseMusicTitle(audioFile.Name);
-
-                    if (albumParseResult == null)
-                    {
-                        _logger.Warn("Unable to parse file on import: [{0}]", audioFile);
-                        return false;
-                    }
-
-                    _logger.Warn("Audio file detected: [{0}]", audioFile);
+                    _logger.Warn("Unable to parse file on import: [{0}]", audioFile);
                     return false;
                 }
 
-                if (rarFiles.Any(f => _diskProvider.GetFileSize(f) > 10.Megabytes()))
-                {
-                    _logger.Warn("RAR file detected, will require manual cleanup");
-                    return false;
-                }
-
-                return true;
-            }
-            catch (DirectoryNotFoundException e)
-            {
-                _logger.Debug(e, "Folder {0} has already been removed", directoryInfo.FullName);
+                _logger.Warn("Audio file detected: [{0}]", audioFile);
                 return false;
             }
+
+            if (rarFiles.Any(f => _diskProvider.GetFileSize(f) > 10.Megabytes()))
+            {
+                _logger.Warn("RAR file detected, will require manual cleanup");
+                return false;
+            }
+
+            return true;
         }
 
         private List<ImportResult> ProcessFolder(IDirectoryInfo directoryInfo, ImportMode importMode, DownloadClientItem downloadClientItem)
@@ -210,25 +196,7 @@ namespace NzbDrone.Core.MediaFiles
                 }
             }
 
-            var idOverrides = new IdentificationOverrides
-            {
-                Artist = artist
-            };
-            var idInfo = new ImportDecisionMakerInfo
-            {
-                DownloadClientItem = downloadClientItem,
-                ParsedTrackInfo = trackInfo
-            };
-            var idConfig = new ImportDecisionMakerConfig
-            {
-                Filter = FilterFilesType.None,
-                NewDownload = true,
-                SingleRelease = false,
-                IncludeExisting = false,
-                AddNewArtists = false
-            };
-
-            var decisions = _importDecisionMaker.GetImportDecisions(audioFiles, idOverrides, idInfo, idConfig);
+            var decisions = _importDecisionMaker.GetImportDecisions(audioFiles, artist, trackInfo);
             var importResults = _importApprovedTracks.Import(decisions, true, downloadClientItem, importMode);
 
             if (importMode == ImportMode.Auto)
@@ -287,24 +255,7 @@ namespace NzbDrone.Core.MediaFiles
                 }
             }
 
-            var idOverrides = new IdentificationOverrides
-            {
-                Artist = artist
-            };
-            var idInfo = new ImportDecisionMakerInfo
-            {
-                DownloadClientItem = downloadClientItem
-            };
-            var idConfig = new ImportDecisionMakerConfig
-            {
-                Filter = FilterFilesType.None,
-                NewDownload = true,
-                SingleRelease = false,
-                IncludeExisting = false,
-                AddNewArtists = false
-            };
-
-            var decisions = _importDecisionMaker.GetImportDecisions(new List<IFileInfo>() { fileInfo }, idOverrides, idInfo, idConfig);
+            var decisions = _importDecisionMaker.GetImportDecisions(new List<IFileInfo>() { fileInfo }, artist, null);
 
             return _importApprovedTracks.Import(decisions, true, downloadClientItem, importMode);
         }
@@ -328,38 +279,6 @@ namespace NzbDrone.Core.MediaFiles
             var localTrack = audioFile == null ? null : new LocalTrack { Path = audioFile };
 
             return new ImportResult(new ImportDecision<LocalTrack>(localTrack, new Rejection("Unknown Artist")), message);
-        }
-
-        private void LogInaccessiblePathError(string path)
-        {
-            if (_runtimeInfo.IsWindowsService)
-            {
-                var mounts = _diskProvider.GetMounts();
-                var mount = mounts.FirstOrDefault(m => m.RootDirectory == Path.GetPathRoot(path));
-
-                if (mount == null)
-                {
-                    _logger.Error("Import failed, path does not exist or is not accessible by Lidarr: {0}. Unable to find a volume mounted for the path. If you're using a mapped network drive see the FAQ for more info", path);
-                    return;
-                }
-
-                if (mount.DriveType == DriveType.Network)
-                {
-                    _logger.Error("Import failed, path does not exist or is not accessible by Lidarr: {0}. It's recommended to avoid mapped network drives when running as a Windows service. See the FAQ for more info", path);
-                    return;
-                }
-            }
-
-            if (OsInfo.IsWindows)
-            {
-                if (path.StartsWith(@"\\"))
-                {
-                    _logger.Error("Import failed, path does not exist or is not accessible by Lidarr: {0}. Ensure the user running Lidarr has access to the network share", path);
-                    return;
-                }
-            }
-
-            _logger.Error("Import failed, path does not exist or is not accessible by Lidarr: {0}. Ensure the path exists and the user running Lidarr has the correct permissions to access this file/folder", path);
         }
     }
 }

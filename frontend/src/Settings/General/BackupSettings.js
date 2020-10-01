@@ -1,10 +1,10 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import { inputTypes } from 'Helpers/Props';
 import FieldSet from 'Components/FieldSet';
 import FormGroup from 'Components/Form/FormGroup';
-import FormInputGroup from 'Components/Form/FormInputGroup';
 import FormLabel from 'Components/Form/FormLabel';
-import { inputTypes } from 'Helpers/Props';
+import FormInputGroup from 'Components/Form/FormInputGroup';
 
 function BackupSettings(props) {
   const {
@@ -34,7 +34,7 @@ function BackupSettings(props) {
         <FormInputGroup
           type={inputTypes.PATH}
           name="backupFolder"
-          helpText="Relative paths will be under Lidarr's AppData directory"
+          helpText="Relative paths will be under Gamearr's AppData directory"
           onChange={onInputChange}
           {...backupFolder}
         />
@@ -50,7 +50,7 @@ function BackupSettings(props) {
           type={inputTypes.NUMBER}
           name="backupInterval"
           unit="days"
-          helpText="Interval to backup the Lidarr DB and settings"
+          helpText="Interval to backup the Gamearr DB and settings"
           onChange={onInputChange}
           {...backupInterval}
         />

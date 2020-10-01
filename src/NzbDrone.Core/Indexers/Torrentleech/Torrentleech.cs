@@ -1,7 +1,7 @@
-﻿using NLog;
-using NzbDrone.Common.Http;
+﻿using NzbDrone.Common.Http;
 using NzbDrone.Core.Configuration;
 using NzbDrone.Core.Parser;
+using NLog;
 
 namespace NzbDrone.Core.Indexers.Torrentleech
 {
@@ -16,6 +16,7 @@ namespace NzbDrone.Core.Indexers.Torrentleech
         public Torrentleech(IHttpClient httpClient, IIndexerStatusService indexerStatusService, IConfigService configService, IParsingService parsingService, Logger logger)
             : base(httpClient, indexerStatusService, configService, parsingService, logger)
         {
+
         }
 
         public override IIndexerRequestGenerator GetRequestGenerator()

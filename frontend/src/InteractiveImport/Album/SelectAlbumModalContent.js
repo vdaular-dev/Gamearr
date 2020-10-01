@@ -1,16 +1,16 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import TextInput from 'Components/Form/TextInput';
 import Button from 'Components/Link/Button';
-import LoadingIndicator from 'Components/Loading/LoadingIndicator';
-import ModalBody from 'Components/Modal/ModalBody';
+import { scrollDirections } from 'Helpers/Props';
 import ModalContent from 'Components/Modal/ModalContent';
-import ModalFooter from 'Components/Modal/ModalFooter';
 import ModalHeader from 'Components/Modal/ModalHeader';
-import Scroller from 'Components/Scroller/Scroller';
+import ModalBody from 'Components/Modal/ModalBody';
+import ModalFooter from 'Components/Modal/ModalFooter';
 import Table from 'Components/Table/Table';
 import TableBody from 'Components/Table/TableBody';
-import { scrollDirections } from 'Helpers/Props';
+import Scroller from 'Components/Scroller/Scroller';
+import TextInput from 'Components/Form/TextInput';
+import LoadingIndicator from 'Components/Loading/LoadingIndicator';
 import SelectAlbumRow from './SelectAlbumRow';
 import styles from './SelectAlbumModalContent.css';
 

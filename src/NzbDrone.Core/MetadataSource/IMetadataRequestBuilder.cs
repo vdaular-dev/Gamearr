@@ -5,18 +5,18 @@ using NzbDrone.Core.Configuration;
 
 namespace NzbDrone.Core.MetadataSource
 {
+
     public interface IMetadataRequestBuilder
     {
         IHttpRequestBuilderFactory GetRequestBuilder();
     }
-
     public class MetadataRequestBuilder : IMetadataRequestBuilder
     {
         private readonly IConfigService _configService;
 
-        private readonly ILidarrCloudRequestBuilder _defaultRequestFactory;
+        private readonly IGamearrCloudRequestBuilder _defaultRequestFactory;
 
-        public MetadataRequestBuilder(IConfigService configService, ILidarrCloudRequestBuilder defaultRequestBuilder)
+        public MetadataRequestBuilder(IConfigService configService, IGamearrCloudRequestBuilder defaultRequestBuilder)
         {
             _configService = configService;
             _defaultRequestFactory = defaultRequestBuilder;

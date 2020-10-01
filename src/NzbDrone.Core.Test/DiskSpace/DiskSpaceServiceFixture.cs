@@ -1,14 +1,15 @@
+using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
+using System.Text;
 using FluentAssertions;
 using Moq;
 using NUnit.Framework;
 using NzbDrone.Common.Disk;
+using NzbDrone.Core.Configuration;
 using NzbDrone.Core.DiskSpace;
-using NzbDrone.Core.Music;
-using NzbDrone.Core.RootFolders;
 using NzbDrone.Core.Test.Framework;
+using NzbDrone.Core.Music;
 using NzbDrone.Test.Common;
 
 namespace NzbDrone.Core.Test.DiskSpace
@@ -16,20 +17,14 @@ namespace NzbDrone.Core.Test.DiskSpace
     [TestFixture]
     public class DiskSpaceServiceFixture : CoreTest<DiskSpaceService>
     {
-        private RootFolder _rootDir;
-        private string _artistFolder1;
-        private string _artistFolder2;
+        private string _artistFolder;
+        private string _artostFolder2;
 
         [SetUp]
         public void SetUp()
         {
-            _rootDir = new RootFolder { Path = @"G:\fasdlfsdf".AsOsAgnostic() };
-            _artistFolder1 = Path.Combine(_rootDir.Path, "artist1");
-            _artistFolder2 = Path.Combine(_rootDir.Path, "artist2");
-
-            Mocker.GetMock<IRootFolderService>()
-                  .Setup(x => x.All())
-                  .Returns(new List<RootFolder>() { _rootDir });
+            _artistFolder = @"G:\fasdlfsdf\artist".AsOsAgnostic();
+            _artostFolder2 = @"G:\fasdlfsdf\artist2".AsOsAgnostic();
 
             Mocker.GetMock<IDiskProvider>()
                   .Setup(v => v.GetMounts())
@@ -67,9 +62,9 @@ namespace NzbDrone.Core.Test.DiskSpace
         [Test]
         public void should_check_diskspace_for_artist_folders()
         {
-            GivenArtist(new Artist { Path = _artistFolder1 });
+            GivenArtist(new Artist { Path = _artistFolder });
 
-            GivenExistingFolder(_artistFolder1);
+            GivenExistingFolder(_artistFolder);
 
             var freeSpace = Subject.GetFreeSpace();
 
@@ -79,10 +74,10 @@ namespace NzbDrone.Core.Test.DiskSpace
         [Test]
         public void should_check_diskspace_for_same_root_folder_only_once()
         {
-            GivenArtist(new Artist { Path = _artistFolder1 }, new Artist { Path = _artistFolder2 });
+            GivenArtist(new Artist { Path = _artistFolder }, new Artist { Path = _artostFolder2 });
 
-            GivenExistingFolder(_artistFolder1);
-            GivenExistingFolder(_artistFolder2);
+            GivenExistingFolder(_artistFolder);
+            GivenExistingFolder(_artostFolder2);
 
             var freeSpace = Subject.GetFreeSpace();
 
@@ -90,6 +85,19 @@ namespace NzbDrone.Core.Test.DiskSpace
 
             Mocker.GetMock<IDiskProvider>()
                   .Verify(v => v.GetAvailableSpace(It.IsAny<string>()), Times.Once());
+        }
+
+        [Test]
+        public void should_not_check_diskspace_for_missing_artist_folders()
+        {
+            GivenArtist(new Artist { Path = _artistFolder });
+
+            var freeSpace = Subject.GetFreeSpace();
+
+            freeSpace.Should().BeEmpty();
+
+            Mocker.GetMock<IDiskProvider>()
+                  .Verify(v => v.GetAvailableSpace(It.IsAny<string>()), Times.Never());
         }
 
         [TestCase("/boot")]
@@ -108,10 +116,6 @@ namespace NzbDrone.Core.Test.DiskSpace
             Mocker.GetMock<IDiskProvider>()
                   .Setup(v => v.GetMounts())
                   .Returns(new List<IMount> { mount.Object });
-
-            Mocker.GetMock<IRootFolderService>()
-                  .Setup(x => x.All())
-                  .Returns(new List<RootFolder>());
 
             var freeSpace = Subject.GetFreeSpace();
 

@@ -4,15 +4,15 @@ using System.IO;
 using System.Linq;
 using NLog;
 using NzbDrone.Common.Extensions;
-using NzbDrone.Common.Serializer;
 using NzbDrone.Core.Datastore;
 using NzbDrone.Core.Download;
 using NzbDrone.Core.MediaFiles;
 using NzbDrone.Core.MediaFiles.Events;
 using NzbDrone.Core.Messaging.Events;
-using NzbDrone.Core.Music.Events;
 using NzbDrone.Core.Parser.Model;
+using NzbDrone.Core.Music.Events;
 using NzbDrone.Core.Qualities;
+using NzbDrone.Common.Serializer;
 
 namespace NzbDrone.Core.History
 {
@@ -39,8 +39,7 @@ namespace NzbDrone.Core.History
                                   IHandle<TrackFileDeletedEvent>,
                                   IHandle<TrackFileRenamedEvent>,
                                   IHandle<TrackFileRetaggedEvent>,
-                                  IHandle<ArtistDeletedEvent>,
-                                  IHandle<DownloadIgnoredEvent>
+                                  IHandle<ArtistDeletedEvent>
     {
         private readonly IHistoryRepository _historyRepository;
         private readonly Logger _logger;
@@ -98,6 +97,7 @@ namespace NzbDrone.Core.History
             var albumIds = trackedDownload.TrackInfo.Tracks.Select(c => c.AlbumId).ToList();
 
             var allHistory = _historyRepository.FindDownloadHistory(trackedDownload.TrackInfo.Artist.Id, trackedDownload.ImportedTrack.Quality);
+
 
             //Find download related items for these episdoes
             var albumsHistory = allHistory.Where(h => albumIds.Contains(h.AlbumId)).ToList();
@@ -217,15 +217,15 @@ namespace NzbDrone.Core.History
             foreach (var track in message.TrackInfo.Tracks)
             {
                 var history = new History
-                {
-                    EventType = HistoryEventType.TrackFileImported,
-                    Date = DateTime.UtcNow,
-                    Quality = message.TrackInfo.Quality,
-                    SourceTitle = message.ImportedTrack.SceneName ?? Path.GetFileNameWithoutExtension(message.TrackInfo.Path),
-                    ArtistId = message.TrackInfo.Artist.Id,
-                    AlbumId = message.TrackInfo.Album.Id,
-                    TrackId = track.Id,
-                    DownloadId = downloadId
+                    {
+                        EventType = HistoryEventType.TrackFileImported,
+                        Date = DateTime.UtcNow,
+                        Quality = message.TrackInfo.Quality,
+                        SourceTitle = message.ImportedTrack.SceneName ?? Path.GetFileNameWithoutExtension(message.TrackInfo.Path),
+                        ArtistId = message.TrackInfo.Artist.Id,
+                        AlbumId = message.TrackInfo.Album.Id,
+                        TrackId = track.Id,
+                        DownloadId = downloadId
                 };
 
                 //Won't have a value since we publish this event before saving to DB.
@@ -292,6 +292,7 @@ namespace NzbDrone.Core.History
                 return;
             }
 
+
             foreach (var track in message.TrackFile.Tracks.Value)
             {
                 var history = new History
@@ -314,6 +315,7 @@ namespace NzbDrone.Core.History
         public void Handle(TrackFileRenamedEvent message)
         {
             var sourcePath = message.OriginalPath;
+            var sourceRelativePath = message.Artist.Path.GetRelativePath(message.OriginalPath);
             var path = message.TrackFile.Path;
 
             foreach (var track in message.TrackFile.Tracks.Value)
@@ -330,6 +332,7 @@ namespace NzbDrone.Core.History
                 };
 
                 history.Data.Add("SourcePath", sourcePath);
+                history.Data.Add("SourceRelativePath", sourceRelativePath);
                 history.Data.Add("Path", path);
 
                 _historyRepository.Insert(history);
@@ -352,14 +355,13 @@ namespace NzbDrone.Core.History
                     AlbumId = message.TrackFile.AlbumId,
                     TrackId = track.Id,
                 };
-
+                
                 history.Data.Add("TagsScrubbed", message.Scrubbed.ToString());
-                history.Data.Add("Diff", message.Diff.Select(x => new
-                {
-                    Field = x.Key,
-                    OldValue = x.Value.Item1,
-                    NewValue = x.Value.Item2
-                }).ToJson());
+                history.Data.Add("Diff", message.Diff.Select(x => new {
+                            Field = x.Key,
+                            OldValue = x.Value.Item1,
+                            NewValue = x.Value.Item2
+                        }).ToJson());
 
                 _historyRepository.Insert(history);
             }
@@ -368,31 +370,6 @@ namespace NzbDrone.Core.History
         public void Handle(ArtistDeletedEvent message)
         {
             _historyRepository.DeleteForArtist(message.Artist.Id);
-        }
-
-        public void Handle(DownloadIgnoredEvent message)
-        {
-            var historyToAdd = new List<History>();
-            foreach (var albumId in message.AlbumIds)
-            {
-                var history = new History
-                {
-                    EventType = HistoryEventType.DownloadIgnored,
-                    Date = DateTime.UtcNow,
-                    Quality = message.Quality,
-                    SourceTitle = message.SourceTitle,
-                    ArtistId = message.ArtistId,
-                    AlbumId = albumId,
-                    DownloadId = message.DownloadId
-                };
-
-                history.Data.Add("DownloadClient", message.DownloadClient);
-                history.Data.Add("Message", message.Message);
-
-                historyToAdd.Add(history);
-            }
-
-            _historyRepository.InsertMany(historyToAdd);
         }
 
         public List<History> Since(DateTime date, HistoryEventType? eventType)

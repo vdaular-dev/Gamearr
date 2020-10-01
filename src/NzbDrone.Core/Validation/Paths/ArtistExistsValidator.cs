@@ -1,5 +1,9 @@
 ﻿using FluentValidation.Validators;
 using NzbDrone.Core.Music;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
 namespace NzbDrone.Core.Validation.Paths
 {
@@ -15,12 +19,9 @@ namespace NzbDrone.Core.Validation.Paths
 
         protected override bool IsValid(PropertyValidatorContext context)
         {
-            if (context.PropertyValue == null)
-            {
-                return true;
-            }
+            if (context.PropertyValue == null) return true;
 
-            return !_artistService.GetAllArtists().Exists(s => s.Metadata.Value.ForeignArtistId == context.PropertyValue.ToString());
+            return (!_artistService.GetAllArtists().Exists(s => s.Metadata.Value.ForeignArtistId == context.PropertyValue.ToString()));
         }
     }
 }

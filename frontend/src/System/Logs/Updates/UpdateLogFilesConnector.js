@@ -2,11 +2,11 @@ import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
-import * as commandNames from 'Commands/commandNames';
+import combinePath from 'Utilities/String/combinePath';
+import createCommandExecutingSelector from 'Store/Selectors/createCommandExecutingSelector';
 import { executeCommand } from 'Store/Actions/commandActions';
 import { fetchUpdateLogFiles } from 'Store/Actions/systemActions';
-import createCommandExecutingSelector from 'Store/Selectors/createCommandExecutingSelector';
-import combinePath from 'Utilities/String/combinePath';
+import * as commandNames from 'Commands/commandNames';
 import LogFiles from '../Files/LogFiles';
 
 function createMapStateToProps() {

@@ -1,9 +1,9 @@
-using System.Linq;
 using FluentAssertions;
+using System.Linq;
 using NUnit.Framework;
 using NzbDrone.Core.Music;
-using NzbDrone.Core.Profiles.Metadata;
 using NzbDrone.Core.Test.Framework;
+using NzbDrone.Core.Profiles.Metadata;
 
 namespace NzbDrone.Core.Test.Profiles.Metadata
 {

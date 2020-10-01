@@ -11,14 +11,13 @@ namespace NzbDrone.Core.Messaging.Commands
     public class CommandExecutor : IHandle<ApplicationStartedEvent>,
                                    IHandle<ApplicationShutdownRequested>
     {
-        private const int THREAD_LIMIT = 3;
-
         private readonly Logger _logger;
         private readonly IServiceFactory _serviceFactory;
         private readonly IManageCommandQueue _commandQueueManager;
         private readonly IEventAggregator _eventAggregator;
 
         private static CancellationTokenSource _cancellationTokenSource;
+        private const int THREAD_LIMIT = 3;
 
         public CommandExecutor(IServiceFactory serviceFactory,
                                IManageCommandQueue commandQueueManager,
@@ -54,7 +53,7 @@ namespace NzbDrone.Core.Messaging.Commands
             }
             catch (OperationCanceledException)
             {
-                _logger.Trace("Stopped one command execution pipeline");
+               _logger.Trace("Stopped one command execution pipeline");
             }
             catch (Exception ex)
             {
@@ -62,17 +61,15 @@ namespace NzbDrone.Core.Messaging.Commands
             }
         }
 
-        private void ExecuteCommand<TCommand>(TCommand command, CommandModel commandModel)
-            where TCommand : Command
+        private void ExecuteCommand<TCommand>(TCommand command, CommandModel commandModel) where TCommand : Command
         {
-            IExecute<TCommand> handler = null;
+            var handlerContract = typeof(IExecute<>).MakeGenericType(command.GetType());
+            var handler = (IExecute<TCommand>)_serviceFactory.Build(handlerContract);
+
+            _logger.Trace("{0} -> {1}", command.GetType().Name, handler.GetType().Name);
 
             try
             {
-                handler = (IExecute<TCommand>)_serviceFactory.Build(typeof(IExecute<TCommand>));
-
-                _logger.Trace("{0} -> {1}", command.GetType().Name, handler.GetType().Name);
-
                 _commandQueueManager.Start(commandModel);
                 BroadcastCommandUpdate(commandModel);
 
@@ -107,12 +104,9 @@ namespace NzbDrone.Core.Messaging.Commands
                 {
                     ProgressMessageContext.CommandModel = null;
                 }
-
-                if (handler != null)
-                {
-                    _logger.Trace("{0} <- {1} [{2}]", command.GetType().Name, handler.GetType().Name, commandModel.Duration.ToString());
-                }
             }
+
+            _logger.Trace("{0} <- {1} [{2}]", command.GetType().Name, handler.GetType().Name, commandModel.Duration.ToString());
         }
 
         private void BroadcastCommandUpdate(CommandModel command)

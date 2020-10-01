@@ -1,10 +1,9 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
+import titleCase from 'Utilities/String/titleCase';
+import FieldSet from 'Components/FieldSet';
 import DescriptionList from 'Components/DescriptionList/DescriptionList';
 import DescriptionListItem from 'Components/DescriptionList/DescriptionListItem';
-import FieldSet from 'Components/FieldSet';
-import InlineMarkdown from 'Components/Markdown/InlineMarkdown';
-import titleCase from 'Utilities/String/titleCase';
 import StartTime from './StartTime';
 import styles from './About.css';
 
@@ -16,10 +15,7 @@ class About extends Component {
   render() {
     const {
       version,
-      packageVersion,
-      packageAuthor,
-      isNetCore,
-      isMono,
+      isMonoRuntime,
       isDocker,
       runtimeVersion,
       migrationVersion,
@@ -40,15 +36,7 @@ class About extends Component {
           />
 
           {
-            packageVersion &&
-              <DescriptionListItem
-                title="Package Version"
-                data={(packageAuthor ? <span> {packageVersion} {' by '} <InlineMarkdown data={packageAuthor} /> </span> : packageVersion)}
-              />
-          }
-
-          {
-            isMono &&
+            isMonoRuntime &&
               <DescriptionListItem
                 title="Mono Version"
                 data={runtimeVersion}
@@ -56,18 +44,10 @@ class About extends Component {
           }
 
           {
-            isNetCore &&
-              <DescriptionListItem
-                title=".NET Core"
-                data={'Yes'}
-              />
-          }
-
-          {
             isDocker &&
               <DescriptionListItem
                 title="Docker"
-                data={'Yes'}
+                data={'True'}
               />
           }
 
@@ -110,10 +90,7 @@ class About extends Component {
 
 About.propTypes = {
   version: PropTypes.string.isRequired,
-  packageVersion: PropTypes.string,
-  packageAuthor: PropTypes.string,
-  isNetCore: PropTypes.bool.isRequired,
-  isMono: PropTypes.bool.isRequired,
+  isMonoRuntime: PropTypes.bool.isRequired,
   runtimeVersion: PropTypes.string.isRequired,
   isDocker: PropTypes.bool.isRequired,
   migrationVersion: PropTypes.number.isRequired,

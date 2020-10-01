@@ -1,12 +1,12 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import { kinds } from 'Helpers/Props';
 import Button from 'Components/Link/Button';
 import Modal from 'Components/Modal/Modal';
-import ModalBody from 'Components/Modal/ModalBody';
 import ModalContent from 'Components/Modal/ModalContent';
-import ModalFooter from 'Components/Modal/ModalFooter';
 import ModalHeader from 'Components/Modal/ModalHeader';
-import { kinds } from 'Helpers/Props';
+import ModalBody from 'Components/Modal/ModalBody';
+import ModalFooter from 'Components/Modal/ModalFooter';
 import styles from './ConnectionLostModal.css';
 
 function ConnectionLostModal(props) {
@@ -22,16 +22,16 @@ function ConnectionLostModal(props) {
     >
       <ModalContent onModalClose={onModalClose}>
         <ModalHeader>
-          Connection Lost
+          Connnection Lost
         </ModalHeader>
 
         <ModalBody>
           <div>
-            Lidarr has lost its connection to the backend and will need to be reloaded to restore functionality.
+            Gamearr has lost it's connection to the backend and will need to be reloaded to restore functionality.
           </div>
 
           <div className={styles.automatic}>
-            Lidarr will try to connect automatically, or you can click reload below.
+            Gamearr will try to connect automatically, or you can click reload below.
           </div>
         </ModalBody>
         <ModalFooter>

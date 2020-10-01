@@ -1,13 +1,16 @@
+﻿using System.Collections.Generic;
+using System.IO;
 using FluentAssertions;
 using Moq;
 using NUnit.Framework;
+using NzbDrone.Common.Disk;
 using NzbDrone.Common.Test.DiskTests;
 using NzbDrone.Mono.Disk;
 
 namespace NzbDrone.Mono.Test.DiskProviderTests
 {
     [TestFixture]
-    [Platform(Exclude = "Win")]
+    [Platform("Mono")]
     public class FreeSpaceFixture : FreeSpaceFixtureBase<DiskProvider>
     {
         public FreeSpaceFixture()

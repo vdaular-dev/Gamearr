@@ -1,3 +1,4 @@
+using System.IO;
 using System.Linq;
 using NLog;
 using NzbDrone.Common.Disk;
@@ -5,8 +6,8 @@ using NzbDrone.Common.Extensions;
 using NzbDrone.Core.Configuration;
 using NzbDrone.Core.IndexerSearch.Definitions;
 using NzbDrone.Core.MediaFiles;
-using NzbDrone.Core.Music;
 using NzbDrone.Core.Parser.Model;
+using NzbDrone.Core.Music;
 
 namespace NzbDrone.Core.DecisionEngine.Specifications.RssSync
 {
@@ -49,6 +50,7 @@ namespace NzbDrone.Core.DecisionEngine.Specifications.RssSync
                                              .DistinctBy(v => v.Id)
                                              .Where(v => IsTrackFileMissing(subject.Artist, v))
                                              .ToArray();
+
 
             if (missingTrackFiles.Any())
             {

@@ -4,12 +4,11 @@ using System.Globalization;
 using System.Linq;
 using NLog;
 using NzbDrone.Common.EnsureThat;
-using NzbDrone.Common.Http.Proxy;
 using NzbDrone.Core.Configuration.Events;
 using NzbDrone.Core.MediaFiles;
 using NzbDrone.Core.Messaging.Events;
+using NzbDrone.Common.Http.Proxy;
 using NzbDrone.Core.Qualities;
-using NzbDrone.Core.Security;
 
 namespace NzbDrone.Core.Configuration
 {
@@ -57,10 +56,7 @@ namespace NzbDrone.Core.Configuration
             {
                 object currentValue;
                 allWithDefaults.TryGetValue(configValue.Key, out currentValue);
-                if (currentValue == null || configValue.Value == null)
-                {
-                    continue;
-                }
+                if (currentValue == null || configValue.Value == null) continue;
 
                 var equal = configValue.Value.ToString().Equals(currentValue.ToString());
 
@@ -111,9 +107,9 @@ namespace NzbDrone.Core.Configuration
 
         public int MaximumSize
         {
-            get { return GetValueInt("MaximumSize", 0); }
+            get { return GetValueInt("MaximumSize", 0);}
 
-            set { SetValue("MaximumSize", value); }
+            set { SetValue("MaximumSize", value);}
         }
 
         public int MinimumAge
@@ -199,13 +195,6 @@ namespace NzbDrone.Core.Configuration
             set { SetValue("SkipFreeSpaceCheckWhenImporting", value); }
         }
 
-        public int MinimumFreeSpaceWhenImporting
-        {
-            get { return GetValueInt("MinimumFreeSpaceWhenImporting", 100); }
-
-            set { SetValue("MinimumFreeSpaceWhenImporting", value); }
-        }
-
         public bool CopyUsingHardlinks
         {
             get { return GetValueBoolean("CopyUsingHardlinks", true); }
@@ -225,13 +214,6 @@ namespace NzbDrone.Core.Configuration
             get { return GetValue("ExtraFileExtensions", "srt"); }
 
             set { SetValue("ExtraFileExtensions", value); }
-        }
-
-        public bool WatchLibraryForChanges
-        {
-            get { return GetValueBoolean("WatchLibraryForChanges", true); }
-
-            set { SetValue("WatchLibraryForChanges", value); }
         }
 
         public RescanAfterRefreshType RescanAfterRefresh
@@ -426,9 +408,6 @@ namespace NzbDrone.Core.Configuration
         public int BackupInterval => GetValueInt("BackupInterval", 7);
 
         public int BackupRetention => GetValueInt("BackupRetention", 28);
-
-        public CertificateValidationType CertificateValidation =>
-            GetValueEnum("CertificateValidation", CertificateValidationType.Enabled);
 
         private string GetValue(string key)
         {

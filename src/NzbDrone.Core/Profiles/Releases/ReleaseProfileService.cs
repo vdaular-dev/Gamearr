@@ -10,7 +10,6 @@ namespace NzbDrone.Core.Profiles.Releases
         List<ReleaseProfile> All();
         List<ReleaseProfile> AllForTag(int tagId);
         List<ReleaseProfile> AllForTags(HashSet<int> tagIds);
-        List<ReleaseProfile> EnabledForTags(HashSet<int> tagIds, int indexerId);
         ReleaseProfile Get(int id);
         void Delete(int id);
         ReleaseProfile Add(ReleaseProfile restriction);
@@ -47,13 +46,6 @@ namespace NzbDrone.Core.Profiles.Releases
         public List<ReleaseProfile> AllForTags(HashSet<int> tagIds)
         {
             return _repo.All().Where(r => r.Tags.Intersect(tagIds).Any() || r.Tags.Empty()).ToList();
-        }
-
-        public List<ReleaseProfile> EnabledForTags(HashSet<int> tagIds, int indexerId)
-        {
-            return AllForTags(tagIds)
-                .Where(r => r.Enabled)
-                .Where(r => r.IndexerId == indexerId || r.IndexerId == 0).ToList();
         }
 
         public ReleaseProfile Get(int id)

@@ -7,6 +7,7 @@ using NzbDrone.Common.Extensions;
 using NzbDrone.Common.Http;
 using NzbDrone.Core.Configuration;
 using NzbDrone.Core.Parser;
+using NzbDrone.Core.Indexers.Newznab;
 
 namespace NzbDrone.Core.Indexers.Headphones
 {
@@ -47,11 +48,7 @@ namespace NzbDrone.Core.Indexers.Headphones
         {
             base.Test(failures);
 
-            if (failures.Any())
-            {
-                return;
-            }
-
+            if (failures.Any()) return;
             failures.AddIfNotNull(TestCapabilities());
         }
 

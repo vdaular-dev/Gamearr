@@ -1,8 +1,8 @@
-using System;
-using System.Collections.Generic;
-using NzbDrone.Core.MediaFiles.TrackImport.Identification;
 using NzbDrone.Core.Music;
 using NzbDrone.Core.Qualities;
+using System.Collections.Generic;
+using NzbDrone.Core.MediaFiles.TrackImport.Identification;
+using System;
 
 namespace NzbDrone.Core.Parser.Model
 {

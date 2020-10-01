@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
 using FluentValidation.Results;
@@ -14,7 +13,6 @@ namespace NzbDrone.Core.Notifications.Plex.Server
     public interface IPlexServerService
     {
         void UpdateLibrary(Artist artist, PlexServerSettings settings);
-        void UpdateLibrary(IEnumerable<Artist> artists, PlexServerSettings settings);
         ValidationFailure Test(PlexServerSettings settings);
     }
 
@@ -35,15 +33,9 @@ namespace NzbDrone.Core.Notifications.Plex.Server
 
         public void UpdateLibrary(Artist artist, PlexServerSettings settings)
         {
-            UpdateLibrary(new[] { artist }, settings);
-        }
-
-        public void UpdateLibrary(IEnumerable<Artist> multipleArtist, PlexServerSettings settings)
-        {
             try
             {
                 _logger.Debug("Sending Update Request to Plex Server");
-                var watch = Stopwatch.StartNew();
 
                 var version = _versionCache.Get(settings.Host, () => GetVersion(settings), TimeSpan.FromHours(2));
                 ValidateVersion(version);
@@ -53,33 +45,16 @@ namespace NzbDrone.Core.Notifications.Plex.Server
 
                 if (partialUpdates)
                 {
-                    var partiallyUpdated = true;
-
-                    foreach (var artist in multipleArtist)
-                    {
-                        partiallyUpdated &= UpdatePartialSection(artist, sections, settings);
-
-                        if (!partiallyUpdated)
-                        {
-                            break;
-                        }
-                    }
-
-                    // Only update complete sections if all partial updates failed
-                    if (!partiallyUpdated)
-                    {
-                        _logger.Debug("Unable to update partial section, updating all Music sections");
-                        sections.ForEach(s => UpdateSection(s.Id, settings));
-                    }
+                    UpdatePartialSection(artist, sections, settings);
                 }
+
                 else
                 {
                     sections.ForEach(s => UpdateSection(s.Id, settings));
                 }
-
-                _logger.Debug("Finished sending Update Request to Plex Server (took {0} ms)", watch.ElapsedMilliseconds);
             }
-            catch (Exception ex)
+
+            catch(Exception ex)
             {
                 _logger.Warn(ex, "Failed to Update Plex host: " + settings.Host);
                 throw;
@@ -122,7 +97,7 @@ namespace NzbDrone.Core.Notifications.Plex.Server
         {
             if (version >= new Version(1, 3, 0) && version < new Version(1, 3, 1))
             {
-                throw new PlexVersionException("Found version {0}, upgrade to PMS 1.3.1 to fix library updating and then restart Lidarr", version);
+                throw new PlexVersionException("Found version {0}, upgrade to PMS 1.3.1 to fix library updating and then restart Gamearr", version);
             }
         }
 
@@ -132,7 +107,7 @@ namespace NzbDrone.Core.Notifications.Plex.Server
 
             var rawVersion = _plexServerProxy.Version(settings);
             var version = new Version(Regex.Match(rawVersion, @"^(\d+[.-]){4}").Value.Trim('.', '-'));
-
+            
             return version;
         }
 
@@ -150,7 +125,7 @@ namespace NzbDrone.Core.Notifications.Plex.Server
             _plexServerProxy.Update(sectionId, settings);
         }
 
-        private bool UpdatePartialSection(Artist artist, List<PlexSection> sections, PlexServerSettings settings)
+        private void UpdatePartialSection(Artist artist, List<PlexSection> sections, PlexServerSettings settings)
         {
             var partiallyUpdated = false;
 
@@ -167,7 +142,12 @@ namespace NzbDrone.Core.Notifications.Plex.Server
                 }
             }
 
-            return partiallyUpdated;
+            // Only update complete sections if all partial updates failed
+            if (!partiallyUpdated)
+            {
+                _logger.Debug("Unable to update partial section, updating all Music sections");
+                sections.ForEach(s => UpdateSection(s.Id, settings));
+            }
         }
 
         private int? GetMetadataId(int sectionId, Artist artist, string language, PlexServerSettings settings)
@@ -181,8 +161,6 @@ namespace NzbDrone.Core.Notifications.Plex.Server
         {
             try
             {
-                _versionCache.Remove(settings.Host);
-                _partialUpdateCache.Remove(settings.Host);
                 var sections = GetSections(settings);
 
                 if (sections.Empty())
@@ -190,7 +168,7 @@ namespace NzbDrone.Core.Notifications.Plex.Server
                     return new ValidationFailure("Host", "At least one Music library is required");
                 }
             }
-            catch (PlexAuthenticationException ex)
+            catch(PlexAuthenticationException ex)
             {
                 _logger.Error(ex, "Unable to connect to Plex Server");
                 return new ValidationFailure("AuthToken", "Invalid authentication token");

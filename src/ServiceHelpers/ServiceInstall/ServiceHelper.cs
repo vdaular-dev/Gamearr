@@ -8,7 +8,7 @@ namespace ServiceInstall
 {
     public static class ServiceHelper
     {
-        private static string LidarrExe => Path.Combine(new FileInfo(Assembly.GetExecutingAssembly().Location).Directory.FullName, "Lidarr.Console.exe");
+        private static string GamearrExe => Path.Combine(new FileInfo(Assembly.GetExecutingAssembly().Location).Directory.FullName, "Gamearr.Console.exe");
 
         private static bool IsAnAdministrator()
         {
@@ -18,9 +18,9 @@ namespace ServiceInstall
 
         public static void Run(string arg)
         {
-            if (!File.Exists(LidarrExe))
+            if (!File.Exists(GamearrExe))
             {
-                Console.WriteLine("Unable to find Lidarr.Console.exe in the current directory.");
+                Console.WriteLine("Unable to find Gamearr.Console.exe in the current directory.");
                 return;
             }
 
@@ -31,18 +31,18 @@ namespace ServiceInstall
             }
 
             var startInfo = new ProcessStartInfo
-            {
-                FileName = LidarrExe,
-                Arguments = arg,
-                UseShellExecute = false,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                CreateNoWindow = true
-            };
+                                {
+                                    FileName = GamearrExe,
+                                    Arguments = arg,
+                                    UseShellExecute = false,
+                                    RedirectStandardOutput = true,
+                                    RedirectStandardError = true,
+                                    CreateNoWindow = true
+                                };
 
             var process = new Process { StartInfo = startInfo };
-            process.OutputDataReceived += OnDataReceived;
-            process.ErrorDataReceived += OnDataReceived;
+            process.OutputDataReceived += (OnDataReceived);
+            process.ErrorDataReceived += (OnDataReceived);
 
             process.Start();
 

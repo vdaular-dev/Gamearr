@@ -1,15 +1,14 @@
 import _ from 'lodash';
 import PropTypes from 'prop-types';
-import React, { Component, Fragment } from 'react';
-import Icon from 'Components/Icon';
-import Label from 'Components/Label';
-import SpinnerButton from 'Components/Link/SpinnerButton';
-import LoadingIndicator from 'Components/Loading/LoadingIndicator';
-import InlineMarkdown from 'Components/Markdown/InlineMarkdown';
-import PageContent from 'Components/Page/PageContent';
-import PageContentBody from 'Components/Page/PageContentBody';
+import React, { Component } from 'react';
 import { icons, kinds } from 'Helpers/Props';
 import formatDate from 'Utilities/Date/formatDate';
+import LoadingIndicator from 'Components/Loading/LoadingIndicator';
+import SpinnerButton from 'Components/Link/SpinnerButton';
+import Icon from 'Components/Icon';
+import Label from 'Components/Label';
+import PageContent from 'Components/Page/PageContent';
+import PageContentBodyConnector from 'Components/Page/PageContentBodyConnector';
 import UpdateChanges from './UpdateChanges';
 import styles from './Updates.css';
 
@@ -23,35 +22,24 @@ class Updates extends Component {
       currentVersion,
       isFetching,
       isPopulated,
-      updatesError,
-      generalSettingsError,
+      error,
       items,
       isInstallingUpdate,
-      updateMechanism,
       isDocker,
-      updateMechanismMessage,
       shortDateFormat,
       onInstallLatestPress
     } = this.props;
 
-    const hasError = !!(updatesError || generalSettingsError);
-    const hasUpdates = isPopulated && !hasError && items.length > 0;
-    const noUpdates = isPopulated && !hasError && !items.length;
+    const hasUpdates = isPopulated && !error && items.length > 0;
+    const noUpdates = isPopulated && !error && !items.length;
     const hasUpdateToInstall = hasUpdates && _.some(items, { installable: true, latest: true });
     const noUpdateToInstall = hasUpdates && !hasUpdateToInstall;
 
-    const externalUpdaterPrefix = 'Unable to update Lidarr directly,';
-    const externalUpdaterMessages = {
-      external: 'Lidarr is configured to use an external update mechanism',
-      apt: 'use apt to install the update',
-      docker: 'update the docker container to receive the update'
-    };
-
     return (
       <PageContent title="Updates">
-        <PageContentBody>
+        <PageContentBodyConnector>
           {
-            !isPopulated && !hasError &&
+            !isPopulated && !error &&
               <LoadingIndicator />
           }
 
@@ -62,29 +50,24 @@ class Updates extends Component {
 
           {
             hasUpdateToInstall &&
-              <div className={styles.messageContainer}>
+              <div className={styles.updateAvailable}>
                 {
-                  (updateMechanism === 'builtIn' || updateMechanism === 'script') && !isDocker ?
-                    <SpinnerButton
-                      className={styles.updateAvailable}
-                      kind={kinds.PRIMARY}
-                      isSpinning={isInstallingUpdate}
-                      onPress={onInstallLatestPress}
-                    >
-                      Install Latest
-                    </SpinnerButton> :
+                  !isDocker &&
+                  <SpinnerButton
+                    className={styles.updateAvailable}
+                    kind={kinds.PRIMARY}
+                    isSpinning={isInstallingUpdate}
+                    onPress={onInstallLatestPress}
+                  >
+                    Install Latest
+                  </SpinnerButton>
+                }
 
-                    <Fragment>
-                      <Icon
-                        name={icons.WARNING}
-                        kind={kinds.WARNING}
-                        size={30}
-                      />
-
-                      <div className={styles.message}>
-                        {externalUpdaterPrefix} <InlineMarkdown data={updateMechanismMessage || externalUpdaterMessages[updateMechanism] || externalUpdaterMessages.external} />
-                      </div>
-                    </Fragment>
+                {
+                  isDocker &&
+                    <div className={styles.upToDateMessage}>
+                      An update is available.  Please update your Docker image and re-create the container.
+                    </div>
                 }
 
                 {
@@ -99,14 +82,14 @@ class Updates extends Component {
 
           {
             noUpdateToInstall &&
-              <div className={styles.messageContainer}>
+              <div className={styles.upToDate}>
                 <Icon
                   className={styles.upToDateIcon}
                   name={icons.CHECK_CIRCLE}
                   size={30}
                 />
-                <div className={styles.message}>
-                  The latest version of Lidarr is already installed
+                <div className={styles.upToDateMessage}>
+                  The latest version of Gamearr is already installed
                 </div>
 
                 {
@@ -185,19 +168,12 @@ class Updates extends Component {
           }
 
           {
-            !!updatesError &&
+            !!error &&
               <div>
                 Failed to fetch updates
               </div>
           }
-
-          {
-            !!generalSettingsError &&
-              <div>
-                Failed to update settings
-              </div>
-          }
-        </PageContentBody>
+        </PageContentBodyConnector>
       </PageContent>
     );
   }
@@ -208,13 +184,10 @@ Updates.propTypes = {
   currentVersion: PropTypes.string.isRequired,
   isFetching: PropTypes.bool.isRequired,
   isPopulated: PropTypes.bool.isRequired,
-  updatesError: PropTypes.object,
-  generalSettingsError: PropTypes.object,
+  error: PropTypes.object,
   items: PropTypes.array.isRequired,
   isInstallingUpdate: PropTypes.bool.isRequired,
   isDocker: PropTypes.bool.isRequired,
-  updateMechanism: PropTypes.string,
-  updateMechanismMessage: PropTypes.string,
   shortDateFormat: PropTypes.string.isRequired,
   onInstallLatestPress: PropTypes.func.isRequired
 };

@@ -1,6 +1,6 @@
 using System.Collections.Generic;
-using NzbDrone.Core.Parser.Model;
 using NzbDrone.Core.ThingiProvider;
+using NzbDrone.Core.Parser.Model;
 
 namespace NzbDrone.Core.ImportLists
 {

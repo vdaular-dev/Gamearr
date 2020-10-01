@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Xml;
 using System.Xml.Linq;
 using NLog;
@@ -73,7 +74,7 @@ namespace NzbDrone.Core.Indexers.Newznab
             }
             catch (Exception ex)
             {
-                _logger.Error(ex, "Failed to determine newznab api capabilities for {0}, using the defaults instead till Lidarr restarts", indexerSettings.BaseUrl);
+                _logger.Error(ex, "Failed to determine newznab api capabilities for {0}, using the defaults instead till Gamearr restarts", indexerSettings.BaseUrl);
             }
 
             return capabilities;
@@ -159,6 +160,7 @@ namespace NzbDrone.Core.Indexers.Newznab
                             Id = int.Parse(xmlSubcat.Attribute("id").Value),
                             Name = xmlSubcat.Attribute("name").Value,
                             Description = xmlSubcat.Attribute("description") != null ? xmlSubcat.Attribute("description").Value : string.Empty
+
                         });
                     }
 

@@ -1,12 +1,12 @@
+using NzbDrone.Core.Music;
 using System;
 using System.Collections.Generic;
-using NzbDrone.Core.Music;
+using NzbDrone.Core.Profiles.Metadata;
 
 namespace NzbDrone.Core.MetadataSource
 {
     public interface IProvideArtistInfo
     {
-        Artist GetArtistInfo(string lidarrId, int metadataProfileId);
-        HashSet<string> GetChangedArtists(DateTime startTime);
+        Artist GetArtistInfo(string gamearrId, int metadataProfileId);
     }
 }

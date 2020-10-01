@@ -9,9 +9,7 @@ namespace NzbDrone.Common.EnsureThat
         public static Param<bool> IsTrue(this Param<bool> param)
         {
             if (!param.Value)
-            {
                 throw ExceptionFactory.CreateForParamValidation(param.Name, ExceptionMessages.EnsureExtensions_IsNotTrue);
-            }
 
             return param;
         }
@@ -20,9 +18,7 @@ namespace NzbDrone.Common.EnsureThat
         public static Param<bool> IsFalse(this Param<bool> param)
         {
             if (param.Value)
-            {
                 throw ExceptionFactory.CreateForParamValidation(param.Name, ExceptionMessages.EnsureExtensions_IsNotFalse);
-            }
 
             return param;
         }

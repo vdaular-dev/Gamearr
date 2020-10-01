@@ -1,6 +1,6 @@
 using System;
 using FluentMigrator;
-using Microsoft.Extensions.Logging;
+using FluentMigrator.Runner;
 using NUnit.Framework;
 using NzbDrone.Core.Datastore.Migration.Framework;
 
@@ -8,8 +8,7 @@ namespace NzbDrone.Core.Test.Framework
 {
     [Category("DbMigrationTest")]
     [Category("DbTest")]
-    public abstract class MigrationTest<TMigration> : DbTest
-        where TMigration : NzbDroneMigrationBase
+    public abstract class MigrationTest<TMigration> : DbTest where TMigration : NzbDroneMigrationBase
     {
         protected long MigrationVersion
         {
@@ -37,14 +36,10 @@ namespace NzbDrone.Core.Test.Framework
             return db.GetDirectDataMapper();
         }
 
-        protected override void SetupLogging()
-        {
-            Mocker.SetConstant<ILoggerProvider>(Mocker.Resolve<MigrationLoggerProvider>());
-        }
-
         [SetUp]
         public override void SetupDb()
         {
+            Mocker.SetConstant<IAnnouncer>(Mocker.Resolve<MigrationLogger>());
             SetupContainer();
         }
     }

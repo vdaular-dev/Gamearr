@@ -1,10 +1,10 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import FormGroup from 'Components/Form/FormGroup';
-import FormInputGroup from 'Components/Form/FormInputGroup';
-import FormInputHelpText from 'Components/Form/FormInputHelpText';
-import FormLabel from 'Components/Form/FormLabel';
 import { inputTypes } from 'Helpers/Props';
+import FormGroup from 'Components/Form/FormGroup';
+import FormLabel from 'Components/Form/FormLabel';
+import FormInputHelpText from 'Components/Form/FormInputHelpText';
+import FormInputGroup from 'Components/Form/FormInputGroup';
 import styles from './NotificationEventItems.css';
 
 function NotificationEventItems(props) {
@@ -39,7 +39,7 @@ function NotificationEventItems(props) {
       <div>
         <FormInputHelpText
           text="Select which events should trigger this notification"
-          link="https://github.com/lidarr/Lidarr/wiki/Connections"
+          link="https://github.com/gamearr/Gamearr/wiki/Connections"
         />
         <div className={styles.events}>
           <div>

@@ -26,8 +26,6 @@ namespace NzbDrone.Core.MediaCover
     public class MediaCoverService :
         IHandleAsync<ArtistRefreshCompleteEvent>,
         IHandleAsync<ArtistDeletedEvent>,
-        IHandleAsync<AlbumAddedEvent>,
-        IHandleAsync<AlbumDeletedEvent>,
         IMapCoversToLocal
     {
         private readonly IImageResizer _resizer;
@@ -45,8 +43,9 @@ namespace NzbDrone.Core.MediaCover
         // So limit the number of concurrent resizing tasks
         private static SemaphoreSlim _semaphore = new SemaphoreSlim((int)Math.Ceiling(Environment.ProcessorCount / 2.0));
 
+
         public MediaCoverService(IImageResizer resizer,
-                                 IAlbumService albumService,
+                                 IAlbumService albumService,     
                                  IHttpClient httpClient,
                                  IDiskProvider diskProvider,
                                  IAppFolderInfo appFolderInfo,
@@ -122,7 +121,7 @@ namespace NzbDrone.Core.MediaCover
             {
                 var fileName = GetCoverPath(artist.Id, MediaCoverEntity.Artist, cover.CoverType, cover.Extension);
                 var alreadyExists = false;
-
+                
                 try
                 {
                     var serverFileHeaders = _httpClient.Head(new HttpRequest(cover.Url) { AllowAutoRedirect = true }).Headers;
@@ -293,21 +292,5 @@ namespace NzbDrone.Core.MediaCover
             }
         }
 
-        public void HandleAsync(AlbumAddedEvent message)
-        {
-            if (message.DoRefresh)
-            {
-                EnsureAlbumCovers(message.Album);
-            }
-        }
-
-        public void HandleAsync(AlbumDeletedEvent message)
-        {
-            var path = GetAlbumCoverPath(message.Album.Id);
-            if (_diskProvider.FolderExists(path))
-            {
-                _diskProvider.DeleteFolder(path, true);
-            }
-        }
     }
 }

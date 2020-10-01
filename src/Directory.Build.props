@@ -1,63 +1,57 @@
 <Project>
-  <!-- Common to all Lidarr Projects -->
+  <!-- Common to all Gamearr Projects -->
   <PropertyGroup>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <TargetLatestRuntimePatch>true</TargetLatestRuntimePatch>
-    <RuntimeIdentifiers>win-x64;osx-x64;linux-x64;linux-musl-x64;linux-arm;linux-arm64;linux-musl-arm64</RuntimeIdentifiers>
-    <ExcludedRuntimeFrameworkPairs>win-x64:net462;osx-x64:net462;linux-arm:net462;linux-arm64:net462;linux-musl-x64:net462;linux-musl-arm64:net462</ExcludedRuntimeFrameworkPairs>
-
-    <LidarrRootDir>$(MSBuildThisFileDirectory)..\</LidarrRootDir>
+    <GamearrRootDir>$(MSBuildThisFileDirectory)..\</GamearrRootDir>
 
     <!-- Specifies the type of output -->
-    <LidarrOutputType>Library</LidarrOutputType>
-    <LidarrOutputType Condition="$(MSBuildProjectName.Contains('.Test'))">Test</LidarrOutputType>
-    <LidarrOutputType Condition="'$(MSBuildProjectName)'=='ServiceInstall'">Exe</LidarrOutputType>
-    <LidarrOutputType Condition="'$(MSBuildProjectName)'=='ServiceUninstall'">Exe</LidarrOutputType>
-    <LidarrOutputType Condition="'$(MSBuildProjectName)'=='Lidarr'">Exe</LidarrOutputType>
-    <LidarrOutputType Condition="'$(MSBuildProjectName)'=='Lidarr.Console'">Exe</LidarrOutputType>
-    <LidarrOutputType Condition="'$(MSBuildProjectName)'=='Lidarr.Update'">Update</LidarrOutputType>
+    <GamearrOutputType>Library</GamearrOutputType>
+    <GamearrOutputType Condition="$(MSBuildProjectName.Contains('.Test'))">Test</GamearrOutputType>
+    <GamearrOutputType Condition="'$(MSBuildProjectName)'=='ServiceInstall'">Exe</GamearrOutputType>
+    <GamearrOutputType Condition="'$(MSBuildProjectName)'=='ServiceUninstall'">Exe</GamearrOutputType>
+    <GamearrOutputType Condition="'$(MSBuildProjectName)'=='Gamearr'">Exe</GamearrOutputType>
+    <GamearrOutputType Condition="'$(MSBuildProjectName)'=='Gamearr.Console'">Exe</GamearrOutputType>
+    <GamearrOutputType Condition="'$(MSBuildProjectName)'=='Gamearr.Update'">Update</GamearrOutputType>
 
     <!-- Specifies whether it's one of our own libraries -->
-    <LidarrProject>false</LidarrProject>
-    <LidarrProject Condition="$(MSBuildProjectName.StartsWith('Lidarr'))">true</LidarrProject>
-    <LidarrProject Condition="$(MSBuildProjectName.StartsWith('ServiceInstall'))">true</LidarrProject>
-    <LidarrProject Condition="$(MSBuildProjectName.StartsWith('ServiceUninstall'))">true</LidarrProject>
+    <GamearrProject>false</GamearrProject>
+    <GamearrProject Condition="$(MSBuildProjectName.StartsWith('Gamearr'))">true</GamearrProject>
+    <GamearrProject Condition="$(MSBuildProjectName.StartsWith('ServiceInstall'))">true</GamearrProject>
+    <GamearrProject Condition="$(MSBuildProjectName.StartsWith('ServiceUninstall'))">true</GamearrProject>
   </PropertyGroup>
 
   <PropertyGroup>
     <Configuration Condition="'$(Configuration)'==''">Release</Configuration>
     <!-- Centralize intermediate and default outputs -->
-    <BaseIntermediateOutputPath>$(LidarrRootDir)_temp\obj\$(MSBuildProjectName)\</BaseIntermediateOutputPath>
-    <IntermediateOutputPath>$(LidarrRootDir)_temp\obj\$(MSBuildProjectName)\$(Configuration)\</IntermediateOutputPath>
-    <OutputPath>$(LidarrRootDir)_temp\bin\$(Configuration)\$(MSBuildProjectName)\</OutputPath>
+    <BaseIntermediateOutputPath>$(GamearrRootDir)_temp\obj\$(MSBuildProjectName)\</BaseIntermediateOutputPath>
+    <IntermediateOutputPath>$(GamearrRootDir)_temp\obj\$(MSBuildProjectName)\$(Configuration)\</IntermediateOutputPath>
+    <OutputPath>$(GamearrRootDir)_temp\bin\$(Configuration)\$(MSBuildProjectName)\</OutputPath>
 
     <!-- Output to _output and _tests respectively -->
-    <OutputPath Condition="'$(LidarrProject)'=='true'">$(LidarrRootDir)_output\</OutputPath>
-    <OutputPath Condition="'$(LidarrOutputType)'=='Test'">$(LidarrRootDir)_tests\</OutputPath>
-    <OutputPath Condition="'$(LidarrOutputType)'=='Update'">$(LidarrRootDir)_output\Lidarr.Update\</OutputPath>
+    <OutputPath Condition="'$(GamearrProject)'=='true'">$(GamearrRootDir)_output\</OutputPath>
+    <OutputPath Condition="'$(GamearrOutputType)'=='Test'">$(GamearrRootDir)_tests\</OutputPath>
+    <OutputPath Condition="'$(GamearrOutputType)'=='Update'">$(GamearrRootDir)_output\Gamearr.Update\</OutputPath>
 
     <!-- Paths relative to project file for better readability -->
     <BaseIntermediateOutputPath>$([MSBuild]::MakeRelative('$(MSBuildProjectDirectory)', '$(BaseIntermediateOutputPath)'))</BaseIntermediateOutputPath>
     <IntermediateOutputPath>$([MSBuild]::MakeRelative('$(MSBuildProjectDirectory)', '$(IntermediateOutputPath)'))</IntermediateOutputPath>
     <OutputPath>$([MSBuild]::MakeRelative('$(MSBuildProjectDirectory)', '$(OutputPath)'))</OutputPath>
 
+    <!-- below net4.7.1 the new portable pdb format has no line numbers, pdb to mdb probably doesn't like it either -->
+    <DebugType>full</DebugType>
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   
   <!-- Test projects need bindingRedirects -->
-  <PropertyGroup Condition="'$(LidarrOutputType)'=='Test'">
+  <PropertyGroup Condition="'$(GamearrOutputType)'=='Test'">
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
-    <SelfContained>false</SelfContained>
   </PropertyGroup>
 
   <!-- Set the Product and Version info for our own projects -->
-  <PropertyGroup Condition="'$(LidarrProject)'=='true'">
-    <Product>Lidarr</Product>
-    <Company>lidarr.audio</Company>
-    <Copyright>Copyright 2017-$([System.DateTime]::Now.ToString('yyyy')) lidarr.audio (GNU General Public v3)</Copyright>
+  <PropertyGroup Condition="'$(GamearrProject)'=='true'">
+    <Product>Gamearr</Product>
+    <Company>gamearr.game</Company>
+    <Copyright>Copyright 2017-$([System.DateTime]::Now.ToString('yyyy')) gamearr.game (GNU General Public v3)</Copyright>
     
     <!-- Should be replaced by CI -->
     <AssemblyVersion>10.0.0.*</AssemblyVersion>
@@ -69,78 +63,18 @@
     
     <Deterministic Condition="$(AssemblyVersion.EndsWith('*'))">False</Deterministic>
   </PropertyGroup>
-
   <!-- Set the AssemblyConfiguration attribute for projects -->
-  <ItemGroup Condition="'$(LidarrProject)'=='true'">
+  <ItemGroup Condition="'$(GamearrProject)'=='true'">
     <AssemblyAttribute Include="System.Reflection.AssemblyConfigurationAttribute">
       <_Parameter1>$(AssemblyConfiguration)</_Parameter1>
     </AssemblyAttribute>
   </ItemGroup>
 
   <PropertyGroup>
+    <!-- We don't want separate framework directories till we go dotnet core -->
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+
     <!-- For now keep the NzbDrone namespace -->
-    <RootNamespace Condition="'$(LidarrProject)'=='true'">$(MSBuildProjectName.Replace('Lidarr','NzbDrone'))</RootNamespace>
+    <RootNamespace Condition="'$(GamearrProject)'=='true'">$(MSBuildProjectName.Replace('Gamearr','NzbDrone'))</RootNamespace>
   </PropertyGroup>
-
-  <!-- Allow building net framework using mono -->
-  <ItemGroup>
-    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
-    </PackageReference>
-  </ItemGroup>
-
-  <!-- Set up stylecop -->
-  <ItemGroup Condition="'$(LidarrProject)'=='true' and '$(EnableAnalyzers)'!='false'">
-    <!-- StyleCop analysis -->
-    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="3.3.0">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
-    </PackageReference>
-    <AdditionalFiles Include="$(SolutionDir)stylecop.json" />
-  </ItemGroup>
-
-  <!--
-       Set runtime identifier to local system type if not specified
-  -->
-  <Choose>
-    <When Condition="'$(OS)' == 'Windows_NT'">
-      <PropertyGroup>
-        <IsWindows>true</IsWindows>
-      </PropertyGroup>
-    </When>
-    <When Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))' == 'true'">
-      <PropertyGroup>
-        <IsOSX>true</IsOSX>
-      </PropertyGroup>
-    </When>
-    <Otherwise>
-      <PropertyGroup>
-        <IsLinux>true</IsLinux>
-      </PropertyGroup>
-    </Otherwise>
-  </Choose>
-
-  <PropertyGroup Condition="'$(IsWindows)' == 'true' and
-                            '$(RuntimeIdentifier)' == ''">
-    <_UsingDefaultRuntimeIdentifier>true</_UsingDefaultRuntimeIdentifier>
-    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(IsLinux)' == 'true' and
-                            '$(RuntimeIdentifier)' == ''">
-    <_UsingDefaultRuntimeIdentifier>true</_UsingDefaultRuntimeIdentifier>
-    <RuntimeIdentifier>linux-x64</RuntimeIdentifier>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(IsOSX)' == 'true' and
-                            '$(RuntimeIdentifier)' == ''">
-    <_UsingDefaultRuntimeIdentifier>true</_UsingDefaultRuntimeIdentifier>
-    <RuntimeIdentifier>osx-x64</RuntimeIdentifier>
-  </PropertyGroup>
-
 </Project>

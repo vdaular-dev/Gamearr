@@ -1,16 +1,17 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Globalization;
 using System.Threading.Tasks;
 using NLog;
-using NzbDrone.Common.Extensions;
 using NzbDrone.Common.Instrumentation.Extensions;
-using NzbDrone.Common.TPL;
 using NzbDrone.Core.DecisionEngine;
-using NzbDrone.Core.Indexers;
 using NzbDrone.Core.IndexerSearch.Definitions;
-using NzbDrone.Core.Music;
+using NzbDrone.Core.Indexers;
 using NzbDrone.Core.Parser.Model;
+using System.Linq;
+using NzbDrone.Common.Extensions;
+using NzbDrone.Common.TPL;
+using NzbDrone.Core.Music;
 
 namespace NzbDrone.Core.IndexerSearch
 {
@@ -61,7 +62,7 @@ namespace NzbDrone.Core.IndexerSearch
             albums = albums.Where(a => a.Monitored).ToList();
 
             searchSpec.Albums = albums;
-
+            
             return Dispatch(indexer => indexer.Fetch(searchSpec), searchSpec);
         }
 
@@ -85,8 +86,7 @@ namespace NzbDrone.Core.IndexerSearch
             return Dispatch(indexer => indexer.Fetch(searchSpec), searchSpec);
         }
 
-        private TSpec Get<TSpec>(Artist artist, List<Album> albums, bool userInvokedSearch, bool interactiveSearch)
-            where TSpec : SearchCriteriaBase, new()
+        private TSpec Get<TSpec>(Artist artist, List<Album> albums, bool userInvokedSearch, bool interactiveSearch) where TSpec : SearchCriteriaBase, new()
         {
             var spec = new TSpec();
 
@@ -98,8 +98,7 @@ namespace NzbDrone.Core.IndexerSearch
             return spec;
         }
 
-        private static TSpec Get<TSpec>(Artist artist, bool userInvokedSearch, bool interactiveSearch)
-            where TSpec : SearchCriteriaBase, new()
+        private static TSpec Get<TSpec>(Artist artist, bool userInvokedSearch, bool interactiveSearch) where TSpec : SearchCriteriaBase, new()
         {
             var spec = new TSpec();
             spec.Artist = artist;

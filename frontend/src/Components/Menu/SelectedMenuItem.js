@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import Icon from 'Components/Icon';
 import { icons } from 'Helpers/Props';
+import Icon from 'Components/Icon';
 import MenuItem from './MenuItem';
 import styles from './SelectedMenuItem.css';
 

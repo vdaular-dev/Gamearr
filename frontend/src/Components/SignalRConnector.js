@@ -1,18 +1,42 @@
-import * as signalR from '@microsoft/signalr/dist/browser/signalr.js';
+import $ from 'jquery';
+import 'signalr';
 import PropTypes from 'prop-types';
 import { Component } from 'react';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
-import { setAppValue, setVersion } from 'Store/Actions/appActions';
-import { fetchArtist } from 'Store/Actions/artistActions';
-import { removeItem, update, updateItem } from 'Store/Actions/baseActions';
-import { fetchCommands, finishCommand, updateCommand } from 'Store/Actions/commandActions';
-import { fetchQueue, fetchQueueDetails } from 'Store/Actions/queueActions';
-import { fetchRootFolders } from 'Store/Actions/settingsActions';
-import { fetchHealth } from 'Store/Actions/systemActions';
-import { fetchTagDetails, fetchTags } from 'Store/Actions/tagActions';
 import { repopulatePage } from 'Utilities/pagePopulator';
 import titleCase from 'Utilities/String/titleCase';
+import { fetchCommands, updateCommand, finishCommand } from 'Store/Actions/commandActions';
+import { setAppValue, setVersion } from 'Store/Actions/appActions';
+import { update, updateItem, removeItem } from 'Store/Actions/baseActions';
+import { fetchArtist } from 'Store/Actions/artistActions';
+import { fetchHealth } from 'Store/Actions/systemActions';
+import { fetchQueue, fetchQueueDetails } from 'Store/Actions/queueActions';
+import { fetchRootFolders } from 'Store/Actions/rootFolderActions';
+import { fetchTags, fetchTagDetails } from 'Store/Actions/tagActions';
+
+function getState(status) {
+  switch (status) {
+    case 0:
+      return 'connecting';
+    case 1:
+      return 'connected';
+    case 2:
+      return 'reconnecting';
+    case 4:
+      return 'disconnected';
+    default:
+      throw new Error(`invalid status ${status}`);
+  }
+}
+
+function isAppDisconnected(disconnectedTime) {
+  if (!disconnectedTime) {
+    return false;
+  }
+
+  return Math.floor(new Date().getTime() / 1000) - disconnectedTime > 180;
+}
 
 function getHandlerName(name) {
   name = titleCase(name);
@@ -54,37 +78,6 @@ const mapDispatchToProps = {
   dispatchFetchTagDetails: fetchTagDetails
 };
 
-function Logger(minimumLogLevel) {
-  this.minimumLogLevel = minimumLogLevel;
-}
-
-Logger.prototype.cleanse = function(message) {
-  const apikey = new RegExp(`access_token=${window.Lidarr.apiKey}`, 'g');
-  return message.replace(apikey, 'access_token=(removed)');
-};
-
-Logger.prototype.log = function(logLevel, message) {
-  // see https://github.com/aspnet/AspNetCore/blob/21c9e2cc954c10719878839cd3f766aca5f57b34/src/SignalR/clients/ts/signalr/src/Utils.ts#L147
-  if (logLevel >= this.minimumLogLevel) {
-    switch (logLevel) {
-      case signalR.LogLevel.Critical:
-      case signalR.LogLevel.Error:
-        console.error(`[signalR] ${signalR.LogLevel[logLevel]}: ${this.cleanse(message)}`);
-        break;
-      case signalR.LogLevel.Warning:
-        console.warn(`[signalR] ${signalR.LogLevel[logLevel]}: ${this.cleanse(message)}`);
-        break;
-      case signalR.LogLevel.Information:
-        console.info(`[signalR] ${signalR.LogLevel[logLevel]}: ${this.cleanse(message)}`);
-        break;
-      default:
-        // console.debug only goes to attached debuggers in Node, so we use console.log for Trace and Debug
-        console.log(`[signalR] ${signalR.LogLevel[logLevel]}: ${this.cleanse(message)}`);
-        break;
-    }
-  }
-};
-
 class SignalRConnector extends Component {
 
   //
@@ -93,43 +86,58 @@ class SignalRConnector extends Component {
   constructor(props, context) {
     super(props, context);
 
-    this.connection = null;
+    this.signalRconnectionOptions = { transport: ['webSockets', 'serverSentEvents', 'longPolling'] };
+    this.signalRconnection = null;
+    this.retryInterval = 1;
+    this.retryTimeoutId = null;
+    this.disconnectedTime = null;
   }
 
   componentDidMount() {
-    console.log('[signalR] starting');
+    console.log('Starting signalR');
 
-    const url = `${window.Lidarr.urlBase}/signalr/messages`;
+    const url = `${window.Gamearr.urlBase}/signalr`;
 
-    this.connection = new signalR.HubConnectionBuilder()
-      .configureLogging(new Logger(signalR.LogLevel.Information))
-      .withUrl(`${url}?access_token=${window.Lidarr.apiKey}`)
-      .withAutomaticReconnect({
-        nextRetryDelayInMilliseconds: (retryContext) => {
-          if (retryContext.elapsedMilliseconds > 180000) {
-            this.props.dispatchSetAppValue({ isDisconnected: true });
-          }
-          return Math.min(retryContext.previousRetryCount, 10) * 1000;
-        }
-      })
-      .build();
+    this.signalRconnection = $.connection(url, { apiKey: window.Gamearr.apiKey });
 
-    this.connection.onreconnecting(this.onReconnecting);
-    this.connection.onreconnected(this.onReconnected);
-    this.connection.onclose(this.onClose);
+    this.signalRconnection.stateChanged(this.onStateChanged);
+    this.signalRconnection.received(this.onReceived);
+    this.signalRconnection.reconnecting(this.onReconnecting);
+    this.signalRconnection.disconnected(this.onDisconnected);
 
-    this.connection.on('receiveMessage', this.onReceiveMessage);
-
-    this.connection.start().then(this.onStart, this.onStartFail);
+    this.signalRconnection.start(this.signalRconnectionOptions);
   }
 
   componentWillUnmount() {
-    this.connection.stop();
-    this.connection = null;
+    if (this.retryTimeoutId) {
+      this.retryTimeoutId = clearTimeout(this.retryTimeoutId);
+    }
+
+    this.signalRconnection.stop();
+    this.signalRconnection = null;
   }
 
   //
   // Control
+
+  retryConnection = () => {
+    if (isAppDisconnected(this.disconnectedTime)) {
+      this.setState({
+        isDisconnected: true
+      });
+    }
+
+    this.retryTimeoutId = setTimeout(() => {
+      if (!this.signalRconnection) {
+        console.error('signalR: Connection was disposed');
+        return;
+      }
+
+      this.signalRconnection.start(this.signalRconnectionOptions);
+      this.retryInterval = Math.min(this.retryInterval + 1, 10);
+    }, this.retryInterval * 1000);
+  }
+
   handleMessage = (message) => {
     const {
       name,
@@ -176,19 +184,11 @@ class SignalRConnector extends Component {
   }
 
   handleAlbum = (body) => {
-    const action = body.action;
-    const section = 'albums';
-
-    if (action === 'updated') {
+    if (body.action === 'updated') {
       this.props.dispatchUpdateItem({
-        section,
+        section: 'albums',
         updateOnly: true,
         ...body.resource
-      });
-    } else if (action === 'deleted') {
-      this.props.dispatchRemoveItem({
-        section,
-        id: body.resource.id
       });
     }
   }
@@ -246,7 +246,7 @@ class SignalRConnector extends Component {
   }
 
   handleVersion = (body) => {
-    const version = body.version;
+    const version = body.Version;
 
     this.props.dispatchSetVersion({ version });
   }
@@ -272,17 +272,11 @@ class SignalRConnector extends Component {
   }
 
   handleSystemTask = () => {
-    this.props.dispatchFetchCommands();
+    // No-op for now, we may want this later
   }
 
-  handleRootfolder = (body) => {
-    if (body.action === 'updated') {
-      this.props.dispatchUpdateItem({
-        section: 'settings.rootFolders',
-        updateOnly: true,
-        ...body.resource
-      });
-    }
+  handleRootfolder = () => {
+    this.props.dispatchFetchRootFolders();
   }
 
   handleTag = (body) => {
@@ -296,63 +290,80 @@ class SignalRConnector extends Component {
   //
   // Listeners
 
-  onStartFail = (error) => {
-    console.error('[signalR] failed to connect');
-    console.error(error);
+  onStateChanged = (change) => {
+    const state = getState(change.newState);
+    console.log(`signalR: ${state}`);
 
-    this.props.dispatchSetAppValue({
-      isConnected: false,
-      isReconnecting: false,
-      isDisconnected: false,
-      isRestarting: false
-    });
+    if (state === 'connected') {
+      // Clear disconnected time
+      this.disconnectedTime = null;
+
+      const {
+        dispatchFetchCommands,
+        dispatchFetchArtist,
+        dispatchSetAppValue
+      } = this.props;
+
+      // Repopulate the page (if a repopulator is set) to ensure things
+      // are in sync after reconnecting.
+
+      if (this.props.isReconnecting || this.props.isDisconnected) {
+        dispatchFetchArtist();
+        dispatchFetchCommands();
+        repopulatePage();
+      }
+
+      dispatchSetAppValue({
+        isConnected: true,
+        isReconnecting: false,
+        isDisconnected: false,
+        isRestarting: false
+      });
+
+      this.retryInterval = 5;
+
+      if (this.retryTimeoutId) {
+        clearTimeout(this.retryTimeoutId);
+      }
+    }
   }
 
-  onStart = () => {
-    console.debug('[signalR] connected');
+  onReceived = (message) => {
+    console.debug('signalR: received', message.name, message.body);
 
-    this.props.dispatchSetAppValue({
-      isConnected: true,
-      isReconnecting: false,
-      isDisconnected: false,
-      isRestarting: false
-    });
+    this.handleMessage(message);
   }
 
   onReconnecting = () => {
-    this.props.dispatchSetAppValue({ isReconnecting: true });
+    if (window.Gamearr.unloading) {
+      return;
+    }
+
+    if (!this.disconnectedTime) {
+      this.disconnectedTime = Math.floor(new Date().getTime() / 1000);
+    }
+
+    this.props.dispatchSetAppValue({
+      isReconnecting: true
+    });
   }
 
-  onReconnected = () => {
+  onDisconnected = () => {
+    if (window.Gamearr.unloading) {
+      return;
+    }
 
-    const {
-      dispatchFetchCommands,
-      dispatchFetchArtist,
-      dispatchSetAppValue
-    } = this.props;
+    if (!this.disconnectedTime) {
+      this.disconnectedTime = Math.floor(new Date().getTime() / 1000);
+    }
 
-    dispatchSetAppValue({
-      isConnected: true,
-      isReconnecting: false,
-      isDisconnected: false,
-      isRestarting: false
+    this.props.dispatchSetAppValue({
+      isConnected: false,
+      isReconnecting: true,
+      isDisconnected: isAppDisconnected(this.disconnectedTime)
     });
 
-    // Repopulate the page (if a repopulator is set) to ensure things
-    // are in sync after reconnecting.
-    dispatchFetchArtist();
-    dispatchFetchCommands();
-    repopulatePage();
-  }
-
-  onClose = () => {
-    console.debug('[signalR] connection closed');
-  }
-
-  onReceiveMessage = (message) => {
-    console.debug('[signalR] received', message.name, message.body);
-
-    this.handleMessage(message);
+    this.retryConnection();
   }
 
   //

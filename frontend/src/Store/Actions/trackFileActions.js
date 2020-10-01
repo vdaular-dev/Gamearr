@@ -1,17 +1,16 @@
 import _ from 'lodash';
 import { createAction } from 'redux-actions';
 import { batchActions } from 'redux-batched-actions';
-import albumEntities from 'Album/albumEntities';
+import createAjaxRequest from 'Utilities/createAjaxRequest';
 import { sortDirections } from 'Helpers/Props';
 import { createThunk, handleThunks } from 'Store/thunks';
-import createAjaxRequest from 'Utilities/createAjaxRequest';
-import { removeItem, set, updateItem } from './baseActions';
+import createSetTableOptionReducer from './Creators/Reducers/createSetTableOptionReducer';
+import createSetClientSideCollectionSortReducer from './Creators/Reducers/createSetClientSideCollectionSortReducer';
+import createClearReducer from './Creators/Reducers/createClearReducer';
 import createFetchHandler from './Creators/createFetchHandler';
 import createHandleActions from './Creators/createHandleActions';
 import createRemoveItemHandler from './Creators/createRemoveItemHandler';
-import createClearReducer from './Creators/Reducers/createClearReducer';
-import createSetClientSideCollectionSortReducer from './Creators/Reducers/createSetClientSideCollectionSortReducer';
-import createSetTableOptionReducer from './Creators/Reducers/createSetTableOptionReducer';
+import { set, removeItem, updateItem } from './baseActions';
 
 //
 // Variables
@@ -200,29 +199,25 @@ export const actionHandlers = handleThunks({
 
     dispatch(set({ section, isSaving: true }));
 
-    const requestData = {
+    const data = {
       trackFileIds
     };
 
     if (quality) {
-      requestData.quality = quality;
+      data.quality = quality;
     }
 
     const promise = createAjaxRequest({
       url: '/trackFile/editor',
       method: 'PUT',
       dataType: 'json',
-      data: JSON.stringify(requestData)
+      data: JSON.stringify(data)
     }).request;
 
-    promise.done((data) => {
+    promise.done(() => {
       dispatch(batchActions([
         ...trackFileIds.map((id) => {
           const props = {};
-
-          const trackFile = data.find((file) => file.id === id);
-
-          props.qualityCutoffNotMet = trackFile.qualityCutoffNotMet;
 
           if (quality) {
             props.quality = quality;

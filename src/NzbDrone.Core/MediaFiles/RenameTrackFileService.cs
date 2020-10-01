@@ -10,8 +10,8 @@ using NzbDrone.Core.MediaFiles.Commands;
 using NzbDrone.Core.MediaFiles.Events;
 using NzbDrone.Core.Messaging.Commands;
 using NzbDrone.Core.Messaging.Events;
-using NzbDrone.Core.Music;
 using NzbDrone.Core.Organizer;
+using NzbDrone.Core.Music;
 
 namespace NzbDrone.Core.MediaFiles
 {
@@ -56,6 +56,7 @@ namespace NzbDrone.Core.MediaFiles
 
         public List<RenameTrackFilePreview> GetRenamePreviews(int artistId)
         {
+
             var artist = _artistService.GetArtist(artistId);
             var tracks = _trackService.GetTracksByArtist(artistId);
             var files = _mediaFileService.GetFilesByArtist(artistId);
@@ -68,6 +69,7 @@ namespace NzbDrone.Core.MediaFiles
 
         public List<RenameTrackFilePreview> GetRenamePreviews(int artistId, int albumId)
         {
+
             var artist = _artistService.GetArtist(artistId);
             var tracks = _trackService.GetTracksByAlbum(albumId);
             var files = _mediaFileService.GetFilesByAlbum(albumId);
@@ -103,8 +105,8 @@ namespace NzbDrone.Core.MediaFiles
                         AlbumId = album.Id,
                         TrackNumbers = tracksInFile.Select(e => e.AbsoluteTrackNumber).ToList(),
                         TrackFileId = file.Id,
-                        ExistingPath = file.Path,
-                        NewPath = newPath
+                        ExistingPath = artist.Path.GetRelativePath(file.Path),
+                        NewPath = artist.Path.GetRelativePath(newPath)
                     };
                 }
             }
@@ -151,18 +153,18 @@ namespace NzbDrone.Core.MediaFiles
 
         public void Execute(RenameFilesCommand message)
         {
+
             var artist = _artistService.GetArtist(message.ArtistId);
             var trackFiles = _mediaFileService.Get(message.Files);
 
             _logger.ProgressInfo("Renaming {0} files for {1}", trackFiles.Count, artist.Name);
             RenameFiles(trackFiles, artist);
             _logger.ProgressInfo("Selected track files renamed for {0}", artist.Name);
-
-            _eventAggregator.PublishEvent(new RenameCompletedEvent());
         }
 
         public void Execute(RenameArtistCommand message)
         {
+
             _logger.Debug("Renaming all files for selected artist");
             var artistToRename = _artistService.GetArtists(message.ArtistIds);
 
@@ -173,8 +175,6 @@ namespace NzbDrone.Core.MediaFiles
                 RenameFiles(trackFiles, artist);
                 _logger.ProgressInfo("All track files renamed for {0}", artist.Name);
             }
-
-            _eventAggregator.PublishEvent(new RenameCompletedEvent());
         }
     }
 }

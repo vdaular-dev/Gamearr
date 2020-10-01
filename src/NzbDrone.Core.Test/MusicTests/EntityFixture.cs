@@ -1,21 +1,22 @@
-using System.Collections;
-using System.Linq;
-using System.Reflection;
-using AutoFixture;
-using Equ;
-using FluentAssertions;
 using NUnit.Framework;
 using NzbDrone.Common.Extensions;
-using NzbDrone.Core.Datastore;
 using NzbDrone.Core.Music;
 using NzbDrone.Test.Common;
+using FluentAssertions;
+using System.Collections;
+using System.Reflection;
+using AutoFixture;
+using System.Linq;
+using Equ;
+using Marr.Data;
 
 namespace NzbDrone.Core.Test.MusicTests
 {
     [TestFixture]
     public class EntityFixture : LoggingTest
     {
-        private Fixture _fixture = new Fixture();
+
+        Fixture fixture = new Fixture();
 
         private static bool IsNotMarkedAsIgnore(PropertyInfo propertyInfo)
         {
@@ -53,20 +54,19 @@ namespace NzbDrone.Core.Test.MusicTests
         [Test]
         public void two_equivalent_artist_metadata_should_be_equal()
         {
-            var item1 = _fixture.Create<ArtistMetadata>();
+            var item1 = fixture.Create<ArtistMetadata>();
             var item2 = item1.JsonClone();
 
             item1.Should().NotBeSameAs(item2);
             item1.Should().Be(item2);
         }
 
-        [Test]
-        [TestCaseSource(typeof(EqualityPropertySource<ArtistMetadata>), "TestCases")]
+        [Test, TestCaseSource(typeof(EqualityPropertySource<ArtistMetadata>), "TestCases")]
         public void two_different_artist_metadata_should_not_be_equal(PropertyInfo prop)
         {
-            var item1 = _fixture.Create<ArtistMetadata>();
+            var item1 = fixture.Create<ArtistMetadata>();
             var item2 = item1.JsonClone();
-            var different = _fixture.Create<ArtistMetadata>();
+            var different = fixture.Create<ArtistMetadata>();
 
             // make item2 different in the property under consideration
             var differentEntry = prop.GetValue(different);
@@ -79,8 +79,8 @@ namespace NzbDrone.Core.Test.MusicTests
         [Test]
         public void metadata_and_db_fields_should_replicate_artist_metadata()
         {
-            var item1 = _fixture.Create<ArtistMetadata>();
-            var item2 = _fixture.Create<ArtistMetadata>();
+            var item1 = fixture.Create<ArtistMetadata>();
+            var item2 = fixture.Create<ArtistMetadata>();
 
             item1.Should().NotBe(item2);
 
@@ -91,7 +91,7 @@ namespace NzbDrone.Core.Test.MusicTests
 
         private Track GivenTrack()
         {
-            return _fixture.Build<Track>()
+            return fixture.Build<Track>()
                 .Without(x => x.AlbumRelease)
                 .Without(x => x.ArtistMetadata)
                 .Without(x => x.TrackFile)
@@ -111,8 +111,7 @@ namespace NzbDrone.Core.Test.MusicTests
             item1.Should().Be(item2);
         }
 
-        [Test]
-        [TestCaseSource(typeof(EqualityPropertySource<Track>), "TestCases")]
+        [Test, TestCaseSource(typeof(EqualityPropertySource<Track>), "TestCases")]
         public void two_different_tracks_should_not_be_equal(PropertyInfo prop)
         {
             var item1 = GivenTrack();
@@ -142,7 +141,7 @@ namespace NzbDrone.Core.Test.MusicTests
 
         private AlbumRelease GivenAlbumRelease()
         {
-            return _fixture.Build<AlbumRelease>()
+            return fixture.Build<AlbumRelease>()
                 .Without(x => x.Album)
                 .Without(x => x.Tracks)
                 .Create();
@@ -158,8 +157,7 @@ namespace NzbDrone.Core.Test.MusicTests
             item1.Should().Be(item2);
         }
 
-        [Test]
-        [TestCaseSource(typeof(EqualityPropertySource<AlbumRelease>), "TestCases")]
+        [Test, TestCaseSource(typeof(EqualityPropertySource<AlbumRelease>), "TestCases")]
         public void two_different_album_releases_should_not_be_equal(PropertyInfo prop)
         {
             var item1 = GivenAlbumRelease();
@@ -189,7 +187,7 @@ namespace NzbDrone.Core.Test.MusicTests
 
         private Album GivenAlbum()
         {
-            return _fixture.Build<Album>()
+            return fixture.Build<Album>()
                 .Without(x => x.ArtistMetadata)
                 .Without(x => x.AlbumReleases)
                 .Without(x => x.Artist)
@@ -207,8 +205,7 @@ namespace NzbDrone.Core.Test.MusicTests
             item1.Should().Be(item2);
         }
 
-        [Test]
-        [TestCaseSource(typeof(EqualityPropertySource<Album>), "TestCases")]
+        [Test, TestCaseSource(typeof(EqualityPropertySource<Album>), "TestCases")]
         public void two_different_albums_should_not_be_equal(PropertyInfo prop)
         {
             var item1 = GivenAlbum();
@@ -244,8 +241,8 @@ namespace NzbDrone.Core.Test.MusicTests
 
         private Artist GivenArtist()
         {
-            return _fixture.Build<Artist>()
-                .With(x => x.Metadata, new LazyLoaded<ArtistMetadata>(_fixture.Create<ArtistMetadata>()))
+            return fixture.Build<Artist>()
+                .With(x => x.Metadata, new LazyLoaded<ArtistMetadata>(fixture.Create<ArtistMetadata>()))
                 .Without(x => x.QualityProfile)
                 .Without(x => x.MetadataProfile)
                 .Without(x => x.Albums)
@@ -264,8 +261,7 @@ namespace NzbDrone.Core.Test.MusicTests
             item1.Should().Be(item2);
         }
 
-        [Test]
-        [TestCaseSource(typeof(EqualityPropertySource<Artist>), "TestCases")]
+        [Test, TestCaseSource(typeof(EqualityPropertySource<Artist>), "TestCases")]
         public void two_different_artists_should_not_be_equal(PropertyInfo prop)
         {
             var item1 = GivenArtist();

@@ -1,19 +1,22 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import { inputTypes, sizes } from 'Helpers/Props';
 import FieldSet from 'Components/FieldSet';
 import FormGroup from 'Components/Form/FormGroup';
-import FormInputGroup from 'Components/Form/FormInputGroup';
 import FormLabel from 'Components/Form/FormLabel';
-import { inputTypes, sizes } from 'Helpers/Props';
-import titleCase from 'Utilities/String/titleCase';
+import FormInputGroup from 'Components/Form/FormInputGroup';
+
+const branchValues = [
+  'develop',
+  'nightly'
+];
 
 function UpdateSettings(props) {
   const {
     advancedSettings,
     settings,
-    isWindows,
+    isMono,
     isDocker,
-    packageUpdateMechanism,
     onInputChange
   } = props;
 
@@ -28,20 +31,10 @@ function UpdateSettings(props) {
     return null;
   }
 
-  const usingExternalUpdateMechanism = packageUpdateMechanism !== 'builtIn';
-
-  const updateOptions = [];
-
-  if (usingExternalUpdateMechanism) {
-    updateOptions.push({
-      key: packageUpdateMechanism,
-      value: titleCase(packageUpdateMechanism)
-    });
-  } else {
-    updateOptions.push({ key: 'builtIn', value: 'Built-In' });
-  }
-
-  updateOptions.push({ key: 'script', value: 'Script' });
+  const updateOptions = [
+    { key: 'builtIn', value: 'Built-In' },
+    { key: 'script', value: 'Script' }
+  ];
 
   if (isDocker) {
     return (
@@ -60,70 +53,70 @@ function UpdateSettings(props) {
         <FormLabel>Branch</FormLabel>
 
         <FormInputGroup
-          type={inputTypes.TEXT}
+          type={inputTypes.AUTO_COMPLETE}
           name="branch"
-          helpText={usingExternalUpdateMechanism ? 'Branch used by external update mechanism' : 'Branch to use to update Lidarr'}
-          helpLink="https://github.com/Lidarr/Lidarr/wiki/Release-Branches"
+          helpText="Branch to use to update Gamearr"
+          helpLink="https://github.com/Gamearr/Gamearr/wiki/Release-Branches"
           {...branch}
+          values={branchValues}
           onChange={onInputChange}
-          readOnly={usingExternalUpdateMechanism}
         />
       </FormGroup>
 
       {
-        !isWindows &&
-          <div>
+        isMono &&
+        <div>
+          <FormGroup
+            advancedSettings={advancedSettings}
+            isAdvanced={true}
+            size={sizes.MEDIUM}
+          >
+            <FormLabel>Automatic</FormLabel>
+
+            <FormInputGroup
+              type={inputTypes.CHECK}
+              name="updateAutomatically"
+              helpText="Automatically download and install updates. You will still be able to install from System: Updates"
+              onChange={onInputChange}
+              {...updateAutomatically}
+            />
+          </FormGroup>
+
+          <FormGroup
+            advancedSettings={advancedSettings}
+            isAdvanced={true}
+          >
+            <FormLabel>Mechanism</FormLabel>
+
+            <FormInputGroup
+              type={inputTypes.SELECT}
+              name="updateMechanism"
+              values={updateOptions}
+              helpText="Use Gamearr's built-in updater or a script"
+              helpLink="https://github.com/Gamearr/Gamearr/wiki/Updating"
+              onChange={onInputChange}
+              {...updateMechanism}
+            />
+          </FormGroup>
+
+          {
+            updateMechanism.value === 'script' &&
             <FormGroup
               advancedSettings={advancedSettings}
               isAdvanced={true}
-              size={sizes.MEDIUM}
             >
-              <FormLabel>Automatic</FormLabel>
+              <FormLabel>Script Path</FormLabel>
 
               <FormInputGroup
-                type={inputTypes.CHECK}
-                name="updateAutomatically"
-                helpText="Automatically download and install updates. You will still be able to install from System: Updates"
+                type={inputTypes.TEXT}
+                name="updateScriptPath"
+                helpText="Path to a custom script that takes an extracted update package and handle the remainder of the update process"
                 onChange={onInputChange}
-                {...updateAutomatically}
+                {...updateScriptPath}
               />
             </FormGroup>
-
-            <FormGroup
-              advancedSettings={advancedSettings}
-              isAdvanced={true}
-            >
-              <FormLabel>Mechanism</FormLabel>
-
-              <FormInputGroup
-                type={inputTypes.SELECT}
-                name="updateMechanism"
-                values={updateOptions}
-                helpText="Use Lidarr's built-in updater or a script"
-                helpLink="https://github.com/Lidarr/Lidarr/wiki/Updating"
-                onChange={onInputChange}
-                {...updateMechanism}
-              />
-            </FormGroup>
-
-            {
-              updateMechanism.value === 'script' &&
-                <FormGroup
-                  advancedSettings={advancedSettings}
-                  isAdvanced={true}
-                >
-                  <FormLabel>Script Path</FormLabel>
-
-                  <FormInputGroup
-                    type={inputTypes.TEXT}
-                    name="updateScriptPath"
-                    helpText="Path to a custom script that takes an extracted update package and handle the remainder of the update process"
-                    onChange={onInputChange}
-                    {...updateScriptPath}
-                  />
-                </FormGroup>
-            }
-          </div>
+          }
+        </div>
       }
     </FieldSet>
   );
@@ -132,9 +125,8 @@ function UpdateSettings(props) {
 UpdateSettings.propTypes = {
   advancedSettings: PropTypes.bool.isRequired,
   settings: PropTypes.object.isRequired,
-  isWindows: PropTypes.bool.isRequired,
+  isMono: PropTypes.bool.isRequired,
   isDocker: PropTypes.bool.isRequired,
-  packageUpdateMechanism: PropTypes.string.isRequired,
   onInputChange: PropTypes.func.isRequired
 };
 

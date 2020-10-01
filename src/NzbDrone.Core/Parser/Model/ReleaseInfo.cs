@@ -17,7 +17,6 @@ namespace NzbDrone.Core.Parser.Model
         public string Indexer { get; set; }
         public string Artist { get; set; }
         public string Album { get; set; }
-        public int IndexerPriority { get; set; }
         public DownloadProtocol DownloadProtocol { get; set; }
         public DateTime PublishDate { get; set; }
 
@@ -29,19 +28,37 @@ namespace NzbDrone.Core.Parser.Model
 
         public int Age
         {
-            get { return DateTime.UtcNow.Subtract(PublishDate).Days; }
+            get
+            {
+                return DateTime.UtcNow.Subtract(PublishDate).Days;
+            }
+
+            //This prevents manually downloading a release from blowing up in mono
+            //TODO: Is there a better way?
             private set { }
         }
 
         public double AgeHours
         {
-            get { return DateTime.UtcNow.Subtract(PublishDate).TotalHours; }
+            get
+            {
+                return DateTime.UtcNow.Subtract(PublishDate).TotalHours;
+            }
+
+            //This prevents manually downloading a release from blowing up in mono
+            //TODO: Is there a better way?
             private set { }
         }
 
         public double AgeMinutes
         {
-            get { return DateTime.UtcNow.Subtract(PublishDate).TotalMinutes; }
+            get
+            {
+                return DateTime.UtcNow.Subtract(PublishDate).TotalMinutes;
+            }
+
+            //This prevents manually downloading a release from blowing up in mono
+            //TODO: Is there a better way?
             private set { }
         }
 

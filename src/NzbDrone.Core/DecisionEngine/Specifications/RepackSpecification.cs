@@ -58,6 +58,7 @@ namespace NzbDrone.Core.DecisionEngine.Specifications
                         }
                     }
                 }
+                
             }
 
             return Decision.Accept();

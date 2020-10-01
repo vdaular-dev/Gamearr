@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import IconButton from 'Components/Link/IconButton';
 import { icons } from 'Helpers/Props';
+import IconButton from 'Components/Link/IconButton';
 import TextInput from './TextInput';
 import styles from './KeyValueListInputItem.css';
 
@@ -63,41 +63,34 @@ class KeyValueListInputItem extends Component {
 
     return (
       <div className={styles.itemContainer}>
-        <div className={styles.inputWrapper}>
-          <TextInput
-            className={styles.keyInput}
-            name="key"
-            value={keyValue}
-            placeholder={keyPlaceholder}
-            onChange={this.onKeyChange}
-            onFocus={this.onFocus}
-            onBlur={this.onBlur}
-          />
-        </div>
+        <TextInput
+          className={styles.keyInput}
+          name="key"
+          value={keyValue}
+          placeholder={keyPlaceholder}
+          onChange={this.onKeyChange}
+          onFocus={this.onFocus}
+          onBlur={this.onBlur}
+        />
 
-        <div className={styles.inputWrapper}>
-          <TextInput
-            className={styles.valueInput}
-            name="value"
-            value={value}
-            placeholder={valuePlaceholder}
-            onChange={this.onValueChange}
-            onFocus={this.onFocus}
-            onBlur={this.onBlur}
-          />
-        </div>
+        <TextInput
+          className={styles.valueInput}
+          name="value"
+          value={value}
+          placeholder={valuePlaceholder}
+          onChange={this.onValueChange}
+          onFocus={this.onFocus}
+          onBlur={this.onBlur}
+        />
 
-        <div className={styles.buttonWrapper}>
-          {
-            isNew ?
-              null :
-              <IconButton
-                name={icons.REMOVE}
-                tabIndex={-1}
-                onPress={this.onRemovePress}
-              />
-          }
-        </div>
+        {
+          !isNew &&
+            <IconButton
+              name={icons.REMOVE}
+              tabIndex={-1}
+              onPress={this.onRemovePress}
+            />
+        }
       </div>
     );
   }

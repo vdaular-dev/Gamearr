@@ -14,8 +14,8 @@ namespace NzbDrone.Core.Download.Clients.DownloadStation
     public class SharedFolderResolver : ISharedFolderResolver
     {
         private readonly IFileStationProxy _proxy;
-        private readonly ILogger _logger;
         private ICached<SharedFolderMapping> _cache;
+        private readonly ILogger _logger;
 
         public SharedFolderResolver(ICacheManager cacheManager,
                                     IFileStationProxy proxy,

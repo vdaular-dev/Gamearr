@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using FluentValidation;
+using FluentValidation.Results;
 using NzbDrone.Common.Extensions;
 using NzbDrone.Core.Annotations;
 using NzbDrone.Core.Validation;
@@ -10,12 +11,14 @@ namespace NzbDrone.Core.Indexers.Headphones
     {
         public HeadphonesSettingsValidator()
         {
-            RuleFor(c => c).Custom((c, context) =>
+            Custom(newznab =>
             {
-                if (c.Categories.Empty())
+                if (newznab.Categories.Empty())
                 {
-                    context.AddFailure("'Categories' must be provided");
+                    return new ValidationFailure("", "'Categories' must be provided");
                 }
+
+                return null;
             });
 
             RuleFor(c => c.Username).NotEmpty();
@@ -50,7 +53,7 @@ namespace NzbDrone.Core.Indexers.Headphones
         [FieldDefinition(2, Label = "Password", Type = FieldType.Password)]
         public string Password { get; set; }
 
-        [FieldDefinition(3, Type = FieldType.Number, Label = "Early Download Limit", Unit = "days", HelpText = "Time before release date Lidarr will download from this indexer, empty is no limit", Advanced = true)]
+        [FieldDefinition(3, Type = FieldType.Number, Label = "Early Download Limit", Unit = "days", HelpText = "Time before release date Gamearr will download from this indexer, empty is no limit", Advanced = true)]
         public int? EarlyReleaseLimit { get; set; }
 
         public virtual NzbDroneValidationResult Validate()

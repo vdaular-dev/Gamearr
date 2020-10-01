@@ -1,15 +1,15 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import PathInputConnector from 'Components/Form/PathInputConnector';
-import Icon from 'Components/Icon';
+import { icons, kinds, sizes } from 'Helpers/Props';
 import Button from 'Components/Link/Button';
-import ModalBody from 'Components/Modal/ModalBody';
+import Icon from 'Components/Icon';
+import PathInputConnector from 'Components/Form/PathInputConnector';
 import ModalContent from 'Components/Modal/ModalContent';
-import ModalFooter from 'Components/Modal/ModalFooter';
 import ModalHeader from 'Components/Modal/ModalHeader';
+import ModalBody from 'Components/Modal/ModalBody';
+import ModalFooter from 'Components/Modal/ModalFooter';
 import Table from 'Components/Table/Table';
 import TableBody from 'Components/Table/TableBody';
-import { icons, kinds, sizes } from 'Helpers/Props';
 import RecentFolderRow from './RecentFolderRow';
 import styles from './InteractiveImportSelectFolderModalContent.css';
 
@@ -93,7 +93,7 @@ class InteractiveImportSelectFolderModalContent extends Component {
                 >
                   <TableBody>
                     {
-                      recentFolders.slice(0).reverse().map((recentFolder) => {
+                      recentFolders.map((recentFolder) => {
                         return (
                           <RecentFolderRow
                             key={recentFolder.folder}

@@ -5,7 +5,6 @@ using NzbDrone.Common.Disk;
 using NzbDrone.Common.EnvironmentInfo;
 using NzbDrone.Core.Configuration;
 using NzbDrone.Core.DecisionEngine;
-using NzbDrone.Core.Download;
 using NzbDrone.Core.Parser.Model;
 
 namespace NzbDrone.Core.MediaFiles.TrackImport.Specifications
@@ -23,30 +22,30 @@ namespace NzbDrone.Core.MediaFiles.TrackImport.Specifications
             _logger = logger;
         }
 
-        public Decision IsSatisfiedBy(LocalTrack item, DownloadClientItem downloadClientItem)
+        public Decision IsSatisfiedBy(LocalTrack localTrack)
         {
-            if (item.ExistingFile)
+            if (localTrack.ExistingFile)
             {
-                _logger.Debug("{0} is in artist folder, skipping unpacking check", item.Path);
+                _logger.Debug("{0} is in artist folder, skipping unpacking check", localTrack.Path);
                 return Decision.Accept();
             }
 
             foreach (var workingFolder in _configService.DownloadClientWorkingFolders.Split('|'))
             {
-                DirectoryInfo parent = Directory.GetParent(item.Path);
+                DirectoryInfo parent = Directory.GetParent(localTrack.Path);
                 while (parent != null)
                 {
                     if (parent.Name.StartsWith(workingFolder))
                     {
                         if (OsInfo.IsNotWindows)
                         {
-                            _logger.Debug("{0} is still being unpacked", item.Path);
+                            _logger.Debug("{0} is still being unpacked", localTrack.Path);
                             return Decision.Reject("File is still being unpacked");
                         }
 
-                        if (_diskProvider.FileGetLastWrite(item.Path) > DateTime.UtcNow.AddMinutes(-5))
+                        if (_diskProvider.FileGetLastWrite(localTrack.Path) > DateTime.UtcNow.AddMinutes(-5))
                         {
-                            _logger.Debug("{0} appears to be unpacking still", item.Path);
+                            _logger.Debug("{0} appears to be unpacking still", localTrack.Path);
                             return Decision.Reject("File is still being unpacked");
                         }
                     }

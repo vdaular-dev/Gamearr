@@ -1,10 +1,9 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
+import { kinds } from 'Helpers/Props';
 import Card from 'Components/Card';
 import Label from 'Components/Label';
-import IconButton from 'Components/Link/IconButton';
 import ConfirmModal from 'Components/Modal/ConfirmModal';
-import { icons, kinds } from 'Helpers/Props';
 import EditIndexerModalConnector from './EditIndexerModalConnector';
 import styles from './Indexer.css';
 
@@ -48,15 +47,6 @@ class Indexer extends Component {
     this.props.onConfirmDeleteIndexer(this.props.id);
   }
 
-  onCloneIndexerPress = () => {
-    const {
-      id,
-      onCloneIndexerPress
-    } = this.props;
-
-    onCloneIndexerPress(id);
-  }
-
   //
   // Render
 
@@ -68,9 +58,7 @@ class Indexer extends Component {
       enableAutomaticSearch,
       enableInteractiveSearch,
       supportsRss,
-      supportsSearch,
-      priority,
-      showPriority
+      supportsSearch
     } = this.props;
 
     return (
@@ -79,17 +67,8 @@ class Indexer extends Component {
         overlayContent={true}
         onPress={this.onEditIndexerPress}
       >
-        <div className={styles.nameContainer}>
-          <div className={styles.name}>
-            {name}
-          </div>
-
-          <IconButton
-            className={styles.cloneButton}
-            title="Clone Profile"
-            name={icons.CLONE}
-            onPress={this.onCloneIndexerPress}
-          />
+        <div className={styles.name}>
+          {name}
         </div>
 
         <div className={styles.enabled}>
@@ -116,19 +95,13 @@ class Indexer extends Component {
           }
 
           {
-            showPriority &&
-              <Label kind={kinds.DEFAULT}>
-                Priority: {priority}
-              </Label>
-          }
-          {
             !enableRss && !enableAutomaticSearch && !enableInteractiveSearch &&
-              <Label
-                kind={kinds.DISABLED}
-                outline={true}
-              >
-                Disabled
-              </Label>
+            <Label
+              kind={kinds.DISABLED}
+              outline={true}
+            >
+              Disabled
+            </Label>
           }
         </div>
 
@@ -156,14 +129,11 @@ class Indexer extends Component {
 Indexer.propTypes = {
   id: PropTypes.number.isRequired,
   name: PropTypes.string.isRequired,
-  priority: PropTypes.number.isRequired,
   enableRss: PropTypes.bool.isRequired,
   enableAutomaticSearch: PropTypes.bool.isRequired,
   enableInteractiveSearch: PropTypes.bool.isRequired,
   supportsRss: PropTypes.bool.isRequired,
   supportsSearch: PropTypes.bool.isRequired,
-  showPriority: PropTypes.bool.isRequired,
-  onCloneIndexerPress: PropTypes.func.isRequired,
   onConfirmDeleteIndexer: PropTypes.func.isRequired
 };
 

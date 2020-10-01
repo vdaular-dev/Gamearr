@@ -42,7 +42,6 @@ class VirtualTableSelectCell extends Component {
 
   render() {
     const {
-      className,
       inputClassName,
       id,
       isSelected,
@@ -52,7 +51,7 @@ class VirtualTableSelectCell extends Component {
 
     return (
       <VirtualTableRowCell
-        className={className}
+        className={styles.cell}
         {...otherProps}
       >
         <CheckInput
@@ -68,7 +67,6 @@ class VirtualTableSelectCell extends Component {
 }
 
 VirtualTableSelectCell.propTypes = {
-  className: PropTypes.string.isRequired,
   inputClassName: PropTypes.string.isRequired,
   id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
   isSelected: PropTypes.bool.isRequired,
@@ -77,7 +75,6 @@ VirtualTableSelectCell.propTypes = {
 };
 
 VirtualTableSelectCell.defaultProps = {
-  className: styles.cell,
   inputClassName: styles.input,
   isSelected: false
 };

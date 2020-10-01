@@ -48,7 +48,7 @@ namespace NzbDrone.Core.Download.Clients.DownloadStation
 
         public override string Name => "Download Station";
 
-        public override ProviderMessage Message => new ProviderMessage("Lidarr is unable to connect to Download Station if 2-Factor Authentication is enabled on your DSM account", ProviderMessageType.Warning);
+        public override ProviderMessage Message => new ProviderMessage("Gamearr is unable to connect to Download Station if 2-Factor Authentication is enabled on your DSM account", ProviderMessageType.Warning);
 
         protected IEnumerable<DownloadStationTask> GetTasks()
         {
@@ -197,11 +197,7 @@ namespace NzbDrone.Core.Download.Clients.DownloadStation
         protected override void Test(List<ValidationFailure> failures)
         {
             failures.AddIfNotNull(TestConnection());
-            if (failures.HasErrors())
-            {
-                return;
-            }
-
+            if (failures.Any()) return;
             failures.AddIfNotNull(TestOutputPath());
             failures.AddIfNotNull(TestGetTorrents());
         }
@@ -213,10 +209,10 @@ namespace NzbDrone.Core.Download.Clients.DownloadStation
 
         protected bool IsCompleted(DownloadStationTask torrent)
         {
-            return torrent.Status == DownloadStationTaskStatus.Seeding || IsFinished(torrent) || (torrent.Status == DownloadStationTaskStatus.Waiting && torrent.Size != 0 && GetRemainingSize(torrent) <= 0);
+            return torrent.Status == DownloadStationTaskStatus.Seeding || IsFinished(torrent) ||  (torrent.Status == DownloadStationTaskStatus.Waiting && torrent.Size != 0 && GetRemainingSize(torrent) <= 0);
         }
 
-        protected string GetMessage(DownloadStationTask torrent)
+    protected string GetMessage(DownloadStationTask torrent)
         {
             if (torrent.StatusExtra != null)
             {
@@ -344,9 +340,8 @@ namespace NzbDrone.Core.Download.Clients.DownloadStation
 
                 return null;
             }
-            catch (DownloadClientAuthenticationException ex)
+            catch (DownloadClientAuthenticationException ex) // User could not have permission to access to downloadstation
             {
-                // User could not have permission to access to downloadstation
                 _logger.Error(ex, "Unable to authenticate");
                 return new NzbDroneValidationFailure(string.Empty, ex.Message);
             }
@@ -368,7 +363,7 @@ namespace NzbDrone.Core.Download.Clients.DownloadStation
                 _logger.Error(ex, "Unable to authenticate");
                 return new NzbDroneValidationFailure("Username", "Authentication failure")
                 {
-                    DetailedDescription = $"Please verify your username and password. Also verify if the host running Lidarr isn't blocked from accessing {Name} by WhiteList limitations in the {Name} configuration."
+                    DetailedDescription = $"Please verify your username and password. Also verify if the host running Gamearr isn't blocked from accessing {Name} by WhiteList limitations in the {Name} configuration."
                 };
             }
             catch (WebException ex)
@@ -382,7 +377,6 @@ namespace NzbDrone.Core.Download.Clients.DownloadStation
                         DetailedDescription = "Please verify the hostname and port."
                     };
                 }
-
                 return new NzbDroneValidationFailure(string.Empty, $"Unknown exception: {ex.Message}");
             }
             catch (Exception ex)

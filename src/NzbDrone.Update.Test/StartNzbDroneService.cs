@@ -3,7 +3,6 @@ using Moq;
 using NUnit.Framework;
 using NzbDrone.Common;
 using NzbDrone.Common.EnvironmentInfo;
-using NzbDrone.Common.Extensions;
 using NzbDrone.Common.Processes;
 using NzbDrone.Test.Common;
 using NzbDrone.Update.UpdateEngine;
@@ -17,7 +16,7 @@ namespace NzbDrone.Update.Test
         [Test]
         public void should_start_service_if_app_type_was_serivce()
         {
-            string targetFolder = "c:\\Lidarr\\".AsOsAgnostic();
+            string targetFolder = "c:\\Gamearr\\".AsOsAgnostic();
 
             Subject.Start(AppType.Service, targetFolder);
 
@@ -27,8 +26,8 @@ namespace NzbDrone.Update.Test
         [Test]
         public void should_start_console_if_app_type_was_service_but_start_failed_because_of_permissions()
         {
-            string targetFolder = "c:\\Lidarr\\".AsOsAgnostic();
-            string targetProcess = "c:\\Lidarr\\Lidarr.Console".AsOsAgnostic().ProcessNameToExe();
+            string targetFolder = "c:\\Gamearr\\".AsOsAgnostic();
+            string targetProcess = "c:\\Gamearr\\Gamearr.Console.exe".AsOsAgnostic();
 
             Mocker.GetMock<IServiceProvider>().Setup(c => c.Start(ServiceProvider.SERVICE_NAME)).Throws(new InvalidOperationException());
 

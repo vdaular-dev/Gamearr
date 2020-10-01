@@ -1,21 +1,19 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import NoArtist from 'Artist/NoArtist';
-import LoadingIndicator from 'Components/Loading/LoadingIndicator';
-import Measure from 'Components/Measure';
-import FilterMenu from 'Components/Menu/FilterMenu';
-import PageContent from 'Components/Page/PageContent';
-import PageContentBody from 'Components/Page/PageContentBody';
-import PageToolbar from 'Components/Page/Toolbar/PageToolbar';
-import PageToolbarButton from 'Components/Page/Toolbar/PageToolbarButton';
-import PageToolbarSection from 'Components/Page/Toolbar/PageToolbarSection';
-import PageToolbarSeparator from 'Components/Page/Toolbar/PageToolbarSeparator';
-import { align, icons } from 'Helpers/Props';
 import getErrorMessage from 'Utilities/Object/getErrorMessage';
-import CalendarConnector from './CalendarConnector';
+import { align, icons } from 'Helpers/Props';
+import PageContent from 'Components/Page/PageContent';
+import Measure from 'Components/Measure';
+import PageContentBodyConnector from 'Components/Page/PageContentBodyConnector';
+import PageToolbar from 'Components/Page/Toolbar/PageToolbar';
+import PageToolbarSection from 'Components/Page/Toolbar/PageToolbarSection';
+import PageToolbarButton from 'Components/Page/Toolbar/PageToolbarButton';
+import FilterMenu from 'Components/Menu/FilterMenu';
+import NoGame from 'Game/NoGame';
 import CalendarLinkModal from './iCal/CalendarLinkModal';
-import LegendConnector from './Legend/LegendConnector';
 import CalendarOptionsModal from './Options/CalendarOptionsModal';
+import LegendConnector from './Legend/LegendConnector';
+import CalendarConnector from './CalendarConnector';
 import styles from './CalendarPage.css';
 
 const MINIMUM_DAY_WIDTH = 120;
@@ -79,13 +77,9 @@ class CalendarPage extends Component {
       filters,
       hasArtist,
       artistError,
-      artistIsFetching,
-      artistIsPopulated,
       missingAlbumIds,
-      isRssSyncExecuting,
       isSearchingForMissing,
       useCurrentPage,
-      onRssSyncPress,
       onFilterSelect
     } = this.props;
 
@@ -96,6 +90,8 @@ class CalendarPage extends Component {
 
     const isMeasured = this.state.width > 0;
 
+    const PageComponent = hasArtist ? CalendarConnector : NoGame;
+
     return (
       <PageContent title="Calendar">
         <PageToolbar>
@@ -104,15 +100,6 @@ class CalendarPage extends Component {
               label="iCal Link"
               iconName={icons.CALENDAR}
               onPress={this.onGetCalendarLinkPress}
-            />
-
-            <PageToolbarSeparator />
-
-            <PageToolbarButton
-              label="RSS Sync"
-              iconName={icons.RSS}
-              isSpinning={isRssSyncExecuting}
-              onPress={onRssSyncPress}
             />
 
             <PageToolbarButton
@@ -142,31 +129,26 @@ class CalendarPage extends Component {
           </PageToolbarSection>
         </PageToolbar>
 
-        <PageContentBody
+        <PageContentBodyConnector
           className={styles.calendarPageBody}
           innerClassName={styles.calendarInnerPageBody}
         >
           {
-            artistIsFetching && !artistIsPopulated &&
-              <LoadingIndicator />
-          }
-
-          {
             artistError &&
-              <div className={styles.errorMessage}>
-                {getErrorMessage(artistError, 'Failed to load artist from API')}
-              </div>
+            <div className={styles.errorMessage}>
+              {getErrorMessage(artistError, 'Failed to load artist from API')}
+            </div>
           }
 
           {
-            !artistError && artistIsPopulated && hasArtist &&
+            !artistError &&
               <Measure
                 whitelist={['width']}
                 onMeasure={this.onMeasure}
               >
                 {
                   isMeasured ?
-                    <CalendarConnector
+                    <PageComponent
                       useCurrentPage={useCurrentPage}
                     /> :
                     <div />
@@ -175,15 +157,10 @@ class CalendarPage extends Component {
           }
 
           {
-            !artistError && artistIsPopulated && !hasArtist &&
-              <NoArtist />
-          }
-
-          {
             hasArtist && !!artistError &&
               <LegendConnector />
           }
-        </PageContentBody>
+        </PageContentBodyConnector>
 
         <CalendarLinkModal
           isOpen={isCalendarLinkModalOpen}
@@ -205,15 +182,11 @@ CalendarPage.propTypes = {
   filters: PropTypes.arrayOf(PropTypes.object).isRequired,
   hasArtist: PropTypes.bool.isRequired,
   artistError: PropTypes.object,
-  artistIsFetching: PropTypes.bool.isRequired,
-  artistIsPopulated: PropTypes.bool.isRequired,
   missingAlbumIds: PropTypes.arrayOf(PropTypes.number).isRequired,
-  isRssSyncExecuting: PropTypes.bool.isRequired,
   isSearchingForMissing: PropTypes.bool.isRequired,
   useCurrentPage: PropTypes.bool.isRequired,
   onSearchMissingPress: PropTypes.func.isRequired,
   onDaysCountChange: PropTypes.func.isRequired,
-  onRssSyncPress: PropTypes.func.isRequired,
   onFilterSelect: PropTypes.func.isRequired
 };
 

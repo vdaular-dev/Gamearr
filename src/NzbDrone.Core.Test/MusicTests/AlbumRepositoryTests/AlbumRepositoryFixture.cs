@@ -1,11 +1,11 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using FizzWare.NBuilder;
 using FluentAssertions;
 using NUnit.Framework;
 using NzbDrone.Core.Music;
 using NzbDrone.Core.Test.Framework;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace NzbDrone.Core.Test.MusicTests.AlbumRepositoryTests
 {
@@ -29,7 +29,9 @@ namespace NzbDrone.Core.Test.MusicTests.AlbumRepositoryTests
                 Monitored = true,
                 ForeignArtistId = "this is a fake id",
                 Id = 1,
-                ArtistMetadataId = 1
+                Metadata = new ArtistMetadata {
+                    Id = 1
+                }
             };
 
             _albumRepo = Mocker.Resolve<AlbumRepository>();
@@ -38,7 +40,7 @@ namespace NzbDrone.Core.Test.MusicTests.AlbumRepositoryTests
             _release = Builder<AlbumRelease>
                 .CreateNew()
                 .With(e => e.Id = 0)
-                .With(e => e.ForeignReleaseId = "e00e40a3-5ed5-4ed3-9c22-0a8ff4119bdf")
+                .With(e => e.ForeignReleaseId = "e00e40a3-5ed5-4ed3-9c22-0a8ff4119bdf" )
                 .With(e => e.Monitored = true)
                 .Build();
 
@@ -50,7 +52,7 @@ namespace NzbDrone.Core.Test.MusicTests.AlbumRepositoryTests
                 Artist = _artist,
                 ArtistMetadataId = _artist.ArtistMetadataId,
                 AlbumType = "",
-                AlbumReleases = new List<AlbumRelease> { _release },
+                AlbumReleases = new List<AlbumRelease> {_release },
             };
 
             _albumRepo.Insert(_album);
@@ -73,9 +75,11 @@ namespace NzbDrone.Core.Test.MusicTests.AlbumRepositoryTests
                         ForeignReleaseId = "fake id"
                     }
                 }
+                
             };
 
             _albumRepo.Insert(_albumSpecial);
+
         }
 
         [Test]
@@ -131,15 +135,15 @@ namespace NzbDrone.Core.Test.MusicTests.AlbumRepositoryTests
                 .With(x => x.Title = "Weezer")
                 .With(x => x.CleanTitle = "weezer")
                 .Build();
-
+            
             _albumRepo.InsertMany(albums);
-
+            
             var album = _albumRepo.FindByTitle(_artist.ArtistMetadataId, "Weezer");
-
+            
             _albumRepo.All().Should().HaveCount(4);
             album.Should().BeNull();
         }
-
+        
         [Test]
         public void should_not_find_album_in_db_by_partial_releaseid()
         {
@@ -158,19 +162,15 @@ namespace NzbDrone.Core.Test.MusicTests.AlbumRepositoryTests
                 .With(x => x.Artist = _artist)
                 .With(x => x.ArtistMetadataId = _artist.ArtistMetadataId)
                 .TheFirst(1)
-
                 // next
                 .With(x => x.ReleaseDate = DateTime.UtcNow.AddDays(1))
                 .TheNext(1)
-
                 // another future one
                 .With(x => x.ReleaseDate = DateTime.UtcNow.AddDays(2))
                 .TheNext(1)
-
                 // most recent
                 .With(x => x.ReleaseDate = DateTime.UtcNow.AddDays(-1))
                 .TheNext(1)
-
                 // an older one
                 .With(x => x.ReleaseDate = DateTime.UtcNow.AddDays(-2))
                 .BuildList();
@@ -183,7 +183,7 @@ namespace NzbDrone.Core.Test.MusicTests.AlbumRepositoryTests
         {
             GivenMultipleAlbums();
 
-            var result = _albumRepo.GetNextAlbums(new[] { _artist.ArtistMetadataId });
+            var result = _albumRepo.GetNextAlbums(new [] { _artist.ArtistMetadataId });
             result.Should().BeEquivalentTo(_albums.Take(1));
         }
 
@@ -192,7 +192,7 @@ namespace NzbDrone.Core.Test.MusicTests.AlbumRepositoryTests
         {
             GivenMultipleAlbums();
 
-            var result = _albumRepo.GetLastAlbums(new[] { _artist.ArtistMetadataId });
+            var result = _albumRepo.GetLastAlbums(new [] { _artist.ArtistMetadataId });
             result.Should().BeEquivalentTo(_albums.Skip(2).Take(1));
         }
     }

@@ -1,11 +1,15 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import { Grid, WindowScroller } from 'react-virtualized';
+import ReactDOM from 'react-dom';
+import { WindowScroller } from 'react-virtualized';
+import { isLocked } from 'Utilities/scrollLock';
+import { scrollDirections } from 'Helpers/Props';
 import Measure from 'Components/Measure';
 import Scroller from 'Components/Scroller/Scroller';
-import { scrollDirections } from 'Helpers/Props';
-import hasDifferentItemsOrOrder from 'Utilities/Object/hasDifferentItemsOrOrder';
+import VirtualTableBody from './VirtualTableBody';
 import styles from './VirtualTable.css';
+
+const ROW_HEIGHT = 38;
 
 function overscanIndicesGetter(options) {
   const {
@@ -40,46 +44,28 @@ class VirtualTable extends Component {
       width: 0
     };
 
-    this._grid = null;
+    this._isInitialized = false;
   }
 
-  componentDidUpdate(prevProps, prevState) {
-    const {
-      items,
-      scrollIndex,
-      scrollTop,
-      onRecompute
-    } = this.props;
+  componentDidMount() {
+    this._contentBodyNode = ReactDOM.findDOMNode(this.props.contentBody);
+  }
 
-    const {
-      width
-    } = this.state;
-
-    if (this._grid &&
-        (prevState.width !== width ||
-            hasDifferentItemsOrOrder(prevProps.items, items))) {
-      onRecompute(width);
-      // recomputeGridSize also forces Grid to discard its cache of rendered cells
-      this._grid.recomputeGridSize();
-    }
+  componentDidUpdate(prevProps, preState) {
+    const scrollIndex = this.props.scrollIndex;
 
     if (scrollIndex != null && scrollIndex !== prevProps.scrollIndex) {
-      this._grid.scrollToCell({
-        rowIndex: scrollIndex,
-        columnIndex: 0
-      });
-    }
+      const scrollTop = (scrollIndex + 1) * ROW_HEIGHT + 20;
 
-    if (this._grid && scrollTop !== undefined && scrollTop !== 0) {
-      this._grid.scrollToPosition({ scrollTop });
+      this.props.onScroll({ scrollTop });
     }
   }
 
   //
   // Control
 
-  setGridRef = (ref) => {
-    this._grid = ref;
+  rowGetter = ({ index }) => {
+    return this.props.items[index];
   }
 
   //
@@ -91,20 +77,36 @@ class VirtualTable extends Component {
     });
   }
 
+  onSectionRendered = () => {
+    if (!this._isInitialized && this._contentBodyNode) {
+      this.props.onRender();
+      this._isInitialized = true;
+    }
+  }
+
+  onScroll = (props) => {
+    if (isLocked()) {
+      return;
+    }
+
+    const { onScroll } = this.props;
+
+    onScroll(props);
+  }
+
   //
   // Render
 
   render() {
     const {
-      isSmallScreen,
       className,
       items,
-      scroller,
-      scrollTop: ignored,
+      isSmallScreen,
       header,
       headerHeight,
-      rowHeight,
+      scrollTop,
       rowRenderer,
+      onScroll,
       ...otherProps
     } = this.props;
 
@@ -112,93 +114,65 @@ class VirtualTable extends Component {
       width
     } = this.state;
 
-    const gridStyle = {
-      boxSizing: undefined,
-      direction: undefined,
-      height: undefined,
-      position: undefined,
-      willChange: undefined,
-      overflow: undefined,
-      width: undefined
-    };
-
-    const containerStyle = {
-      position: undefined
-    };
-
     return (
-      <WindowScroller
-        scrollElement={isSmallScreen ? undefined : scroller}
-      >
-        {({ height, registerChild, onChildScroll, scrollTop }) => {
-          if (!height) {
-            return null;
-          }
-          return (
-            <Measure
-              whitelist={['width']}
-              onMeasure={this.onMeasure}
-            >
+      <Measure onMeasure={this.onMeasure}>
+        <WindowScroller
+          scrollElement={isSmallScreen ? undefined : this._contentBodyNode}
+          onScroll={this.onScroll}
+        >
+          {({ height, isScrolling }) => {
+            return (
               <Scroller
                 className={className}
                 scrollDirection={scrollDirections.HORIZONTAL}
               >
                 {header}
-                <div ref={registerChild}>
-                  <Grid
-                    ref={this.setGridRef}
-                    autoContainerWidth={true}
-                    autoHeight={true}
-                    autoWidth={true}
-                    width={width}
-                    height={height}
-                    headerHeight={height - headerHeight}
-                    rowHeight={rowHeight}
-                    rowCount={items.length}
-                    columnCount={1}
-                    columnWidth={width}
-                    scrollTop={scrollTop}
-                    onScroll={onChildScroll}
-                    overscanRowCount={2}
-                    cellRenderer={rowRenderer}
-                    overscanIndicesGetter={overscanIndicesGetter}
-                    scrollToAlignment={'start'}
-                    isScrollingOptout={true}
-                    className={styles.tableBodyContainer}
-                    style={gridStyle}
-                    containerStyle={containerStyle}
-                    {...otherProps}
-                  />
-                </div>
+
+                <VirtualTableBody
+                  autoContainerWidth={true}
+                  width={width}
+                  height={height}
+                  headerHeight={height - headerHeight}
+                  rowHeight={ROW_HEIGHT}
+                  rowCount={items.length}
+                  columnCount={1}
+                  scrollTop={scrollTop}
+                  autoHeight={true}
+                  overscanRowCount={2}
+                  cellRenderer={rowRenderer}
+                  columnWidth={width}
+                  overscanIndicesGetter={overscanIndicesGetter}
+                  onSectionRendered={this.onSectionRendered}
+                  {...otherProps}
+                />
               </Scroller>
-            </Measure>
-          );
-        }
-        }
-      </WindowScroller>
+            );
+          }
+          }
+        </WindowScroller>
+      </Measure>
     );
   }
 }
 
 VirtualTable.propTypes = {
-  isSmallScreen: PropTypes.bool.isRequired,
   className: PropTypes.string.isRequired,
   items: PropTypes.arrayOf(PropTypes.object).isRequired,
+  scrollTop: PropTypes.number.isRequired,
   scrollIndex: PropTypes.number,
-  scrollTop: PropTypes.number,
-  scroller: PropTypes.instanceOf(Element).isRequired,
+  contentBody: PropTypes.object.isRequired,
+  isSmallScreen: PropTypes.bool.isRequired,
   header: PropTypes.node.isRequired,
   headerHeight: PropTypes.number.isRequired,
-  rowHeight: PropTypes.oneOfType([PropTypes.func, PropTypes.number]).isRequired,
   rowRenderer: PropTypes.func.isRequired,
-  onRecompute: PropTypes.func.isRequired
+  onRender: PropTypes.func.isRequired,
+  onScroll: PropTypes.func.isRequired
 };
 
 VirtualTable.defaultProps = {
   className: styles.tableContainer,
   headerHeight: 38,
-  rowHeight: 38,
-  onRecompute: () => {}
+  onRender: () => {}
 };
 
 export default VirtualTable;

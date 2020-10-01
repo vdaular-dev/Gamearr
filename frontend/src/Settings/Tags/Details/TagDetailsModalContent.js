@@ -1,14 +1,14 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import FieldSet from 'Components/FieldSet';
-import Label from 'Components/Label';
-import Button from 'Components/Link/Button';
-import ModalBody from 'Components/Modal/ModalBody';
-import ModalContent from 'Components/Modal/ModalContent';
-import ModalFooter from 'Components/Modal/ModalFooter';
-import ModalHeader from 'Components/Modal/ModalHeader';
-import { kinds } from 'Helpers/Props';
 import split from 'Utilities/String/split';
+import { kinds } from 'Helpers/Props';
+import FieldSet from 'Components/FieldSet';
+import Button from 'Components/Link/Button';
+import Label from 'Components/Label';
+import ModalContent from 'Components/Modal/ModalContent';
+import ModalHeader from 'Components/Modal/ModalHeader';
+import ModalBody from 'Components/Modal/ModalBody';
+import ModalFooter from 'Components/Modal/ModalFooter';
 import TagDetailsDelayProfile from './TagDetailsDelayProfile';
 import styles from './TagDetailsModalContent.css';
 
@@ -167,7 +167,7 @@ function TagDetailsModalContent(props) {
             isDisabled={isTagUsed}
             onPress={onDeleteTagPress}
           >
-            Delete
+              Delete
           </Button>
         }
 

@@ -1,12 +1,12 @@
 import { createAction } from 'redux-actions';
+import serverSideCollectionHandlers from 'Utilities/serverSideCollectionHandlers';
 import { filterTypes, sortDirections } from 'Helpers/Props';
 import { createThunk, handleThunks } from 'Store/thunks';
-import serverSideCollectionHandlers from 'Utilities/serverSideCollectionHandlers';
-import createBatchToggleAlbumMonitoredHandler from './Creators/createBatchToggleAlbumMonitoredHandler';
-import createHandleActions from './Creators/createHandleActions';
-import createServerSideCollectionHandlers from './Creators/createServerSideCollectionHandlers';
 import createClearReducer from './Creators/Reducers/createClearReducer';
 import createSetTableOptionReducer from './Creators/Reducers/createSetTableOptionReducer';
+import createBatchToggleAlbumMonitoredHandler from './Creators/createBatchToggleAlbumMonitoredHandler';
+import createServerSideCollectionHandlers from './Creators/createServerSideCollectionHandlers';
+import createHandleActions from './Creators/createHandleActions';
 
 //
 // Variables
@@ -28,13 +28,13 @@ export const defaultState = {
 
     columns: [
       {
-        name: 'artists.sortName',
+        name: 'artist.sortName',
         label: 'Artist Name',
         isSortable: true,
         isVisible: true
       },
       {
-        name: 'albums.title',
+        name: 'albumTitle',
         label: 'Album Title',
         isSortable: true,
         isVisible: true
@@ -102,13 +102,13 @@ export const defaultState = {
 
     columns: [
       {
-        name: 'artists.sortName',
+        name: 'artist.sortName',
         label: 'Artist Name',
         isSortable: true,
         isVisible: true
       },
       {
-        name: 'albums.title',
+        name: 'albumTitle',
         label: 'Album Title',
         isSortable: true,
         isVisible: true

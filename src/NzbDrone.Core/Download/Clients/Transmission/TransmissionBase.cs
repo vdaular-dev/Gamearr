@@ -32,7 +32,6 @@ namespace NzbDrone.Core.Download.Clients.Transmission
 
         public override IEnumerable<DownloadClientItem> GetItems()
         {
-            var configFunc = new Lazy<TransmissionConfig>(() => _proxy.GetConfig(Settings));
             var torrents = _proxy.GetTorrents(Settings);
 
             var items = new List<DownloadClientItem>();
@@ -40,27 +39,18 @@ namespace NzbDrone.Core.Download.Clients.Transmission
             foreach (var torrent in torrents)
             {
                 // If totalsize == 0 the torrent is a magnet downloading metadata
-                if (torrent.TotalSize == 0)
-                {
-                    continue;
-                }
+                if (torrent.TotalSize == 0) continue;
 
                 var outputPath = new OsPath(torrent.DownloadDir);
 
                 if (Settings.TvDirectory.IsNotNullOrWhiteSpace())
                 {
-                    if (!new OsPath(Settings.TvDirectory).Contains(outputPath))
-                    {
-                        continue;
-                    }
+                    if (!new OsPath(Settings.TvDirectory).Contains(outputPath)) continue;
                 }
                 else if (Settings.MusicCategory.IsNotNullOrWhiteSpace())
                 {
                     var directories = outputPath.FullPath.Split('\\', '/');
-                    if (!directories.Contains(Settings.MusicCategory))
-                    {
-                        continue;
-                    }
+                    if (!directories.Contains(Settings.MusicCategory)) continue;
                 }
 
                 outputPath = _remotePathMappingService.RemapRemoteToLocal(Settings.Host, outputPath);
@@ -108,53 +98,14 @@ namespace NzbDrone.Core.Download.Clients.Transmission
                     item.Status = DownloadItemStatus.Downloading;
                 }
 
-                item.CanBeRemoved = HasReachedSeedLimit(torrent, item.SeedRatio, configFunc);
-                item.CanMoveFiles = item.CanBeRemoved && torrent.Status == TransmissionTorrentStatus.Stopped;
+                item.CanMoveFiles = item.CanBeRemoved =
+                    torrent.Status == TransmissionTorrentStatus.Stopped &&
+                    item.SeedRatio >= torrent.SeedRatioLimit;
 
                 items.Add(item);
             }
 
             return items;
-        }
-
-        protected bool HasReachedSeedLimit(TransmissionTorrent torrent, double? ratio, Lazy<TransmissionConfig> config)
-        {
-            var isStopped = torrent.Status == TransmissionTorrentStatus.Stopped;
-            var isSeeding = torrent.Status == TransmissionTorrentStatus.Seeding;
-
-            if (torrent.SeedRatioMode == 1)
-            {
-                if (isStopped && ratio.HasValue && ratio >= torrent.SeedRatioLimit)
-                {
-                    return true;
-                }
-            }
-            else if (torrent.SeedRatioMode == 0)
-            {
-                if (isStopped && config.Value.SeedRatioLimited && ratio >= config.Value.SeedRatioLimit)
-                {
-                    return true;
-                }
-            }
-
-            // Transmission doesn't support SeedTimeLimit, use/abuse seed idle limit, but only if it was set per-torrent.
-            if (torrent.SeedIdleMode == 1)
-            {
-                if ((isStopped || isSeeding) && torrent.SecondsSeeding > torrent.SeedIdleLimit * 60)
-                {
-                    return true;
-                }
-            }
-            else if (torrent.SeedIdleMode == 0)
-            {
-                // The global idle limit is a real idle limit, if it's configured then 'Stopped' is enough.
-                if (isStopped && config.Value.IdleSeedingLimitEnabled)
-                {
-                    return true;
-                }
-            }
-
-            return false;
         }
 
         public override void RemoveItem(string downloadId, bool deleteData)
@@ -165,8 +116,8 @@ namespace NzbDrone.Core.Download.Clients.Transmission
         public override DownloadClientInfo GetStatus()
         {
             var config = _proxy.GetConfig(Settings);
-            var destDir = config.DownloadDir;
-
+            var destDir = config.GetValueOrDefault("download-dir") as string;
+            
             if (Settings.MusicCategory.IsNotNullOrWhiteSpace())
             {
                 destDir = string.Format("{0}/{1}", destDir, Settings.MusicCategory);
@@ -186,8 +137,8 @@ namespace NzbDrone.Core.Download.Clients.Transmission
 
             var isRecentAlbum = remoteAlbum.IsRecentAlbum();
 
-            if ((isRecentAlbum && Settings.RecentTvPriority == (int)TransmissionPriority.First) ||
-                (!isRecentAlbum && Settings.OlderTvPriority == (int)TransmissionPriority.First))
+            if (isRecentAlbum && Settings.RecentTvPriority == (int)TransmissionPriority.First ||
+                !isRecentAlbum && Settings.OlderTvPriority == (int)TransmissionPriority.First)
             {
                 _proxy.MoveTorrentToTopInQueue(hash, Settings);
             }
@@ -202,8 +153,8 @@ namespace NzbDrone.Core.Download.Clients.Transmission
 
             var isRecentAlbum = remoteAlbum.IsRecentAlbum();
 
-            if ((isRecentAlbum && Settings.RecentTvPriority == (int)TransmissionPriority.First) ||
-                (!isRecentAlbum && Settings.OlderTvPriority == (int)TransmissionPriority.First))
+            if (isRecentAlbum && Settings.RecentTvPriority == (int)TransmissionPriority.First ||
+                !isRecentAlbum && Settings.OlderTvPriority == (int)TransmissionPriority.First)
             {
                 _proxy.MoveTorrentToTopInQueue(hash, Settings);
             }
@@ -214,17 +165,13 @@ namespace NzbDrone.Core.Download.Clients.Transmission
         protected override void Test(List<ValidationFailure> failures)
         {
             failures.AddIfNotNull(TestConnection());
-            if (failures.HasErrors())
-            {
-                return;
-            }
-
+            if (failures.Any()) return;
             failures.AddIfNotNull(TestGetTorrents());
         }
 
         protected virtual OsPath GetOutputPath(OsPath outputPath, TransmissionTorrent torrent)
         {
-            return outputPath + torrent.Name.Replace(":", "_");
+            return outputPath + torrent.Name;
         }
 
         protected string GetDownloadDirectory()
@@ -240,7 +187,7 @@ namespace NzbDrone.Core.Download.Clients.Transmission
             }
 
             var config = _proxy.GetConfig(Settings);
-            var destDir = config.DownloadDir;
+            var destDir = (string)config.GetValueOrDefault("download-dir");
 
             return $"{destDir.TrimEnd('/')}/{Settings.MusicCategory}";
         }
@@ -256,7 +203,7 @@ namespace NzbDrone.Core.Download.Clients.Transmission
                 _logger.Error(ex, "Unable to authenticate");
                 return new NzbDroneValidationFailure("Username", "Authentication failure")
                 {
-                    DetailedDescription = string.Format("Please verify your username and password. Also verify if the host running Lidarr isn't blocked from accessing {0} by WhiteList limitations in the {0} configuration.", Name)
+                    DetailedDescription = string.Format("Please verify your username and password. Also verify if the host running Gamearr isn't blocked from accessing {0} by WhiteList limitations in the {0} configuration.", Name)
                 };
             }
             catch (DownloadClientUnavailableException ex)

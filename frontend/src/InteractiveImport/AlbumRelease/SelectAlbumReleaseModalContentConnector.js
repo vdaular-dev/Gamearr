@@ -2,8 +2,9 @@ import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import {
-  saveInteractiveImportItem,
-  updateInteractiveImportItem } from 'Store/Actions/interactiveImportActions';
+  updateInteractiveImportItem,
+  saveInteractiveImportItem
+} from 'Store/Actions/interactiveImportActions';
 import SelectAlbumReleaseModalContent from './SelectAlbumReleaseModalContent';
 
 function createMapStateToProps() {

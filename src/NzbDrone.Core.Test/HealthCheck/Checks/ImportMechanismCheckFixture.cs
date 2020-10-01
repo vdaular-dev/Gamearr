@@ -8,6 +8,7 @@ namespace NzbDrone.Core.Test.HealthCheck.Checks
     [TestFixture]
     public class ImportMechanismCheckFixture : CoreTest<ImportMechanismCheck>
     {
+
         private void GivenCompletedDownloadHandling(bool? enabled = null)
         {
             if (enabled.HasValue)
@@ -22,10 +23,10 @@ namespace NzbDrone.Core.Test.HealthCheck.Checks
         public void should_return_warning_when_completeddownloadhandling_false()
         {
             GivenCompletedDownloadHandling(false);
-
+            
             Subject.Check().ShouldBeWarning();
         }
-
+        
         [Test]
         public void should_return_ok_when_no_issues_found()
         {

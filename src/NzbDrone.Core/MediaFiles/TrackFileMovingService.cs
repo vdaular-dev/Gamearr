@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
 using NLog;
 using NzbDrone.Common.Disk;
 using NzbDrone.Common.EnsureThat;
@@ -12,6 +9,11 @@ using NzbDrone.Core.Messaging.Events;
 using NzbDrone.Core.Music;
 using NzbDrone.Core.Organizer;
 using NzbDrone.Core.Parser.Model;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
 
 namespace NzbDrone.Core.MediaFiles
 {
@@ -30,23 +32,21 @@ namespace NzbDrone.Core.MediaFiles
         private readonly IBuildFileNames _buildFileNames;
         private readonly IDiskTransferService _diskTransferService;
         private readonly IDiskProvider _diskProvider;
-        private readonly IRootFolderWatchingService _rootFolderWatchingService;
         private readonly IMediaFileAttributeService _mediaFileAttributeService;
         private readonly IEventAggregator _eventAggregator;
         private readonly IConfigService _configService;
         private readonly Logger _logger;
 
         public TrackFileMovingService(ITrackService trackService,
-                                      IAlbumService albumService,
-                                      IUpdateTrackFileService updateTrackFileService,
-                                      IBuildFileNames buildFileNames,
-                                      IDiskTransferService diskTransferService,
-                                      IDiskProvider diskProvider,
-                                      IRootFolderWatchingService rootFolderWatchingService,
-                                      IMediaFileAttributeService mediaFileAttributeService,
-                                      IEventAggregator eventAggregator,
-                                      IConfigService configService,
-                                      Logger logger)
+                                IAlbumService albumService,
+                                IUpdateTrackFileService updateTrackFileService,
+                                IBuildFileNames buildFileNames,
+                                IDiskTransferService diskTransferService,
+                                IDiskProvider diskProvider,
+                                IMediaFileAttributeService mediaFileAttributeService,
+                                IEventAggregator eventAggregator,
+                                IConfigService configService,
+                                Logger logger)
         {
             _trackService = trackService;
             _albumService = albumService;
@@ -54,7 +54,6 @@ namespace NzbDrone.Core.MediaFiles
             _buildFileNames = buildFileNames;
             _diskTransferService = diskTransferService;
             _diskProvider = diskProvider;
-            _rootFolderWatchingService = rootFolderWatchingService;
             _mediaFileAttributeService = mediaFileAttributeService;
             _eventAggregator = eventAggregator;
             _configService = configService;
@@ -63,6 +62,7 @@ namespace NzbDrone.Core.MediaFiles
 
         public TrackFile MoveTrackFile(TrackFile trackFile, Artist artist)
         {
+
             var tracks = _trackService.GetTracksByFileId(trackFile.Id);
             var album = _albumService.GetAlbum(trackFile.AlbumId);
             var newFileName = _buildFileNames.BuildTrackFileName(tracks, artist, album, trackFile);
@@ -77,6 +77,7 @@ namespace NzbDrone.Core.MediaFiles
 
         public TrackFile MoveTrackFile(TrackFile trackFile, LocalTrack localTrack)
         {
+
             var newFileName = _buildFileNames.BuildTrackFileName(localTrack.Tracks, localTrack.Artist, localTrack.Album, trackFile);
             var filePath = _buildFileNames.BuildTrackFilePath(localTrack.Artist, localTrack.Album, newFileName, Path.GetExtension(localTrack.Path));
 
@@ -106,6 +107,7 @@ namespace NzbDrone.Core.MediaFiles
 
         private TrackFile TransferFile(TrackFile trackFile, Artist artist, List<Track> tracks, string destinationFilePath, TransferMode mode)
         {
+
             Ensure.That(trackFile, () => trackFile).IsNotNull();
             Ensure.That(artist, () => artist).IsNotNull();
             Ensure.That(destinationFilePath, () => destinationFilePath).IsValidPath();
@@ -122,7 +124,6 @@ namespace NzbDrone.Core.MediaFiles
                 throw new SameFilenameException("File not moved, source and destination are the same", trackFilePath);
             }
 
-            _rootFolderWatchingService.ReportFileSystemChangeBeginning(trackFilePath, destinationFilePath);
             _diskTransferService.TransferFile(trackFilePath, destinationFilePath, mode);
 
             trackFile.Path = destinationFilePath;
@@ -140,6 +141,7 @@ namespace NzbDrone.Core.MediaFiles
                     _mediaFileAttributeService.SetFolderLastWriteTime(albumFolder, trackFile.DateAdded);
                 }
             }
+
             catch (Exception ex)
             {
                 _logger.Warn(ex, "Unable to set last write time");
@@ -169,8 +171,6 @@ namespace NzbDrone.Core.MediaFiles
 
             var changed = false;
             var newEvent = new TrackFolderCreatedEvent(artist, trackFile);
-
-            _rootFolderWatchingService.ReportFileSystemChangeBeginning(artistFolder, albumFolder, trackFolder);
 
             if (!_diskProvider.FolderExists(artistFolder))
             {

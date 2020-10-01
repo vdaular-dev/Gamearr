@@ -1,16 +1,16 @@
 using System.Linq;
 using FizzWare.NBuilder;
 using FluentAssertions;
+using Marr.Data;
 using NUnit.Framework;
-using NzbDrone.Core.Configuration;
-using NzbDrone.Core.Datastore;
 using NzbDrone.Core.MediaFiles;
 using NzbDrone.Core.MediaFiles.TrackImport.Specifications;
-using NzbDrone.Core.Music;
 using NzbDrone.Core.Parser.Model;
 using NzbDrone.Core.Profiles.Qualities;
 using NzbDrone.Core.Qualities;
 using NzbDrone.Core.Test.Framework;
+using NzbDrone.Core.Music;
+using NzbDrone.Core.Configuration;
 
 namespace NzbDrone.Core.Test.MediaFiles.TrackImport.Specifications
 {
@@ -51,7 +51,7 @@ namespace NzbDrone.Core.Test.MediaFiles.TrackImport.Specifications
                                                      .Build()
                                                      .ToList();
 
-            Subject.IsSatisfiedBy(_localTrack, null).Accepted.Should().BeTrue();
+            Subject.IsSatisfiedBy(_localTrack).Accepted.Should().BeTrue();
         }
 
         [Test]
@@ -64,7 +64,7 @@ namespace NzbDrone.Core.Test.MediaFiles.TrackImport.Specifications
                                                      .Build()
                                                      .ToList();
 
-            Subject.IsSatisfiedBy(_localTrack, null).Accepted.Should().BeTrue();
+            Subject.IsSatisfiedBy(_localTrack).Accepted.Should().BeTrue();
         }
 
         [Test]
@@ -81,7 +81,7 @@ namespace NzbDrone.Core.Test.MediaFiles.TrackImport.Specifications
                                                      .Build()
                                                      .ToList();
 
-            Subject.IsSatisfiedBy(_localTrack, null).Accepted.Should().BeTrue();
+            Subject.IsSatisfiedBy(_localTrack).Accepted.Should().BeTrue();
         }
 
         [Test]
@@ -98,7 +98,7 @@ namespace NzbDrone.Core.Test.MediaFiles.TrackImport.Specifications
                                                      .Build()
                                                      .ToList();
 
-            Subject.IsSatisfiedBy(_localTrack, null).Accepted.Should().BeTrue();
+            Subject.IsSatisfiedBy(_localTrack).Accepted.Should().BeTrue();
         }
 
         [Test]
@@ -115,7 +115,7 @@ namespace NzbDrone.Core.Test.MediaFiles.TrackImport.Specifications
                                                      .Build()
                                                      .ToList();
 
-            Subject.IsSatisfiedBy(_localTrack, null).Accepted.Should().BeFalse();
+            Subject.IsSatisfiedBy(_localTrack).Accepted.Should().BeFalse();
         }
 
         [Test]
@@ -132,7 +132,7 @@ namespace NzbDrone.Core.Test.MediaFiles.TrackImport.Specifications
                                                      .Build()
                                                      .ToList();
 
-            Subject.IsSatisfiedBy(_localTrack, null).Accepted.Should().BeFalse();
+            Subject.IsSatisfiedBy(_localTrack).Accepted.Should().BeFalse();
         }
 
         [Test]
@@ -156,8 +156,9 @@ namespace NzbDrone.Core.Test.MediaFiles.TrackImport.Specifications
                                                      .Build()
                                                      .ToList();
 
-            Subject.IsSatisfiedBy(_localTrack, null).Accepted.Should().BeFalse();
+            Subject.IsSatisfiedBy(_localTrack).Accepted.Should().BeFalse();
         }
+
 
         [Test]
         public void should_return_false_if_not_a_revision_upgrade_and_prefers_propers()
@@ -177,7 +178,7 @@ namespace NzbDrone.Core.Test.MediaFiles.TrackImport.Specifications
                                                      .Build()
                                                      .ToList();
 
-            Subject.IsSatisfiedBy(_localTrack, null).Accepted.Should().BeFalse();
+            Subject.IsSatisfiedBy(_localTrack).Accepted.Should().BeFalse();
         }
 
         [Test]
@@ -198,7 +199,7 @@ namespace NzbDrone.Core.Test.MediaFiles.TrackImport.Specifications
                                                      .Build()
                                                      .ToList();
 
-            Subject.IsSatisfiedBy(_localTrack, null).Accepted.Should().BeTrue();
+            Subject.IsSatisfiedBy(_localTrack).Accepted.Should().BeTrue();
         }
 
         [Test]
@@ -221,20 +222,7 @@ namespace NzbDrone.Core.Test.MediaFiles.TrackImport.Specifications
                                                      .Build()
                                                      .ToList();
 
-            Subject.IsSatisfiedBy(_localTrack, null).Accepted.Should().BeTrue();
-        }
-
-        [Test]
-        public void should_return_true_if_track_file_is_null()
-        {
-            _localTrack.Tracks = Builder<Track>.CreateListOfSize(2)
-                                                     .All()
-                                                     .With(e => e.TrackFileId = 1)
-                                                     .With(e => e.TrackFile = new LazyLoaded<TrackFile>(null))
-                                                     .Build()
-                                                     .ToList();
-
-            Subject.IsSatisfiedBy(_localTrack, null).Accepted.Should().BeTrue();
+            Subject.IsSatisfiedBy(_localTrack).Accepted.Should().BeTrue();
         }
     }
 }

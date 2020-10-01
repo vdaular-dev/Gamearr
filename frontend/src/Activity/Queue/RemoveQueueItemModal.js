@@ -1,15 +1,16 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import FormGroup from 'Components/Form/FormGroup';
-import FormInputGroup from 'Components/Form/FormInputGroup';
-import FormLabel from 'Components/Form/FormLabel';
+import { inputTypes, kinds, sizes } from 'Helpers/Props';
 import Button from 'Components/Link/Button';
 import Modal from 'Components/Modal/Modal';
-import ModalBody from 'Components/Modal/ModalBody';
+import FormGroup from 'Components/Form/FormGroup';
+import FormLabel from 'Components/Form/FormLabel';
+import FormInputGroup from 'Components/Form/FormInputGroup';
 import ModalContent from 'Components/Modal/ModalContent';
-import ModalFooter from 'Components/Modal/ModalFooter';
 import ModalHeader from 'Components/Modal/ModalHeader';
-import { inputTypes, kinds, sizes } from 'Helpers/Props';
+import ModalBody from 'Components/Modal/ModalBody';
+import ModalFooter from 'Components/Modal/ModalFooter';
+import styles from './RemoveQueueItemModal.css';
 
 class RemoveQueueItemModal extends Component {
 
@@ -20,29 +21,13 @@ class RemoveQueueItemModal extends Component {
     super(props, context);
 
     this.state = {
-      remove: true,
       blacklist: false,
       skipredownload: false
     };
   }
 
   //
-  // Control
-
-  resetState = function() {
-    this.setState({
-      remove: true,
-      blacklist: false,
-      skipredownload: false
-    });
-  }
-
-  //
   // Listeners
-
-  onRemoveChange = ({ value }) => {
-    this.setState({ remove: value });
-  }
 
   onBlacklistChange = ({ value }) => {
     this.setState({ blacklist: value });
@@ -52,15 +37,22 @@ class RemoveQueueItemModal extends Component {
     this.setState({ skipredownload: value });
   }
 
-  onRemoveConfirmed = () => {
-    const state = this.state;
+  onRemoveQueueItemConfirmed = () => {
+    const blacklist = this.state.blacklist;
+    const skipredownload = this.state.skipredownload;
 
-    this.resetState();
-    this.props.onRemovePress(state);
+    this.setState({
+      blacklist: false,
+      skipredownload: false
+    });
+    this.props.onRemovePress(blacklist, skipredownload);
   }
 
   onModalClose = () => {
-    this.resetState();
+    this.setState({
+      blacklist: false,
+      skipredownload: false
+    });
     this.props.onModalClose();
   }
 
@@ -70,11 +62,11 @@ class RemoveQueueItemModal extends Component {
   render() {
     const {
       isOpen,
-      sourceTitle,
-      canIgnore
+      sourceTitle
     } = this.props;
 
-    const { remove, blacklist, skipredownload } = this.state;
+    const blacklist = this.state.blacklist;
+    const skipredownload = this.state.skipredownload;
 
     return (
       <Modal
@@ -94,27 +86,17 @@ class RemoveQueueItemModal extends Component {
               Are you sure you want to remove '{sourceTitle}' from the queue?
             </div>
 
-            <FormGroup>
-              <FormLabel>Remove From Download Client</FormLabel>
-
-              <FormInputGroup
-                type={inputTypes.CHECK}
-                name="remove"
-                value={remove}
-                helpTextWarning="Removing will remove the download and the file(s) from the download client."
-                isDisabled={!canIgnore}
-                onChange={this.onRemoveChange}
-              />
-            </FormGroup>
+            <div className={styles.messageRemove}>
+              Removing will remove the download and the file(s) from the download client.
+            </div>
 
             <FormGroup>
               <FormLabel>Blacklist Release</FormLabel>
-
               <FormInputGroup
                 type={inputTypes.CHECK}
                 name="blacklist"
                 value={blacklist}
-                helpText="Prevents Lidarr from automatically grabbing this release again"
+                helpText="Prevents Gamearr from automatically grabbing this release again"
                 onChange={this.onBlacklistChange}
               />
             </FormGroup>
@@ -127,7 +109,7 @@ class RemoveQueueItemModal extends Component {
                     type={inputTypes.CHECK}
                     name="skipredownload"
                     value={skipredownload}
-                    helpText="Prevents Lidarr from trying download an alternative release for this item"
+                    helpText="Prevents Gamearr from trying download an alternative release for this item"
                     onChange={this.onSkipReDownloadChange}
                   />
                 </FormGroup>
@@ -142,7 +124,7 @@ class RemoveQueueItemModal extends Component {
 
             <Button
               kind={kinds.DANGER}
-              onPress={this.onRemoveConfirmed}
+              onPress={this.onRemoveQueueItemConfirmed}
             >
               Remove
             </Button>
@@ -156,7 +138,6 @@ class RemoveQueueItemModal extends Component {
 RemoveQueueItemModal.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   sourceTitle: PropTypes.string.isRequired,
-  canIgnore: PropTypes.bool.isRequired,
   onRemovePress: PropTypes.func.isRequired,
   onModalClose: PropTypes.func.isRequired
 };

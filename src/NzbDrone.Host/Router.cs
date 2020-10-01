@@ -1,3 +1,4 @@
+using System;
 using NLog;
 using NzbDrone.Common;
 using NzbDrone.Common.EnvironmentInfo;
@@ -5,11 +6,11 @@ using NzbDrone.Common.Processes;
 using NzbDrone.Host.AccessControl;
 using IServiceProvider = NzbDrone.Common.IServiceProvider;
 
+
 namespace NzbDrone.Host
 {
     public class Router
     {
-        private readonly INzbDroneConsoleFactory _nzbDroneConsoleFactory;
         private readonly INzbDroneServiceFactory _nzbDroneServiceFactory;
         private readonly IServiceProvider _serviceProvider;
         private readonly IConsoleService _consoleService;
@@ -18,8 +19,7 @@ namespace NzbDrone.Host
         private readonly IRemoteAccessAdapter _remoteAccessAdapter;
         private readonly Logger _logger;
 
-        public Router(INzbDroneConsoleFactory nzbDroneConsoleFactory,
-                      INzbDroneServiceFactory nzbDroneServiceFactory,
+        public Router(INzbDroneServiceFactory nzbDroneServiceFactory,
                       IServiceProvider serviceProvider,
                       IConsoleService consoleService,
                       IRuntimeInfo runtimeInfo,
@@ -27,7 +27,6 @@ namespace NzbDrone.Host
                       IRemoteAccessAdapter remoteAccessAdapter,
                       Logger logger)
         {
-            _nzbDroneConsoleFactory = nzbDroneConsoleFactory;
             _nzbDroneServiceFactory = nzbDroneServiceFactory;
             _serviceProvider = serviceProvider;
             _consoleService = consoleService;
@@ -53,10 +52,9 @@ namespace NzbDrone.Host
                 case ApplicationModes.Interactive:
                     {
                         _logger.Debug(_runtimeInfo.IsWindowsTray ? "Tray selected" : "Console selected");
-                        _nzbDroneConsoleFactory.Start();
+                        _nzbDroneServiceFactory.Start();
                         break;
                     }
-
                 case ApplicationModes.InstallService:
                     {
                         _logger.Debug("Install Service selected");
@@ -71,13 +69,11 @@ namespace NzbDrone.Host
                             _serviceProvider.SetPermissions(ServiceProvider.SERVICE_NAME);
 
                             // Start the service and exit.
-                            // Ensures that there isn't an instance of Lidarr already running that the service account cannot stop.
+                            // Ensures that there isn't an instance of Gamearr already running that the service account cannot stop.
                             _processProvider.SpawnNewProcess("sc.exe", $"start {ServiceProvider.SERVICE_NAME}", null, true);
                         }
-
                         break;
                     }
-
                 case ApplicationModes.UninstallService:
                     {
                         _logger.Debug("Uninstall Service selected");
@@ -92,7 +88,6 @@ namespace NzbDrone.Host
 
                         break;
                     }
-
                 case ApplicationModes.RegisterUrl:
                     {
                         _logger.Debug("Regiser URL selected");
@@ -100,7 +95,6 @@ namespace NzbDrone.Host
 
                         break;
                     }
-
                 default:
                     {
                         _consoleService.PrintHelp();

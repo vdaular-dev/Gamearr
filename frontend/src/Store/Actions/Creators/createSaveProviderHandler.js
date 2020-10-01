@@ -1,9 +1,9 @@
-import $ from 'jquery';
 import _ from 'lodash';
+import $ from 'jquery';
 import { batchActions } from 'redux-batched-actions';
 import createAjaxRequest from 'Utilities/createAjaxRequest';
 import getProviderState from 'Utilities/State/getProviderState';
-import { removeItem, set, updateItem } from '../baseActions';
+import { set, updateItem, removeItem } from '../baseActions';
 
 const abortCurrentRequests = {};
 

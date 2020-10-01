@@ -76,6 +76,7 @@ namespace NzbDrone.Core.Datastore.Migration
                 .WithColumn("AddOptions").AsString().Nullable()
                 .WithColumn("Duration").AsInt32().WithDefaultValue(0);
 
+
             Create.TableForModel("Tracks")
                 .WithColumn("ForeignTrackId").AsString().Unique()
                 .WithColumn("ArtistId").AsInt32().Indexed()
@@ -206,6 +207,7 @@ namespace NzbDrone.Core.Datastore.Migration
                 .WithColumn("Release").AsString()
                 .WithColumn("ArtistId").AsInt32().WithDefaultValue(0)
                 .WithColumn("ParsedAlbumInfo").AsString().WithDefaultValue("");
+
 
             Create.TableForModel("RemotePathMappings")
                 .WithColumn("Host").AsString()

@@ -1,11 +1,15 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using FizzWare.NBuilder;
+using FluentAssertions;
 using Moq;
 using NUnit.Framework;
 using NzbDrone.Common.Disk;
 using NzbDrone.Core.RootFolders;
 using NzbDrone.Core.Test.Framework;
+using NzbDrone.Core.Music;
 using NzbDrone.Test.Common;
 
 namespace NzbDrone.Core.Test.RootFolderTests
@@ -69,7 +73,8 @@ namespace NzbDrone.Core.Test.RootFolderTests
         public void invalid_folder_path_throws_on_add(string path)
         {
             Assert.Throws<ArgumentException>(() =>
-                    Mocker.Resolve<RootFolderService>().Add(new RootFolder { Id = 0, Path = path }));
+                    Mocker.Resolve<RootFolderService>().Add(new RootFolder { Id = 0, Path = path })
+                );
         }
 
         [Test]
@@ -88,6 +93,50 @@ namespace NzbDrone.Core.Test.RootFolderTests
                   .Returns(false);
 
             Assert.Throws<UnauthorizedAccessException>(() => Subject.Add(new RootFolder { Path = @"C:\Music".AsOsAgnostic() }));
+        }
+
+        [TestCase("$recycle.bin")]
+        [TestCase("system volume information")]
+        [TestCase("recycler")]
+        [TestCase("lost+found")]
+        [TestCase(".appledb")]
+        [TestCase(".appledesktop")]
+        [TestCase(".appledouble")]
+        [TestCase("@eadir")]
+        [TestCase(".grab")]
+        public void should_get_root_folder_with_subfolders_excluding_special_sub_folders(string subFolder)
+        {
+            var rootFolderPath = @"C:\Test\Music".AsOsAgnostic();
+            var rootFolder = Builder<RootFolder>.CreateNew()
+                                                .With(r => r.Path = rootFolderPath)
+                                                .Build();
+
+            var subFolders = new[]
+                        {
+                            "Artist1",
+                            "Artist2",
+                            "Artist3",
+                            subFolder
+                        };
+
+            var folders = subFolders.Select(f => Path.Combine(rootFolderPath, f)).ToArray();
+
+            Mocker.GetMock<IRootFolderRepository>()
+                  .Setup(s => s.Get(It.IsAny<int>()))
+                  .Returns(rootFolder);
+
+            Mocker.GetMock<IArtistService>()
+                  .Setup(s => s.GetAllArtists())
+                  .Returns(new List<Artist>());
+
+            Mocker.GetMock<IDiskProvider>()
+                  .Setup(s => s.GetDirectories(rootFolder.Path))
+                  .Returns(folders);
+
+            var unmappedFolders = Subject.Get(rootFolder.Id).UnmappedFolders;
+
+            unmappedFolders.Count.Should().BeGreaterThan(0);
+            unmappedFolders.Should().NotContain(u => u.Name == subFolder);
         }
     }
 }

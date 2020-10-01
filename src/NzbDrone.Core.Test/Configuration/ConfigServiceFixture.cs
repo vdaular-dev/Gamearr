@@ -28,6 +28,7 @@ namespace NzbDrone.Core.Test.Configuration
             AssertUpsert(key, value);
         }
 
+
         [Test]
         public void Get_value_should_return_default_when_no_value()
         {

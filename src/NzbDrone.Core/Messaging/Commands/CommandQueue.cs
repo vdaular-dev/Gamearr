@@ -124,6 +124,7 @@ namespace NzbDrone.Core.Messaging.Commands
                 {
                     rval = false;
                 }
+
                 else
                 {
                     var startedCommands = _items.Where(c => c.Status == CommandStatus.Started)
@@ -148,7 +149,7 @@ namespace NzbDrone.Core.Messaging.Commands
                     var localItem = queuedCommands.OrderByDescending(c => c.Priority)
                         .ThenBy(c => c.QueuedAt)
                         .FirstOrDefault();
-
+                    
                     // Nothing queued that meets the requirements
                     if (localItem == null)
                     {

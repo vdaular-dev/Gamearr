@@ -52,10 +52,7 @@ namespace NzbDrone.Core.Extras.Metadata.Consumers.Xbmc
         {
             var filename = Path.GetFileName(path);
 
-            if (filename == null)
-            {
-                return null;
-            }
+            if (filename == null) return null;
 
             var metadata = new MetadataFile
             {
@@ -66,7 +63,7 @@ namespace NzbDrone.Core.Extras.Metadata.Consumers.Xbmc
 
             if (ArtistImagesRegex.IsMatch(filename))
             {
-                metadata.Type = MetadataType.ArtistImage;
+                metadata.Type = MetadataType.GameImage;
                 return metadata;
             }
 
@@ -166,7 +163,7 @@ namespace NzbDrone.Core.Extras.Metadata.Consumers.Xbmc
                 doc.Save(xw);
 
                 _logger.Debug("Saving album.nfo for {0}", album.Title);
-
+                
                 var fileName = Path.Combine(albumPath, "album.nfo");
 
                 return new MetadataFileResult(fileName, doc.ToString());
@@ -200,6 +197,7 @@ namespace NzbDrone.Core.Extras.Metadata.Consumers.Xbmc
 
         public override List<ImageFileResult> TrackImages(Artist artist, TrackFile trackFile)
         {
+
             return new List<ImageFileResult>();
         }
 
@@ -226,7 +224,7 @@ namespace NzbDrone.Core.Extras.Metadata.Consumers.Xbmc
                 // var source = _mediaCoverService.GetCoverPath(album.ArtistId, image.CoverType, null, album.Id);
                 string filename;
 
-                switch (image.CoverType)
+                switch(image.CoverType)
                 {
                     case MediaCoverTypes.Cover:
                         filename = "folder";
@@ -248,5 +246,6 @@ namespace NzbDrone.Core.Extras.Metadata.Consumers.Xbmc
         {
             return Path.ChangeExtension(trackFilePath, "nfo");
         }
+
     }
 }

@@ -1,5 +1,10 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using static NzbDrone.Core.Download.Clients.DownloadStation.DownloadStationTask;
 
 namespace NzbDrone.Core.Download.Clients.DownloadStation
 {

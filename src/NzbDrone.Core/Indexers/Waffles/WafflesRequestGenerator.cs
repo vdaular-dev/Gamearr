@@ -1,7 +1,8 @@
 using System.Collections.Generic;
-using System.Text;
 using NzbDrone.Common.Extensions;
 using NzbDrone.Common.Http;
+using System.Text;
+using System;
 using NzbDrone.Core.IndexerSearch.Definitions;
 
 namespace NzbDrone.Core.Indexers.Waffles
@@ -29,7 +30,7 @@ namespace NzbDrone.Core.Indexers.Waffles
         {
             var pageableRequests = new IndexerPageableRequestChain();
 
-            pageableRequests.Add(GetPagedRequests(MaxPages, string.Format("&q=artist:{0} album:{1}", searchCriteria.ArtistQuery, searchCriteria.AlbumQuery)));
+            pageableRequests.Add(GetPagedRequests(MaxPages, string.Format("&q=artist:{0} album:{1}",searchCriteria.ArtistQuery,searchCriteria.AlbumQuery)));
 
             return pageableRequests;
         }
@@ -44,9 +45,10 @@ namespace NzbDrone.Core.Indexers.Waffles
         }
 
         private IEnumerable<IndexerRequest> GetPagedRequests(int maxPages, string query)
-        {
-            var url = new StringBuilder();
+        { 
 
+            var url = new StringBuilder();
+        
             url.AppendFormat("{0}/browse.php?rss=1&c0=1&uid={1}&passkey={2}", Settings.BaseUrl.Trim().TrimEnd('/'), Settings.UserId, Settings.RssPasskey);
 
             if (query.IsNotNullOrWhiteSpace())

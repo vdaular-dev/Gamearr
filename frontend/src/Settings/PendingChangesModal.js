@@ -1,25 +1,19 @@
 import PropTypes from 'prop-types';
-import React, { useEffect } from 'react';
-import keyboardShortcuts from 'Components/keyboardShortcuts';
+import React from 'react';
+import { kinds } from 'Helpers/Props';
 import Button from 'Components/Link/Button';
 import Modal from 'Components/Modal/Modal';
-import ModalBody from 'Components/Modal/ModalBody';
 import ModalContent from 'Components/Modal/ModalContent';
-import ModalFooter from 'Components/Modal/ModalFooter';
 import ModalHeader from 'Components/Modal/ModalHeader';
-import { kinds } from 'Helpers/Props';
+import ModalBody from 'Components/Modal/ModalBody';
+import ModalFooter from 'Components/Modal/ModalFooter';
 
 function PendingChangesModal(props) {
   const {
     isOpen,
     onConfirm,
-    onCancel,
-    bindShortcut
+    onCancel
   } = props;
-
-  useEffect(() => {
-    bindShortcut('enter', onConfirm);
-  }, [onConfirm]);
 
   return (
     <Modal
@@ -42,7 +36,6 @@ function PendingChangesModal(props) {
           </Button>
 
           <Button
-            autoFocus={true}
             kind={kinds.DANGER}
             onPress={onConfirm}
           >
@@ -59,12 +52,11 @@ PendingChangesModal.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   kind: PropTypes.oneOf(kinds.all),
   onConfirm: PropTypes.func.isRequired,
-  onCancel: PropTypes.func.isRequired,
-  bindShortcut: PropTypes.func.isRequired
+  onCancel: PropTypes.func.isRequired
 };
 
 PendingChangesModal.defaultProps = {
   kind: kinds.PRIMARY
 };
 
-export default keyboardShortcuts(PendingChangesModal);
+export default PendingChangesModal;

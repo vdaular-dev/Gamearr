@@ -1,10 +1,10 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import TagInput from 'Components/Form/TagInput';
-import { filterBuilderTypes, filterBuilderValueTypes, kinds } from 'Helpers/Props';
-import tagShape from 'Helpers/Props/Shapes/tagShape';
 import convertToBytes from 'Utilities/Number/convertToBytes';
 import formatBytes from 'Utilities/Number/formatBytes';
+import { kinds, filterBuilderTypes, filterBuilderValueTypes } from 'Helpers/Props';
+import tagShape from 'Helpers/Props/Shapes/tagShape';
+import TagInput from 'Components/Form/TagInput';
 import FilterBuilderRowValueTag from './FilterBuilderRowValueTag';
 
 export const NAME = 'value';
@@ -135,7 +135,7 @@ class FilterBuilderRowValue extends Component {
         tagList={tagList}
         allowNew={!tagList.length}
         kind={kinds.DEFAULT}
-        delimiters={['Tab', 'Enter']}
+        delimiters={[9, 13]}
         maxSuggestionsLength={100}
         minQueryLength={0}
         tagComponent={FilterBuilderRowValueTag}

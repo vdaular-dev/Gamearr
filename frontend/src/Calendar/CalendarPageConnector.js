@@ -1,16 +1,13 @@
-import moment from 'moment';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
-import * as commandNames from 'Commands/commandNames';
-import withCurrentPage from 'Components/withCurrentPage';
-import { searchMissing, setCalendarDaysCount, setCalendarFilter } from 'Store/Actions/calendarActions';
-import { executeCommand } from 'Store/Actions/commandActions';
-import createArtistCountSelector from 'Store/Selectors/createArtistCountSelector';
-import createCommandExecutingSelector from 'Store/Selectors/createCommandExecutingSelector';
-import createCommandsSelector from 'Store/Selectors/createCommandsSelector';
-import createUISettingsSelector from 'Store/Selectors/createUISettingsSelector';
+import moment from 'moment';
 import { isCommandExecuting } from 'Utilities/Command';
 import isBefore from 'Utilities/Date/isBefore';
+import withCurrentPage from 'Components/withCurrentPage';
+import { searchMissing, setCalendarDaysCount, setCalendarFilter } from 'Store/Actions/calendarActions';
+import createArtistCountSelector from 'Store/Selectors/createArtistCountSelector';
+import createUISettingsSelector from 'Store/Selectors/createUISettingsSelector';
+import createCommandsSelector from 'Store/Selectors/createCommandsSelector';
 import CalendarPage from './CalendarPage';
 
 function createMissingAlbumIdsSelector() {
@@ -62,7 +59,6 @@ function createMapStateToProps() {
     createArtistCountSelector(),
     createUISettingsSelector(),
     createMissingAlbumIdsSelector(),
-    createCommandExecutingSelector(commandNames.RSS_SYNC),
     createIsSearchingSelector(),
     (
       selectedFilterKey,
@@ -70,7 +66,6 @@ function createMapStateToProps() {
       artistCount,
       uiSettings,
       missingAlbumIds,
-      isRssSyncExecuting,
       isSearchingForMissing
     ) => {
       return {
@@ -79,10 +74,7 @@ function createMapStateToProps() {
         colorImpairedMode: uiSettings.enableColorImpairedMode,
         hasArtist: !!artistCount.count,
         artistError: artistCount.error,
-        artistIsFetching: artistCount.isFetching,
-        artistIsPopulated: artistCount.isPopulated,
         missingAlbumIds,
-        isRssSyncExecuting,
         isSearchingForMissing
       };
     }
@@ -91,16 +83,9 @@ function createMapStateToProps() {
 
 function createMapDispatchToProps(dispatch, props) {
   return {
-    onRssSyncPress() {
-      dispatch(executeCommand({
-        name: commandNames.RSS_SYNC
-      }));
-    },
-
     onSearchMissingPress(albumIds) {
       dispatch(searchMissing({ albumIds }));
     },
-
     onDaysCountChange(dayCount) {
       dispatch(setCalendarDaysCount({ dayCount }));
     },

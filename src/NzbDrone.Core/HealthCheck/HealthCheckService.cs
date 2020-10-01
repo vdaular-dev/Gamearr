@@ -3,11 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using NLog;
 using NzbDrone.Common.Cache;
+using NzbDrone.Common.Extensions;
 using NzbDrone.Common.Messaging;
 using NzbDrone.Common.Reflection;
+using NzbDrone.Core.Configuration.Events;
+using NzbDrone.Core.Download;
+using NzbDrone.Core.Indexers;
 using NzbDrone.Core.Lifecycle;
 using NzbDrone.Core.Messaging.Commands;
 using NzbDrone.Core.Messaging.Events;
+using NzbDrone.Core.ThingiProvider.Events;
 
 namespace NzbDrone.Core.HealthCheck
 {
@@ -24,7 +29,7 @@ namespace NzbDrone.Core.HealthCheck
         private readonly IProvideHealthCheck[] _healthChecks;
         private readonly IProvideHealthCheck[] _startupHealthChecks;
         private readonly IProvideHealthCheck[] _scheduledHealthChecks;
-        private readonly Dictionary<Type, IEventDrivenHealthCheck[]> _eventDrivenHealthChecks;
+        private readonly Dictionary<Type, EventDrivenHealthCheck[]> _eventDrivenHealthChecks;
         private readonly IEventAggregator _eventAggregator;
         private readonly ICacheManager _cacheManager;
         private readonly Logger _logger;
@@ -53,16 +58,10 @@ namespace NzbDrone.Core.HealthCheck
             return _healthCheckResults.Values.ToList();
         }
 
-        private Dictionary<Type, IEventDrivenHealthCheck[]> GetEventDrivenHealthChecks()
+        private Dictionary<Type, EventDrivenHealthCheck[]> GetEventDrivenHealthChecks()
         {
             return _healthChecks
-                .SelectMany(h => h.GetType().GetAttributes<CheckOnAttribute>().Select(a =>
-                {
-                    var eventDrivenType = typeof(EventDrivenHealthCheck<>).MakeGenericType(a.EventType);
-                    var eventDriven = (IEventDrivenHealthCheck)Activator.CreateInstance(eventDrivenType, h, a.Condition);
-
-                    return Tuple.Create(a.EventType, eventDriven);
-                }))
+                .SelectMany(h => h.GetType().GetAttributes<CheckOnAttribute>().Select(a => Tuple.Create(a.EventType, new EventDrivenHealthCheck(h, a.Condition))))
                 .GroupBy(t => t.Item1, t => t.Item2)
                 .ToDictionary(g => g.Key, g => g.ToArray());
         }
@@ -89,6 +88,7 @@ namespace NzbDrone.Core.HealthCheck
                 {
                     _healthCheckResults.Remove(result.Source.Name);
                 }
+
                 else
                 {
                     if (_healthCheckResults.Find(result.Source.Name) == null)
@@ -97,6 +97,7 @@ namespace NzbDrone.Core.HealthCheck
                     }
 
                     _healthCheckResults.Set(result.Source.Name, result);
+                    
                 }
             }
 
@@ -127,7 +128,7 @@ namespace NzbDrone.Core.HealthCheck
                 return;
             }
 
-            IEventDrivenHealthCheck[] checks;
+            EventDrivenHealthCheck[] checks;
             if (!_eventDrivenHealthChecks.TryGetValue(message.GetType(), out checks))
             {
                 return;
@@ -138,13 +139,25 @@ namespace NzbDrone.Core.HealthCheck
 
             foreach (var eventDrivenHealthCheck in checks)
             {
-                var healthCheckType = eventDrivenHealthCheck.HealthCheck.GetType();
-                var previouslyFailed = healthCheckResults.Any(r => r.Source == healthCheckType);
-
-                if (eventDrivenHealthCheck.ShouldExecute(message, previouslyFailed))
+                if (eventDrivenHealthCheck.Condition == CheckOnCondition.Always)
                 {
                     filteredChecks.Add(eventDrivenHealthCheck.HealthCheck);
                     continue;
+                }
+
+                var healthCheckType = eventDrivenHealthCheck.HealthCheck.GetType();
+
+                if (eventDrivenHealthCheck.Condition == CheckOnCondition.FailedOnly &&
+                    healthCheckResults.Any(r => r.Source == healthCheckType))
+                {
+                    filteredChecks.Add(eventDrivenHealthCheck.HealthCheck);
+                    continue;
+                }
+
+                if (eventDrivenHealthCheck.Condition == CheckOnCondition.SuccessfulOnly &&
+                    healthCheckResults.None(r => r.Source == healthCheckType))
+                {
+                    filteredChecks.Add(eventDrivenHealthCheck.HealthCheck);
                 }
             }
 

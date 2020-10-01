@@ -1,37 +1,38 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using FizzWare.NBuilder;
-using FluentAssertions;
 using NUnit.Framework;
 using NzbDrone.Core.MediaFiles.TrackImport.Identification;
-using NzbDrone.Core.Music;
-using NzbDrone.Core.Parser;
-using NzbDrone.Core.Parser.Model;
+using FluentAssertions;
 using NzbDrone.Core.Test.Framework;
+using FizzWare.NBuilder;
+using NzbDrone.Core.Parser.Model;
+using NzbDrone.Core.Music;
+using System.Collections.Generic;
+using System.Linq;
+using System;
+using NzbDrone.Core.Parser;
 
 namespace NzbDrone.Core.Test.MediaFiles.TrackImport.Identification
 {
     [TestFixture]
-    public class AlbumDistanceFixture : CoreTest
+    public class AlbumDistanceFixture : CoreTest<IdentificationService>
     {
-        private ArtistMetadata _artist;
+
+        private ArtistMetadata artist;
 
         [SetUp]
         public void Setup()
         {
-            _artist = Builder<ArtistMetadata>
+            artist = Builder<ArtistMetadata>
                 .CreateNew()
                 .With(x => x.Name = "artist")
                 .Build();
         }
-
+        
         private List<Track> GivenTracks(int count)
         {
              return Builder<Track>
                 .CreateListOfSize(count)
                 .All()
-                .With(x => x.ArtistMetadata = _artist)
+                .With(x => x.ArtistMetadata = artist)
                 .With(x => x.MediumNumber = 1)
                 .Build()
                 .ToList();
@@ -55,7 +56,7 @@ namespace NzbDrone.Core.Test.MediaFiles.TrackImport.Identification
                 .With(x => x.Label = release.Label.First())
                 .With(x => x.Year = (uint)(release.Album.Value.ReleaseDate?.Year ?? 0))
                 .Build();
-
+            
             var localTrack = Builder<LocalTrack>
                 .CreateNew()
                 .With(x => x.FileTrackInfo = fileInfo)
@@ -71,7 +72,6 @@ namespace NzbDrone.Core.Test.MediaFiles.TrackImport.Identification
             {
                 output.Add(GivenLocalTrack(track, release));
             }
-
             return output;
         }
 
@@ -80,7 +80,7 @@ namespace NzbDrone.Core.Test.MediaFiles.TrackImport.Identification
             var album = Builder<Album>
                 .CreateNew()
                 .With(x => x.Title = title)
-                .With(x => x.ArtistMetadata = _artist)
+                .With(x => x.ArtistMetadata = artist)
                 .Build();
 
             var media = Builder<Medium>
@@ -102,14 +102,14 @@ namespace NzbDrone.Core.Test.MediaFiles.TrackImport.Identification
         private TrackMapping GivenMapping(List<LocalTrack> local, List<Track> remote)
         {
             var mapping = new TrackMapping();
-            var distances = local.Zip(remote, (l, r) => Tuple.Create(r, DistanceCalculator.TrackDistance(l, r, DistanceCalculator.GetTotalTrackNumber(r, remote))));
+            var distances = local.Zip(remote, (l, r) => Tuple.Create(r, Subject.TrackDistance(l, r, Subject.GetTotalTrackNumber(r, remote))));
             mapping.Mapping = local.Zip(distances, (l, r) => new { l, r }).ToDictionary(x => x.l, x => x.r);
             mapping.LocalExtra = local.Except(mapping.Mapping.Keys).ToList();
             mapping.MBExtra = remote.Except(mapping.Mapping.Values.Select(x => x.Item1)).ToList();
 
             return mapping;
         }
-
+        
         [Test]
         public void test_identical_albums()
         {
@@ -118,7 +118,7 @@ namespace NzbDrone.Core.Test.MediaFiles.TrackImport.Identification
             var localTracks = GivenLocalTracks(tracks, release);
             var mapping = GivenMapping(localTracks, tracks);
 
-            DistanceCalculator.AlbumReleaseDistance(localTracks, release, mapping).NormalizedDistance().Should().Be(0.0);
+            Subject.AlbumReleaseDistance(localTracks, release, mapping).NormalizedDistance().Should().Be(0.0);
         }
 
         [Test]
@@ -130,7 +130,7 @@ namespace NzbDrone.Core.Test.MediaFiles.TrackImport.Identification
             localTracks.RemoveAt(1);
             var mapping = GivenMapping(localTracks, tracks);
 
-            var dist = DistanceCalculator.AlbumReleaseDistance(localTracks, release, mapping);
+            var dist = Subject.AlbumReleaseDistance(localTracks, release, mapping);
             dist.NormalizedDistance().Should().NotBe(0.0);
             dist.NormalizedDistance().Should().BeLessThan(0.2);
         }
@@ -142,13 +142,13 @@ namespace NzbDrone.Core.Test.MediaFiles.TrackImport.Identification
             var release = GivenAlbumRelease("album", tracks);
             var localTracks = GivenLocalTracks(tracks, release);
             var mapping = GivenMapping(localTracks, tracks);
-
+            
             release.Album.Value.ArtistMetadata = Builder<ArtistMetadata>
                 .CreateNew()
                 .With(x => x.Name = "different artist")
                 .Build();
 
-            DistanceCalculator.AlbumReleaseDistance(localTracks, release, mapping).NormalizedDistance().Should().NotBe(0.0);
+            Subject.AlbumReleaseDistance(localTracks, release, mapping).NormalizedDistance().Should().NotBe(0.0);
         }
 
         [Test]
@@ -164,21 +164,22 @@ namespace NzbDrone.Core.Test.MediaFiles.TrackImport.Identification
                 .With(x => x.Name = "Various Artists")
                 .With(x => x.ForeignArtistId = "89ad4ac3-39f7-470e-963a-56509c546377")
                 .Build();
-
-            DistanceCalculator.AlbumReleaseDistance(localTracks, release, mapping).NormalizedDistance().Should().Be(0.0);
+            
+            Subject.AlbumReleaseDistance(localTracks, release, mapping).NormalizedDistance().Should().Be(0.0);
         }
 
         // TODO: there are a couple more VA tests in beets but we don't support VA yet anyway
+
         [Test]
         public void test_tracks_out_of_order()
         {
             var tracks = GivenTracks(3);
             var release = GivenAlbumRelease("album", tracks);
             var localTracks = GivenLocalTracks(tracks, release);
-            localTracks = new[] { 1, 3, 2 }.Select(x => localTracks[x - 1]).ToList();
+            localTracks = new [] {1, 3, 2}.Select(x => localTracks[x-1]).ToList();
             var mapping = GivenMapping(localTracks, tracks);
 
-            var dist = DistanceCalculator.AlbumReleaseDistance(localTracks, release, mapping);
+            var dist = Subject.AlbumReleaseDistance(localTracks, release, mapping);
             dist.NormalizedDistance().Should().NotBe(0.0);
             dist.NormalizedDistance().Should().BeLessThan(0.2);
         }
@@ -193,7 +194,7 @@ namespace NzbDrone.Core.Test.MediaFiles.TrackImport.Identification
             var localTracks = GivenLocalTracks(tracks, release);
             var mapping = GivenMapping(localTracks, tracks);
 
-            DistanceCalculator.AlbumReleaseDistance(localTracks, release, mapping).NormalizedDistance().Should().Be(0.0);
+            Subject.AlbumReleaseDistance(localTracks, release, mapping).NormalizedDistance().Should().Be(0.0);
         }
 
         [Test]
@@ -209,7 +210,7 @@ namespace NzbDrone.Core.Test.MediaFiles.TrackImport.Identification
 
             var mapping = GivenMapping(localTracks, tracks);
 
-            DistanceCalculator.AlbumReleaseDistance(localTracks, release, mapping).NormalizedDistance().Should().Be(0.0);
+            Subject.AlbumReleaseDistance(localTracks, release, mapping).NormalizedDistance().Should().Be(0.0);
         }
 
         private static DateTime?[] dates = new DateTime?[] { null, new DateTime(2007, 1, 1), DateTime.Now };
@@ -225,7 +226,7 @@ namespace NzbDrone.Core.Test.MediaFiles.TrackImport.Identification
             release.Album.Value.ReleaseDate = null;
             release.ReleaseDate = releaseDate;
 
-            var result = DistanceCalculator.AlbumReleaseDistance(localTracks, release, mapping).NormalizedDistance();
+            var result = Subject.AlbumReleaseDistance(localTracks, release, mapping).NormalizedDistance();
 
             if (!releaseDate.HasValue || (localTracks[0].FileTrackInfo.Year == (releaseDate?.Year ?? 0)))
             {
@@ -248,7 +249,7 @@ namespace NzbDrone.Core.Test.MediaFiles.TrackImport.Identification
             release.Album.Value.ReleaseDate = albumDate;
             release.ReleaseDate = null;
 
-            var result = DistanceCalculator.AlbumReleaseDistance(localTracks, release, mapping).NormalizedDistance();
+            var result = Subject.AlbumReleaseDistance(localTracks, release, mapping).NormalizedDistance();
 
             if (!albumDate.HasValue || (localTracks[0].FileTrackInfo.Year == (albumDate?.Year ?? 0)))
             {

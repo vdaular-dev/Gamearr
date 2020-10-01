@@ -1,26 +1,14 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
+import { icons, kinds, inputTypes } from 'Helpers/Props';
 import FieldSet from 'Components/FieldSet';
-import FormGroup from 'Components/Form/FormGroup';
-import FormInputButton from 'Components/Form/FormInputButton';
-import FormInputGroup from 'Components/Form/FormInputGroup';
-import FormLabel from 'Components/Form/FormLabel';
 import Icon from 'Components/Icon';
 import ClipboardButton from 'Components/Link/ClipboardButton';
+import FormGroup from 'Components/Form/FormGroup';
+import FormLabel from 'Components/Form/FormLabel';
+import FormInputGroup from 'Components/Form/FormInputGroup';
+import FormInputButton from 'Components/Form/FormInputButton';
 import ConfirmModal from 'Components/Modal/ConfirmModal';
-import { icons, inputTypes, kinds } from 'Helpers/Props';
-
-const authenticationMethodOptions = [
-  { key: 'none', value: 'None' },
-  { key: 'basic', value: 'Basic (Browser Popup)' },
-  { key: 'forms', value: 'Forms (Login Page)' }
-];
-
-const certificateValidationOptions = [
-  { key: 'enabled', value: 'Enabled' },
-  { key: 'disabledForLocalAddresses', value: 'Disabled for Local Addresses' },
-  { key: 'disabled', value: 'Disabled' }
-];
 
 class SecuritySettings extends Component {
 
@@ -69,9 +57,14 @@ class SecuritySettings extends Component {
       authenticationMethod,
       username,
       password,
-      apiKey,
-      certificateValidation
+      apiKey
     } = settings;
+
+    const authenticationMethodOptions = [
+      { key: 'none', value: 'None' },
+      { key: 'basic', value: 'Basic (Browser Popup)' },
+      { key: 'forms', value: 'Forms (Login Page)' }
+    ];
 
     const authenticationEnabled = authenticationMethod && authenticationMethod.value !== 'none';
 
@@ -84,7 +77,7 @@ class SecuritySettings extends Component {
             type={inputTypes.SELECT}
             name="authenticationMethod"
             values={authenticationMethodOptions}
-            helpText="Require Username and Password to access Lidarr"
+            helpText="Require Username and Password to access Gamearr"
             helpTextWarning="Requires restart to take effect"
             onChange={onInputChange}
             {...authenticationMethod}
@@ -93,32 +86,32 @@ class SecuritySettings extends Component {
 
         {
           authenticationEnabled &&
-            <FormGroup>
-              <FormLabel>Username</FormLabel>
+          <FormGroup>
+            <FormLabel>Username</FormLabel>
 
-              <FormInputGroup
-                type={inputTypes.TEXT}
-                name="username"
-                helpTextWarning="Requires restart to take effect"
-                onChange={onInputChange}
-                {...username}
-              />
-            </FormGroup>
+            <FormInputGroup
+              type={inputTypes.TEXT}
+              name="username"
+              helpTextWarning="Requires restart to take effect"
+              onChange={onInputChange}
+              {...username}
+            />
+          </FormGroup>
         }
 
         {
           authenticationEnabled &&
-            <FormGroup>
-              <FormLabel>Password</FormLabel>
+          <FormGroup>
+            <FormLabel>Password</FormLabel>
 
-              <FormInputGroup
-                type={inputTypes.PASSWORD}
-                name="password"
-                helpTextWarning="Requires restart to take effect"
-                onChange={onInputChange}
-                {...password}
-              />
-            </FormGroup>
+            <FormInputGroup
+              type={inputTypes.PASSWORD}
+              name="password"
+              helpTextWarning="Requires restart to take effect"
+              onChange={onInputChange}
+              {...password}
+            />
+          </FormGroup>
         }
 
         <FormGroup>
@@ -150,19 +143,6 @@ class SecuritySettings extends Component {
             onChange={onInputChange}
             onFocus={this.onApikeyFocus}
             {...apiKey}
-          />
-        </FormGroup>
-
-        <FormGroup>
-          <FormLabel>Certificate Validation</FormLabel>
-
-          <FormInputGroup
-            type={inputTypes.SELECT}
-            name="certificateValidation"
-            values={certificateValidationOptions}
-            helpText="Change how strict HTTPS certification validation is"
-            onChange={onInputChange}
-            {...certificateValidation}
           />
         </FormGroup>
 

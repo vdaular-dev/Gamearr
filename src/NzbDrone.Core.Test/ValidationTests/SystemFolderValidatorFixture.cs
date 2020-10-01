@@ -3,11 +3,11 @@ using System.IO;
 using FizzWare.NBuilder;
 using FluentAssertions;
 using NUnit.Framework;
-using NzbDrone.Common.EnvironmentInfo;
-using NzbDrone.Core.Music;
 using NzbDrone.Core.Test.Framework;
+using NzbDrone.Core.Music;
 using NzbDrone.Core.Validation.Paths;
 using NzbDrone.Test.Common;
+using NzbDrone.Common.EnvironmentInfo;
 
 namespace NzbDrone.Core.Test.ValidationTests
 {
@@ -51,7 +51,7 @@ namespace NzbDrone.Core.Test.ValidationTests
         [Test]
         public void should_not_be_valid_if_set_to_bin_folder()
         {
-            PosixOnly();
+            MonoOnly();
 
             var bin = OsInfo.IsOsx ? "/System" : "/bin";
             var artist = Builder<Artist>.CreateNew()
@@ -64,7 +64,7 @@ namespace NzbDrone.Core.Test.ValidationTests
         [Test]
         public void should_not_be_valid_if_child_of_bin_folder()
         {
-            PosixOnly();
+            MonoOnly();
 
             var bin = OsInfo.IsOsx ? "/System" : "/bin";
             var artist = Builder<Artist>.CreateNew()

@@ -1,9 +1,9 @@
-import classNames from 'classnames';
 import moment from 'moment';
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import * as calendarViews from 'Calendar/calendarViews';
+import classNames from 'classnames';
 import isToday from 'Utilities/Date/isToday';
+import * as calendarViews from 'Calendar/calendarViews';
 import CalendarDayConnector from './CalendarDayConnector';
 import styles from './CalendarDays.css';
 

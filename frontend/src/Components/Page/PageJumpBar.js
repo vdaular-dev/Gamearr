@@ -1,7 +1,8 @@
+import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import Measure from 'Components/Measure';
 import dimensions from 'Styles/Variables/dimensions';
+import Measure from 'Components/Measure';
 import PageJumpBarItem from './PageJumpBarItem';
 import styles from './PageJumpBar.css';
 
@@ -17,7 +18,7 @@ class PageJumpBar extends Component {
 
     this.state = {
       height: 0,
-      visibleItems: props.items.order
+      visibleItems: props.items
     };
   }
 
@@ -51,47 +52,29 @@ class PageJumpBar extends Component {
       minimumItems
     } = this.props;
 
-    if (!items) {
-      return;
-    }
-
-    const {
-      characters,
-      order
-    } = items;
-
     const height = this.state.height;
     const maximumItems = Math.floor(height / ITEM_HEIGHT);
-    const diff = order.length - maximumItems;
+    const diff = items.length - maximumItems;
 
     if (diff < 0) {
-      this.setState({ visibleItems: order });
+      this.setState({ visibleItems: items });
       return;
     }
 
-    if (order.length < minimumItems) {
-      this.setState({ visibleItems: order });
+    if (items.length < minimumItems) {
+      this.setState({ visibleItems: items });
       return;
     }
 
-    // get first, last, and most common in between to make up numbers
-    const visibleItems = [order[0]];
+    const removeDiff = Math.ceil(items.length / maximumItems);
 
-    const sorted = order.slice(1, -1).map((x) => characters[x]).sort((a, b) => b - a);
-    const minCount = sorted[maximumItems - 3];
-    const greater = sorted.reduce((acc, value) => acc + (value > minCount ? 1 : 0), 0);
-    let minAllowed = maximumItems - 2 - greater;
-
-    for (let i = 1; i < order.length - 1; i++) {
-      if (characters[order[i]] > minCount) {
-        visibleItems.push(order[i]);
-      } else if (characters[order[i]] === minCount && minAllowed > 0) {
-        visibleItems.push(order[i]);
-        minAllowed--;
+    const visibleItems = _.reduce(items, (acc, item, index) => {
+      if (index % removeDiff === 0) {
+        acc.push(item);
       }
-    }
 
-    visibleItems.push(order[order.length - 1]);
+      return acc;
+    }, []);
 
     this.setState({ visibleItems });
   }
@@ -146,7 +129,7 @@ class PageJumpBar extends Component {
 }
 
 PageJumpBar.propTypes = {
-  items: PropTypes.object.isRequired,
+  items: PropTypes.arrayOf(PropTypes.string).isRequired,
   minimumItems: PropTypes.number.isRequired,
   onItemPress: PropTypes.func.isRequired
 };

@@ -29,6 +29,7 @@ namespace NzbDrone.Core.Test.ThingiProviderTests
         public MockProviderStatusService(IMockProviderStatusRepository providerStatusRepository, IEventAggregator eventAggregator, IRuntimeInfo runtimeInfo, Logger logger)
             : base(providerStatusRepository, eventAggregator, runtimeInfo, logger)
         {
+
         }
     }
 

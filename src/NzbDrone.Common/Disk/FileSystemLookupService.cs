@@ -44,8 +44,7 @@ namespace NzbDrone.Common.Disk
                                                             ".@__thumb",
 
                                                             // Synology
-                                                            "@eadir",
-                                                            "#recycle"
+                                                            "@eadir"
                                                         };
 
         public FileSystemLookupService(IDiskProvider diskProvider, IRuntimeInfo runtimeInfo)
@@ -102,12 +101,12 @@ namespace NzbDrone.Common.Disk
                                     return true;
                                 })
                                 .Select(d => new FileSystemModel
-                                {
-                                    Type = FileSystemEntityType.Drive,
-                                    Name = d.VolumeName,
-                                    Path = d.RootDirectory,
-                                    LastModified = null
-                                })
+                                             {
+                                                 Type = FileSystemEntityType.Drive,
+                                                 Name = d.VolumeName,
+                                                 Path = d.RootDirectory,
+                                                 LastModified = null
+                                             })
                                 .ToList();
         }
 
@@ -125,6 +124,7 @@ namespace NzbDrone.Common.Disk
                     result.Files = GetFiles(path);
                 }
             }
+
             catch (DirectoryNotFoundException)
             {
                 return new FileSystemResult { Parent = GetParent(path) };
@@ -150,12 +150,12 @@ namespace NzbDrone.Common.Disk
             var directories = _diskProvider.GetDirectoryInfos(path)
                                            .OrderBy(d => d.Name)
                                            .Select(d => new FileSystemModel
-                                           {
-                                               Name = d.Name,
-                                               Path = GetDirectoryPath(d.FullName.GetActualCasing()),
-                                               LastModified = d.LastWriteTimeUtc,
-                                               Type = FileSystemEntityType.Folder
-                                           })
+                                                        {
+                                                            Name = d.Name,
+                                                            Path = GetDirectoryPath(d.FullName.GetActualCasing()),
+                                                            LastModified = d.LastWriteTimeUtc,
+                                                            Type = FileSystemEntityType.Folder
+                                                        })
                                            .ToList();
 
             directories.RemoveAll(d => _setToRemove.Contains(d.Name.ToLowerInvariant()));
@@ -168,14 +168,14 @@ namespace NzbDrone.Common.Disk
             return _diskProvider.GetFileInfos(path)
                                 .OrderBy(d => d.Name)
                                 .Select(d => new FileSystemModel
-                                {
-                                    Name = d.Name,
-                                    Path = d.FullName.GetActualCasing(),
-                                    LastModified = d.LastWriteTimeUtc,
-                                    Extension = d.Extension,
-                                    Size = d.Length,
-                                    Type = FileSystemEntityType.File
-                                })
+                                             {
+                                                 Name = d.Name,
+                                                 Path = d.FullName.GetActualCasing(),
+                                                 LastModified = d.LastWriteTimeUtc,
+                                                 Extension = d.Extension,
+                                                 Size = d.Length,
+                                                 Type = FileSystemEntityType.File
+                                             })
                                 .ToList();
         }
 
@@ -185,7 +185,7 @@ namespace NzbDrone.Common.Disk
             {
                 return mountInfo.Name;
             }
-
+ 
             return $"{mountInfo.Name} ({mountInfo.VolumeLabel})";
         }
 

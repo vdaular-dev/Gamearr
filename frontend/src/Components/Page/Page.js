@@ -1,10 +1,10 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import AppUpdatedModalConnector from 'App/AppUpdatedModalConnector';
+import locationShape from 'Helpers/Props/Shapes/locationShape';
+import SignalRConnector from 'Components/SignalRConnector';
 import ColorImpairedContext from 'App/ColorImpairedContext';
 import ConnectionLostModalConnector from 'App/ConnectionLostModalConnector';
-import SignalRConnector from 'Components/SignalRConnector';
-import locationShape from 'Helpers/Props/Shapes/locationShape';
+import AppUpdatedModalConnector from 'App/AppUpdatedModalConnector';
 import PageHeader from './Header/PageHeader';
 import PageSidebar from './Sidebar/PageSidebar';
 import styles from './Page.css';

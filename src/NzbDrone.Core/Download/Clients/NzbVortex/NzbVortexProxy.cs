@@ -42,12 +42,12 @@ namespace NzbDrone.Core.Download.Clients.NzbVortex
             var requestBuilder = BuildRequest(settings).Resource("nzb/add")
                                                        .Post()
                                                        .AddQueryParam("priority", priority.ToString());
-
+            
             if (settings.MusicCategory.IsNotNullOrWhiteSpace())
             {
                 requestBuilder.AddQueryParam("groupname", settings.MusicCategory);
             }
-
+            
             requestBuilder.AddFormUpload("name", filename, nzbData, "application/x-nzb");
 
             var response = ProcessRequest<NzbVortexAddResponse>(requestBuilder, true, settings);
@@ -91,6 +91,7 @@ namespace NzbDrone.Core.Download.Clients.NzbVortex
         public List<NzbVortexQueueItem> GetQueue(int doneLimit, NzbVortexSettings settings)
         {
             var requestBuilder = BuildRequest(settings).Resource("nzb");
+                
 
             if (settings.MusicCategory.IsNotNullOrWhiteSpace())
             {
@@ -112,12 +113,10 @@ namespace NzbDrone.Core.Download.Clients.NzbVortex
 
             return response.Files;
         }
-
+        
         private HttpRequestBuilder BuildRequest(NzbVortexSettings settings)
         {
-            var baseUrl = HttpRequestBuilder.BuildBaseUrl(true, settings.Host, settings.Port, settings.UrlBase);
-            baseUrl = HttpUri.CombinePath(baseUrl, "api");
-            var requestBuilder = new HttpRequestBuilder(baseUrl);
+            var requestBuilder = new HttpRequestBuilder(true, settings.Host, settings.Port, "api");
             requestBuilder.LogResponseContent = true;
 
             return requestBuilder;

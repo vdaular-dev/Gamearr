@@ -1,26 +1,26 @@
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import LoadingIndicator from 'Components/Loading/LoadingIndicator';
-import PageContent from 'Components/Page/PageContent';
-import PageContentBody from 'Components/Page/PageContentBody';
-import PageToolbar from 'Components/Page/Toolbar/PageToolbar';
-import PageToolbarButton from 'Components/Page/Toolbar/PageToolbarButton';
-import PageToolbarSection from 'Components/Page/Toolbar/PageToolbarSection';
-import PageToolbarSeparator from 'Components/Page/Toolbar/PageToolbarSeparator';
-import Table from 'Components/Table/Table';
-import TableBody from 'Components/Table/TableBody';
-import TableOptionsModalWrapper from 'Components/Table/TableOptions/TableOptionsModalWrapper';
-import TablePager from 'Components/Table/TablePager';
-import { align, icons } from 'Helpers/Props';
 import hasDifferentItems from 'Utilities/Object/hasDifferentItems';
 import getSelectedIds from 'Utilities/Table/getSelectedIds';
 import removeOldSelectedState from 'Utilities/Table/removeOldSelectedState';
 import selectAll from 'Utilities/Table/selectAll';
 import toggleSelected from 'Utilities/Table/toggleSelected';
+import { align, icons } from 'Helpers/Props';
+import LoadingIndicator from 'Components/Loading/LoadingIndicator';
+import Table from 'Components/Table/Table';
+import TableBody from 'Components/Table/TableBody';
+import TablePager from 'Components/Table/TablePager';
+import PageContent from 'Components/Page/PageContent';
+import PageContentBodyConnector from 'Components/Page/PageContentBodyConnector';
+import PageToolbar from 'Components/Page/Toolbar/PageToolbar';
+import PageToolbarSection from 'Components/Page/Toolbar/PageToolbarSection';
+import PageToolbarButton from 'Components/Page/Toolbar/PageToolbarButton';
+import PageToolbarSeparator from 'Components/Page/Toolbar/PageToolbarSeparator';
+import TableOptionsModalWrapper from 'Components/Table/TableOptions/TableOptionsModalWrapper';
+import RemoveQueueItemsModal from './RemoveQueueItemsModal';
 import QueueOptionsConnector from './QueueOptionsConnector';
 import QueueRowConnector from './QueueRowConnector';
-import RemoveQueueItemsModal from './RemoveQueueItemsModal';
 
 class Queue extends Component {
 
@@ -71,7 +71,7 @@ class Queue extends Component {
 
     const selectedIds = this.getSelectedIds();
     const isPendingSelected = _.some(this.props.items, (item) => {
-      return selectedIds.indexOf(item.id) > -1 && item.status === 'delay';
+      return selectedIds.indexOf(item.id) > -1 && item.status === 'Delay';
     });
 
     if (isPendingSelected !== this.state.isPendingSelected) {
@@ -107,8 +107,8 @@ class Queue extends Component {
     this.setState({ isConfirmRemoveModalOpen: true });
   }
 
-  onRemoveSelectedConfirmed = (payload) => {
-    this.props.onRemoveSelectedPress({ ids: this.getSelectedIds(), ...payload });
+  onRemoveSelectedConfirmed = (blacklist, skipredownload) => {
+    this.props.onRemoveSelectedPress(this.getSelectedIds(), blacklist, skipredownload);
     this.setState({ isConfirmRemoveModalOpen: false });
   }
 
@@ -125,8 +125,6 @@ class Queue extends Component {
       isPopulated,
       error,
       items,
-      isArtistFetching,
-      isArtistPopulated,
       isAlbumsFetching,
       isAlbumsPopulated,
       albumsError,
@@ -134,7 +132,7 @@ class Queue extends Component {
       totalRecords,
       isGrabbing,
       isRemoving,
-      isRefreshMonitoredDownloadsExecuting,
+      isCheckForFinishedDownloadExecuting,
       onRefreshPress,
       ...otherProps
     } = this.props;
@@ -147,11 +145,10 @@ class Queue extends Component {
       isPendingSelected
     } = this.state;
 
-    const isRefreshing = isFetching || isArtistFetching || isAlbumsFetching || isRefreshMonitoredDownloadsExecuting;
-    const isAllPopulated = isPopulated && ((isArtistPopulated && isAlbumsPopulated) || !items.length || items.every((e) => !e.albumId));
+    const isRefreshing = isFetching || isAlbumsFetching || isCheckForFinishedDownloadExecuting;
+    const isAllPopulated = isPopulated && (isAlbumsPopulated || !items.length || items.every((e) => !e.albumId));
     const hasError = error || albumsError;
-    const selectedIds = this.getSelectedIds();
-    const selectedCount = selectedIds.length;
+    const selectedCount = this.getSelectedIds().length;
     const disableSelectedActions = selectedCount === 0;
 
     return (
@@ -200,7 +197,7 @@ class Queue extends Component {
           </PageToolbarSection>
         </PageToolbar>
 
-        <PageContentBody>
+        <PageContentBodyConnector>
           {
             isRefreshing && !isAllPopulated &&
               <LoadingIndicator />
@@ -257,18 +254,11 @@ class Queue extends Component {
                 />
               </div>
           }
-        </PageContentBody>
+        </PageContentBodyConnector>
 
         <RemoveQueueItemsModal
           isOpen={isConfirmRemoveModalOpen}
           selectedCount={selectedCount}
-          canIgnore={isConfirmRemoveModalOpen && (
-            selectedIds.every((id) => {
-              const item = items.find((i) => i.id === id);
-
-              return !!(item && item.artistId && item.albumId);
-            })
-          )}
           onRemovePress={this.onRemoveSelectedConfirmed}
           onModalClose={this.onConfirmRemoveModalClose}
         />
@@ -282,8 +272,6 @@ Queue.propTypes = {
   isPopulated: PropTypes.bool.isRequired,
   error: PropTypes.object,
   items: PropTypes.arrayOf(PropTypes.object).isRequired,
-  isArtistFetching: PropTypes.bool.isRequired,
-  isArtistPopulated: PropTypes.bool.isRequired,
   isAlbumsFetching: PropTypes.bool.isRequired,
   isAlbumsPopulated: PropTypes.bool.isRequired,
   albumsError: PropTypes.object,
@@ -291,7 +279,7 @@ Queue.propTypes = {
   totalRecords: PropTypes.number,
   isGrabbing: PropTypes.bool.isRequired,
   isRemoving: PropTypes.bool.isRequired,
-  isRefreshMonitoredDownloadsExecuting: PropTypes.bool.isRequired,
+  isCheckForFinishedDownloadExecuting: PropTypes.bool.isRequired,
   onRefreshPress: PropTypes.func.isRequired,
   onGrabSelectedPress: PropTypes.func.isRequired,
   onRemoveSelectedPress: PropTypes.func.isRequired

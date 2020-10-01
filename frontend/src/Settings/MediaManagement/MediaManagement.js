@@ -1,17 +1,18 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
+import { inputTypes, sizes } from 'Helpers/Props';
+import LoadingIndicator from 'Components/Loading/LoadingIndicator';
 import FieldSet from 'Components/FieldSet';
+import PageContent from 'Components/Page/PageContent';
+import PageContentBodyConnector from 'Components/Page/PageContentBodyConnector';
+import SettingsToolbarConnector from 'Settings/SettingsToolbarConnector';
 import Form from 'Components/Form/Form';
 import FormGroup from 'Components/Form/FormGroup';
-import FormInputGroup from 'Components/Form/FormInputGroup';
 import FormLabel from 'Components/Form/FormLabel';
-import LoadingIndicator from 'Components/Loading/LoadingIndicator';
-import PageContent from 'Components/Page/PageContent';
-import PageContentBody from 'Components/Page/PageContentBody';
-import { inputTypes, sizes } from 'Helpers/Props';
-import SettingsToolbarConnector from 'Settings/SettingsToolbarConnector';
+import FormInputGroup from 'Components/Form/FormInputGroup';
+import RootFoldersConnector from 'RootFolder/RootFoldersConnector';
 import NamingConnector from './Naming/NamingConnector';
-import RootFoldersConnector from './RootFolder/RootFoldersConnector';
+import AddRootFolderConnector from './RootFolder/AddRootFolderConnector';
 
 const rescanAfterRefreshOptions = [
   { key: 'always', value: 'Always' },
@@ -48,7 +49,7 @@ class MediaManagement extends Component {
       error,
       settings,
       hasSettings,
-      isWindows,
+      isMono,
       onInputChange,
       onSavePress,
       ...otherProps
@@ -62,8 +63,7 @@ class MediaManagement extends Component {
           onSavePress={onSavePress}
         />
 
-        <PageContentBody>
-          <RootFoldersConnector />
+        <PageContentBodyConnector>
           <NamingConnector />
 
           {
@@ -94,12 +94,12 @@ class MediaManagement extends Component {
                         isAdvanced={true}
                         size={sizes.MEDIUM}
                       >
-                        <FormLabel>Create empty artist folders</FormLabel>
+                        <FormLabel>Create empty game folders</FormLabel>
 
                         <FormInputGroup
                           type={inputTypes.CHECK}
                           name="createEmptyArtistFolders"
-                          helpText="Create missing artist folders during disk scan"
+                          helpText="Create missing game folders during disk scan"
                           onChange={onInputChange}
                           {...settings.createEmptyArtistFolders}
                         />
@@ -115,7 +115,7 @@ class MediaManagement extends Component {
                         <FormInputGroup
                           type={inputTypes.CHECK}
                           name="deleteEmptyFolders"
-                          helpText="Delete empty artist and album folders during disk scan and when track files are deleted"
+                          helpText="Delete empty game folders during disk scan and when track files are deleted"
                           onChange={onInputChange}
                           {...settings.deleteEmptyFolders}
                         />
@@ -129,7 +129,7 @@ class MediaManagement extends Component {
                       legend="Importing"
                     >
                       {
-                        !isWindows &&
+                        isMono &&
                           <FormGroup
                             advancedSettings={advancedSettings}
                             isAdvanced={true}
@@ -140,29 +140,12 @@ class MediaManagement extends Component {
                             <FormInputGroup
                               type={inputTypes.CHECK}
                               name="skipFreeSpaceCheckWhenImporting"
-                              helpText="Use when Lidarr is unable to detect free space from your artist root folder"
+                              helpText="Use when Gamearr is unable to detect free space from your artist root folder"
                               onChange={onInputChange}
                               {...settings.skipFreeSpaceCheckWhenImporting}
                             />
                           </FormGroup>
                       }
-
-                      <FormGroup
-                        advancedSettings={advancedSettings}
-                        isAdvanced={true}
-                        size={sizes.MEDIUM}
-                      >
-                        <FormLabel>Minimum Free Space</FormLabel>
-
-                        <FormInputGroup
-                          type={inputTypes.NUMBER}
-                          unit='MB'
-                          name="minimumFreeSpaceWhenImporting"
-                          helpText="Prevent import if it would leave less than this amount of disk space available"
-                          onChange={onInputChange}
-                          {...settings.minimumFreeSpaceWhenImporting}
-                        />
-                      </FormGroup>
 
                       <FormGroup
                         advancedSettings={advancedSettings}
@@ -175,7 +158,7 @@ class MediaManagement extends Component {
                           type={inputTypes.CHECK}
                           name="copyUsingHardlinks"
                           helpText="Use Hardlinks when trying to copy files from torrents that are still being seeded"
-                          helpTextWarning="Occasionally, file locks may prevent renaming files that are being seeded. You may temporarily disable seeding and use Lidarr's rename function as a work around."
+                          helpTextWarning="Occasionally, file locks may prevent renaming files that are being seeded. You may temporarily disable seeding and use Gamearr's rename function as a work around."
                           onChange={onInputChange}
                           {...settings.copyUsingHardlinks}
                         />
@@ -220,12 +203,12 @@ class MediaManagement extends Component {
                   legend="File Management"
                 >
                   <FormGroup size={sizes.MEDIUM}>
-                    <FormLabel>Ignore Deleted Tracks</FormLabel>
+                    <FormLabel>Ignore Deleted Gamess</FormLabel>
 
                     <FormInputGroup
                       type={inputTypes.CHECK}
                       name="autoUnmonitorPreviouslyDownloadedTracks"
-                      helpText="Tracks deleted from disk are automatically unmonitored in Lidarr"
+                      helpText="Games deleted from disk are automatically unmonitored in Gamearr"
                       onChange={onInputChange}
                       {...settings.autoUnmonitorPreviouslyDownloadedTracks}
                     />
@@ -259,30 +242,14 @@ class MediaManagement extends Component {
                   <FormGroup
                     advancedSettings={advancedSettings}
                     isAdvanced={true}
-                    size={sizes.MEDIUM}
                   >
-                    <FormLabel>Watch Root Folders for file changes</FormLabel>
-
-                    <FormInputGroup
-                      type={inputTypes.CHECK}
-                      name="watchLibraryForChanges"
-                      helpText="Rescan automatically when files change in a root folder"
-                      onChange={onInputChange}
-                      {...settings.watchLibraryForChanges}
-                    />
-                  </FormGroup>
-
-                  <FormGroup
-                    advancedSettings={advancedSettings}
-                    isAdvanced={true}
-                  >
-                    <FormLabel>Rescan Artist Folder after Refresh</FormLabel>
+                    <FormLabel>Rescan Game Folder after Refresh</FormLabel>
 
                     <FormInputGroup
                       type={inputTypes.SELECT}
                       name="rescanAfterRefresh"
-                      helpText="Rescan the artist folder after refreshing the artist"
-                      helpTextWarning="Lidarr will not automatically detect changes to files when not set to 'Always'"
+                      helpText="Rescan the game folder after refreshing the game"
+                      helpTextWarning="Gamearr will not automatically detect changes to files when not set to 'Always'"
                       values={rescanAfterRefreshOptions}
                       onChange={onInputChange}
                       {...settings.rescanAfterRefresh}
@@ -298,8 +265,8 @@ class MediaManagement extends Component {
                     <FormInputGroup
                       type={inputTypes.SELECT}
                       name="allowFingerprinting"
-                      helpText="Use fingerprinting to improve accuracy of track matching"
-                      helpTextWarning="This requires Lidarr to read parts of the file which will slow down scans and may cause high disk or network activity."
+                      helpText="Use fingerprinting to improve accuracy of game matching"
+                      helpTextWarning="This requires Gamearr to read parts of the file which will slow down scans and may cause high disk or network activity."
                       values={allowFingerprintingOptions}
                       onChange={onInputChange}
                       {...settings.allowFingerprinting}
@@ -331,7 +298,7 @@ class MediaManagement extends Component {
                     <FormInputGroup
                       type={inputTypes.PATH}
                       name="recycleBin"
-                      helpText="Track files will go here when deleted instead of being permanently deleted"
+                      helpText="Game files will go here when deleted instead of being permanently deleted"
                       onChange={onInputChange}
                       {...settings.recycleBin}
                     />
@@ -356,7 +323,7 @@ class MediaManagement extends Component {
                 </FieldSet>
 
                 {
-                  advancedSettings && !isWindows &&
+                  advancedSettings && isMono &&
                     <FieldSet
                       legend="Permissions"
                     >
@@ -386,7 +353,7 @@ class MediaManagement extends Component {
                         <FormInputGroup
                           type={inputTypes.TEXT}
                           name="fileChmod"
-                          helpText="Octal, applied to media files when imported/renamed by Lidarr"
+                          helpText="Octal, applied to media files when imported/renamed by Gamearr"
                           onChange={onInputChange}
                           {...settings.fileChmod}
                         />
@@ -401,7 +368,7 @@ class MediaManagement extends Component {
                         <FormInputGroup
                           type={inputTypes.TEXT}
                           name="folderChmod"
-                          helpText="Octal, applied to artist/album folders created by Lidarr"
+                          helpText="Octal, applied to artist/album folders created by Gamearr"
                           values={fileDateOptions}
                           onChange={onInputChange}
                           {...settings.folderChmod}
@@ -443,7 +410,12 @@ class MediaManagement extends Component {
                 }
               </Form>
           }
-        </PageContentBody>
+
+          <FieldSet legend="Root Folders">
+            <RootFoldersConnector />
+            <AddRootFolderConnector />
+          </FieldSet>
+        </PageContentBodyConnector>
       </PageContent>
     );
   }
@@ -456,7 +428,7 @@ MediaManagement.propTypes = {
   error: PropTypes.object,
   settings: PropTypes.object.isRequired,
   hasSettings: PropTypes.bool.isRequired,
-  isWindows: PropTypes.bool.isRequired,
+  isMono: PropTypes.bool.isRequired,
   onSavePress: PropTypes.func.isRequired,
   onInputChange: PropTypes.func.isRequired
 };

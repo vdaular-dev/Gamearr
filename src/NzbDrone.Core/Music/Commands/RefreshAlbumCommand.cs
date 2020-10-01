@@ -5,16 +5,14 @@ namespace NzbDrone.Core.Music.Commands
     public class RefreshAlbumCommand : Command
     {
         public int? AlbumId { get; set; }
-        public bool IsNewAlbum { get; set; }
 
         public RefreshAlbumCommand()
         {
         }
 
-        public RefreshAlbumCommand(int? albumId, bool isNewAlbum = false)
+        public RefreshAlbumCommand(int? albumId)
         {
             AlbumId = albumId;
-            IsNewAlbum = isNewAlbum;
         }
 
         public override bool SendUpdatesToClient => true;

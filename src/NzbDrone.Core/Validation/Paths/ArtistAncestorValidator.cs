@@ -17,10 +17,7 @@ namespace NzbDrone.Core.Validation.Paths
 
         protected override bool IsValid(PropertyValidatorContext context)
         {
-            if (context.PropertyValue == null)
-            {
-                return true;
-            }
+            if (context.PropertyValue == null) return true;
 
             return !_artistService.GetAllArtists().Any(s => context.PropertyValue.ToString().IsParentPath(s.Path));
         }

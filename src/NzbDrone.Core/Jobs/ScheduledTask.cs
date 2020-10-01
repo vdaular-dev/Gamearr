@@ -8,6 +8,5 @@ namespace NzbDrone.Core.Jobs
         public string TypeName { get; set; }
         public int Interval { get; set; }
         public DateTime LastExecution { get; set; }
-        public DateTime LastStartTime { get; set; }
     }
 }

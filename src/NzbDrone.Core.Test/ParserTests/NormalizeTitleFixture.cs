@@ -5,6 +5,7 @@ using NzbDrone.Core.Test.Framework;
 
 namespace NzbDrone.Core.Test.ParserTests
 {
+
     [TestFixture]
     public class NormalizeTitleFixture : CoreTest
     {
@@ -92,8 +93,9 @@ namespace NzbDrone.Core.Test.ParserTests
             foreach (var s in dirtyFormat)
             {
                 var dirty = string.Format(s, word);
-                dirty.CleanArtistName().Should().Be("word" + word.ToLower() + "word");
+                dirty.CleanArtistName().Should().Be(("word" + word.ToLower() + "word"));
             }
+
         }
 
         [TestCase("The Office", "theoffice")]
@@ -131,14 +133,6 @@ namespace NzbDrone.Core.Test.ParserTests
         public void should_not_clean_trailing_a()
         {
             "Tokyo Ghoul A".CleanArtistName().Should().Be("tokyoghoula");
-        }
-
-        [TestCase("3%", "3percent")]
-        [TestCase("Teen Top & 100% Outing Brothers", "teentop100percentoutingbrothers")]
-        [TestCase("Big Jay Oakerson's What's Your F@%king Deal?!", "bigjayoakersonswhatsyourfkingdeal")]
-        public void should_replace_percent_sign_with_percent_following_numbers(string input, string expected)
-        {
-            input.CleanArtistName().Should().Be(expected);
         }
     }
 }

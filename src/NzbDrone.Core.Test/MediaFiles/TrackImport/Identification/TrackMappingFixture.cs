@@ -1,38 +1,41 @@
-using System.Collections.Generic;
-using System.Linq;
-using FizzWare.NBuilder;
-using FluentAssertions;
 using NUnit.Framework;
 using NzbDrone.Core.MediaFiles.TrackImport.Identification;
-using NzbDrone.Core.Music;
-using NzbDrone.Core.Parser;
-using NzbDrone.Core.Parser.Model;
+using FluentAssertions;
 using NzbDrone.Core.Test.Framework;
+using FizzWare.NBuilder;
+using NzbDrone.Core.Parser.Model;
+using NzbDrone.Core.Music;
+using System.Collections.Generic;
+using System.Linq;
+using System;
+using NzbDrone.Core.Parser;
+using NzbDrone.Common.Serializer;
 
 namespace NzbDrone.Core.Test.MediaFiles.TrackImport.Identification
 {
     [TestFixture]
     public class TrackMappingFixture : CoreTest<IdentificationService>
     {
-        private ArtistMetadata _artist;
+
+        private ArtistMetadata artist;
 
         [SetUp]
         public void Setup()
         {
-            _artist = Builder<ArtistMetadata>
+            artist = Builder<ArtistMetadata>
                 .CreateNew()
                 .With(x => x.Name = "artist")
                 .Build();
         }
-
+        
         private List<Track> GivenTracks(int count)
         {
-            return Builder<Track>
-               .CreateListOfSize(count)
-               .All()
-               .With(x => x.ArtistMetadata = _artist)
-               .Build()
-               .ToList();
+             return Builder<Track>
+                .CreateListOfSize(count)
+                .All()
+                .With(x => x.ArtistMetadata = artist)
+                .Build()
+                .ToList();
         }
 
         private ParsedTrackInfo GivenParsedTrackInfo(Track track, AlbumRelease release)
@@ -73,7 +76,7 @@ namespace NzbDrone.Core.Test.MediaFiles.TrackImport.Identification
             var album = Builder<Album>
                 .CreateNew()
                 .With(x => x.Title = title)
-                .With(x => x.ArtistMetadata = _artist)
+                .With(x => x.ArtistMetadata = artist)
                 .Build();
 
             var media = Builder<Medium>
@@ -99,20 +102,19 @@ namespace NzbDrone.Core.Test.MediaFiles.TrackImport.Identification
             var release = GivenAlbumRelease("album", tracks);
             var localTracks = GivenLocalTracks(tracks, release);
 
-            localTracks[2].FileTrackInfo.TrackNumbers = new[] { 2 };
-            localTracks[1].FileTrackInfo.TrackNumbers = new[] { 3 };
-            localTracks = new[] { 0, 2, 1 }.Select(x => localTracks[x]).ToList();
+            localTracks[2].FileTrackInfo.TrackNumbers = new [] { 2 };
+            localTracks[1].FileTrackInfo.TrackNumbers = new [] { 3 };
+            localTracks = new [] {0, 2, 1}.Select(x => localTracks[x]).ToList();
 
             var result = Subject.MapReleaseTracks(localTracks, tracks);
-
+            
             result.Mapping
                 .ToDictionary(x => x.Key, y => y.Value.Item1)
-                .Should().BeEquivalentTo(new Dictionary<LocalTrack, Track>
-                {
-                        { localTracks[0], tracks[0] },
-                        { localTracks[1], tracks[2] },
-                        { localTracks[2], tracks[1] },
-                });
+                .ShouldBeEquivalentTo(new Dictionary<LocalTrack, Track> {
+                        {localTracks[0], tracks[0]},
+                        {localTracks[1], tracks[2]},
+                        {localTracks[2], tracks[1]},
+                    });
             result.LocalExtra.Should().BeEmpty();
             result.MBExtra.Should().BeEmpty();
         }
@@ -133,12 +135,11 @@ namespace NzbDrone.Core.Test.MediaFiles.TrackImport.Identification
 
             result.Mapping
                 .ToDictionary(x => x.Key, y => y.Value.Item1)
-                .Should().BeEquivalentTo(new Dictionary<LocalTrack, Track>
-                {
-                        { localTracks[0], tracks[0] },
-                        { localTracks[1], tracks[1] },
-                        { localTracks[2], tracks[2] },
-                });
+                .ShouldBeEquivalentTo(new Dictionary<LocalTrack, Track> {
+                        {localTracks[0], tracks[0]},
+                        {localTracks[1], tracks[1]},
+                        {localTracks[2], tracks[2]},
+                    });
             result.LocalExtra.Should().BeEmpty();
             result.MBExtra.Should().BeEmpty();
         }
@@ -152,16 +153,15 @@ namespace NzbDrone.Core.Test.MediaFiles.TrackImport.Identification
             localTracks.RemoveAt(1);
 
             var result = Subject.MapReleaseTracks(localTracks, tracks);
-
+            
             result.Mapping
                 .ToDictionary(x => x.Key, y => y.Value.Item1)
-                .Should().BeEquivalentTo(new Dictionary<LocalTrack, Track>
-                {
-                        { localTracks[0], tracks[0] },
-                        { localTracks[1], tracks[2] }
-                });
+                .ShouldBeEquivalentTo(new Dictionary<LocalTrack, Track> {
+                        {localTracks[0], tracks[0]},
+                        {localTracks[1], tracks[2]}
+                    });
             result.LocalExtra.Should().BeEmpty();
-            result.MBExtra.Should().BeEquivalentTo(new List<Track> { tracks[1] });
+            result.MBExtra.ShouldBeEquivalentTo(new List<Track> { tracks[1] });
         }
 
         [Test]
@@ -173,15 +173,14 @@ namespace NzbDrone.Core.Test.MediaFiles.TrackImport.Identification
             tracks.RemoveAt(1);
 
             var result = Subject.MapReleaseTracks(localTracks, tracks);
-
+            
             result.Mapping
                 .ToDictionary(x => x.Key, y => y.Value.Item1)
-                .Should().BeEquivalentTo(new Dictionary<LocalTrack, Track>
-                {
-                        { localTracks[0], tracks[0] },
-                        { localTracks[2], tracks[1] }
-                });
-            result.LocalExtra.Should().BeEquivalentTo(new List<LocalTrack> { localTracks[1] });
+                .ShouldBeEquivalentTo(new Dictionary<LocalTrack, Track> {
+                        {localTracks[0], tracks[0]},
+                        {localTracks[2], tracks[1]}
+                    });
+            result.LocalExtra.ShouldBeEquivalentTo(new List<LocalTrack> { localTracks[1] });
             result.MBExtra.Should().BeEmpty();
         }
     }

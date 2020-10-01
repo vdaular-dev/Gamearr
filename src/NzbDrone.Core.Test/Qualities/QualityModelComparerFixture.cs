@@ -61,6 +61,7 @@ namespace NzbDrone.Core.Test.Qualities
             Subject = new QualityModelComparer(profile);
         }
 
+
         [Test]
         public void should_be_greater_when_first_quality_is_greater_than_second()
         {

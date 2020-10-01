@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using NzbDrone.Common.Composition;
 using NzbDrone.Common.EnvironmentInfo;
+using NzbDrone.Common.Http.Dispatchers;
 
 namespace NzbDrone.Update
 {
@@ -9,13 +10,14 @@ namespace NzbDrone.Update
         private UpdateContainerBuilder(IStartupContext startupContext, List<string> assemblies)
             : base(startupContext, assemblies)
         {
+
         }
 
         public static IContainer Build(IStartupContext startupContext)
         {
             var assemblies = new List<string>
                              {
-                                 "Lidarr.Update"
+                                 "Gamearr.Update"
                              };
 
             return new UpdateContainerBuilder(startupContext, assemblies).Container;
