@@ -8,7 +8,7 @@
 
 ## Getting Started
 
-Gamearr is a Game collection manager for Usenet and BitTorrent users. It can monitor multiple RSS feeds for new games as there being released and when they have been cracked automatically download them. 
+Gamearr is a Game collection manager forked from lidarr for Usenet and BitTorrent users. It can monitor multiple RSS feeds for new games as there being released and when they have been cracked.
 
 ## Major Features Include:
 
@@ -51,6 +51,11 @@ Support this project by becoming a sponsor. Your logo will show up here with a l
 ## Graphics
 
 https://www.instagram.com/crushingtokyo/ Give him a like and buy his stuff.
+
+## Check out Lidarr @ http://lidarr.audio/
+## Check out Radarr @ http://radarr.video
+## Check out Sonarr @ http://sonarr.tv
+## Check out readarr @ http://readarr.com
 
 ### License
 
