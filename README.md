@@ -54,10 +54,10 @@ https://www.instagram.com/crushingtokyo/ Give him a like and buy his stuff.
 
 ## Check out 
 
-Lidarr @ http://lidarr.audio/
-Radarr @ http://radarr.video/
-Sonarr @ http://sonarr.tv/
-Readarr @ http://readarr.com/
+ * Lidarr @ http://lidarr.audio/
+ * Radarr @ http://radarr.video/
+ * Sonarr @ http://sonarr.tv/
+ * Readarr @ http://readarr.com/
 
 ### License
 
