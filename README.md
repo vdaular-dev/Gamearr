@@ -1,5 +1,7 @@
 # <img width="24px" src="./Logo/256.png" alt="gamearr"></img> Gamearr
 
+## NOT WORKING - STILL IN DEVELOPMENT
+
 - [Download](https://gamearr.game/#download) (Linux, MacOS, Windows, Docker, etc.)
 - [Installation](https://github.com/Gamearr/Gamearr/wiki/Installation)
 - [FAQ](https://github.com/Gamearr/Gamearr/wiki/FAQ)
