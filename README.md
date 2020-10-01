@@ -52,10 +52,12 @@ Support this project by becoming a sponsor. Your logo will show up here with a l
 
 https://www.instagram.com/crushingtokyo/ Give him a like and buy his stuff.
 
-## Check out Lidarr @ http://lidarr.audio/
-## Check out Radarr @ http://radarr.video
-## Check out Sonarr @ http://sonarr.tv
-## Check out readarr @ http://readarr.com
+## Check out 
+
+Lidarr @ http://lidarr.audio/
+Radarr @ http://radarr.video/
+Sonarr @ http://sonarr.tv/
+Readarr @ http://readarr.com/
 
 ### License
 
