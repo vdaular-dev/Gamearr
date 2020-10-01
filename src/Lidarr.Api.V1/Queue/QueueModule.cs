@@ -1,8 +1,7 @@
 using System;
 using System.Linq;
-using Lidarr.Http;
-using Lidarr.Http.Extensions;
 using NzbDrone.Common.Extensions;
+using NzbDrone.Core.Configuration;
 using NzbDrone.Core.Datastore;
 using NzbDrone.Core.Datastore.Events;
 using NzbDrone.Core.Download.Pending;
@@ -11,6 +10,8 @@ using NzbDrone.Core.Profiles.Qualities;
 using NzbDrone.Core.Qualities;
 using NzbDrone.Core.Queue;
 using NzbDrone.SignalR;
+using Lidarr.Http;
+using Lidarr.Http.Extensions;
 
 namespace Lidarr.Api.V1.Queue
 {
@@ -20,7 +21,7 @@ namespace Lidarr.Api.V1.Queue
         private readonly IQueueService _queueService;
         private readonly IPendingReleaseService _pendingReleaseService;
 
-        private readonly QualityModelComparer _qualityComparer;
+        private readonly QualityModelComparer QUALITY_COMPARER;
 
         public QueueModule(IBroadcastSignalRMessage broadcastSignalRMessage,
                            IQueueService queueService,
@@ -32,7 +33,7 @@ namespace Lidarr.Api.V1.Queue
             _pendingReleaseService = pendingReleaseService;
             GetResourcePaged = GetQueue;
 
-            _qualityComparer = new QualityModelComparer(qualityProfileService.GetDefaultProfile(string.Empty));
+            QUALITY_COMPARER = new QualityModelComparer(qualityProfileService.GetDefaultProfile(string.Empty));
         }
 
         private PagingResource<QueueResource> GetQueue(PagingResource<QueueResource> pagingResource)
@@ -62,6 +63,7 @@ namespace Lidarr.Api.V1.Queue
                     ? fullQueue.OrderBy(q => q.Timeleft, new TimeleftComparer())
                     : fullQueue.OrderByDescending(q => q.Timeleft, new TimeleftComparer());
             }
+
             else if (pagingSpec.SortKey == "estimatedCompletionTime")
             {
                 ordered = ascending
@@ -69,36 +71,41 @@ namespace Lidarr.Api.V1.Queue
                     : fullQueue.OrderByDescending(q => q.EstimatedCompletionTime,
                         new EstimatedCompletionTimeComparer());
             }
+
             else if (pagingSpec.SortKey == "protocol")
             {
                 ordered = ascending
                     ? fullQueue.OrderBy(q => q.Protocol)
                     : fullQueue.OrderByDescending(q => q.Protocol);
             }
+
             else if (pagingSpec.SortKey == "indexer")
             {
                 ordered = ascending
                     ? fullQueue.OrderBy(q => q.Indexer, StringComparer.InvariantCultureIgnoreCase)
                     : fullQueue.OrderByDescending(q => q.Indexer, StringComparer.InvariantCultureIgnoreCase);
             }
+
             else if (pagingSpec.SortKey == "downloadClient")
             {
                 ordered = ascending
                     ? fullQueue.OrderBy(q => q.DownloadClient, StringComparer.InvariantCultureIgnoreCase)
                     : fullQueue.OrderByDescending(q => q.DownloadClient, StringComparer.InvariantCultureIgnoreCase);
             }
+
             else if (pagingSpec.SortKey == "quality")
             {
                 ordered = ascending
-                    ? fullQueue.OrderBy(q => q.Quality, _qualityComparer)
-                    : fullQueue.OrderByDescending(q => q.Quality, _qualityComparer);
+                    ? fullQueue.OrderBy(q => q.Quality, QUALITY_COMPARER)
+                    : fullQueue.OrderByDescending(q => q.Quality, QUALITY_COMPARER);
             }
+
             else
             {
                 ordered = ascending ? fullQueue.OrderBy(orderByFunc) : fullQueue.OrderByDescending(orderByFunc);
             }
 
-            ordered = ordered.ThenByDescending(q => q.Size == 0 ? 0 : 100 - (q.Sizeleft / q.Size * 100));
+            ordered = ordered.ThenByDescending(q => q.Size == 0 ? 0 : 100 - q.Sizeleft / q.Size * 100);
 
             pagingSpec.Records = ordered.Skip((pagingSpec.Page - 1) * pagingSpec.PageSize).Take(pagingSpec.PageSize).ToList();
             pagingSpec.TotalRecords = fullQueue.Count;
@@ -112,19 +119,19 @@ namespace Lidarr.Api.V1.Queue
             return pagingSpec;
         }
 
-        private Func<NzbDrone.Core.Queue.Queue, object> GetOrderByFunc(PagingSpec<NzbDrone.Core.Queue.Queue> pagingSpec)
+        private Func<NzbDrone.Core.Queue.Queue, Object> GetOrderByFunc(PagingSpec<NzbDrone.Core.Queue.Queue> pagingSpec)
         {
             switch (pagingSpec.SortKey)
             {
                 case "status":
                     return q => q.Status;
-                case "artists.sortName":
+                case "artist.sortName":
                     return q => q.Artist?.SortName;
                 case "title":
                     return q => q.Title;
                 case "album":
                     return q => q.Album;
-                case "albums.title":
+                case "album.title":
                     return q => q.Album?.Title;
                 case "album.releaseDate":
                     return q => q.Album?.ReleaseDate;
@@ -132,7 +139,7 @@ namespace Lidarr.Api.V1.Queue
                     return q => q.Quality;
                 case "progress":
                     // Avoid exploding if a download's size is 0
-                    return q => 100 - (q.Sizeleft / Math.Max(q.Size * 100, 1));
+                    return q => 100 - q.Sizeleft / Math.Max(q.Size * 100, 1);
                 default:
                     return q => q.Timeleft;
             }

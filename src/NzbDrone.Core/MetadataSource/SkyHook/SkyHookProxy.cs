@@ -48,7 +48,7 @@ namespace NzbDrone.Core.MetadataSource.SkyHook
         public Artist GetArtistInfo(string foreignArtistId, int metadataProfileId)
         {
 
-            _logger.Debug("Getting Artist with GamearrAPI.MetadataID of {0}", foreignArtistId);
+            _logger.Debug("Getting Artist with LidarrAPI.MetadataID of {0}", foreignArtistId);
 
             var httpRequest = _requestBuilder.GetRequestBuilder().Create()
                                              .SetSegment("route", "artist/" + foreignArtistId)
@@ -103,7 +103,7 @@ namespace NzbDrone.Core.MetadataSource.SkyHook
 
         public Tuple<string, Album, List<ArtistMetadata>> GetAlbumInfo(string foreignAlbumId)
         {
-            _logger.Debug("Getting Album with GamearrAPI.MetadataID of {0}", foreignAlbumId);
+            _logger.Debug("Getting Album with LidarrAPI.MetadataID of {0}", foreignAlbumId);
             
             var httpRequest = _requestBuilder.GetRequestBuilder().Create()
                 .SetSegment("route", "album/" + foreignAlbumId)
@@ -144,7 +144,7 @@ namespace NzbDrone.Core.MetadataSource.SkyHook
             {
                 var lowerTitle = title.ToLowerInvariant();
 
-                if (lowerTitle.StartsWith("gamearr:") || lowerTitle.StartsWith("gamearrid:") || lowerTitle.StartsWith("mbid:"))
+                if (lowerTitle.StartsWith("lidarr:") || lowerTitle.StartsWith("lidarrid:") || lowerTitle.StartsWith("mbid:"))
                 {
                     var slug = lowerTitle.Split(':')[1].Trim();
 
@@ -189,12 +189,12 @@ namespace NzbDrone.Core.MetadataSource.SkyHook
             }
             catch (HttpException)
             {
-                throw new SkyHookException("Search for '{0}' failed. Unable to communicate with GamearrAPI.", title);
+                throw new SkyHookException("Search for '{0}' failed. Unable to communicate with LidarrAPI.", title);
             }
             catch (Exception ex)
             {
                 _logger.Warn(ex, ex.Message);
-                throw new SkyHookException("Search for '{0}' failed. Invalid response received from GamearrAPI.", title);
+                throw new SkyHookException("Search for '{0}' failed. Invalid response received from LidarrAPI.", title);
             }
         }
 
@@ -204,7 +204,7 @@ namespace NzbDrone.Core.MetadataSource.SkyHook
             {
                 var lowerTitle = title.ToLowerInvariant();
 
-                if (lowerTitle.StartsWith("gamearr:") || lowerTitle.StartsWith("gamearrid:") || lowerTitle.StartsWith("mbid:"))
+                if (lowerTitle.StartsWith("lidarr:") || lowerTitle.StartsWith("lidarrid:") || lowerTitle.StartsWith("mbid:"))
                 {
                     var slug = lowerTitle.Split(':')[1].Trim();
 
@@ -257,12 +257,12 @@ namespace NzbDrone.Core.MetadataSource.SkyHook
             }
             catch (HttpException)
             {
-                throw new SkyHookException("Search for '{0}' failed. Unable to communicate with GamearrAPI.", title);
+                throw new SkyHookException("Search for '{0}' failed. Unable to communicate with LidarrAPI.", title);
             }
             catch (Exception ex)
             {
                 _logger.Warn(ex, ex.Message);
-                throw new SkyHookException("Search for '{0}' failed. Invalid response received from GamearrAPI.", title);
+                throw new SkyHookException("Search for '{0}' failed. Invalid response received from LidarrAPI.", title);
             }
         }
 

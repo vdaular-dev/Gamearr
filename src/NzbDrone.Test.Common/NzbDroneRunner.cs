@@ -21,10 +21,10 @@ namespace NzbDrone.Test.Common
         public string AppData { get; private set; }
         public string ApiKey { get; private set; }
 
-        public NzbDroneRunner(Logger logger, int port = 8383)
+        public NzbDroneRunner(Logger logger, int port = 8686)
         {
             _processProvider = new ProcessProvider(logger);
-            _restClient = new RestClient("http://localhost:8383/api");
+            _restClient = new RestClient("http://localhost:8686/api");
         }
 
         public void Start()
@@ -34,15 +34,15 @@ namespace NzbDrone.Test.Common
 
             GenerateConfigFile();
             
-            var gamearrConsoleExe = OsInfo.IsWindows ? "Gamearr.Console.exe" : "Gamearr.exe";
+            var lidarrConsoleExe = OsInfo.IsWindows ? "Lidarr.Console.exe" : "Lidarr.exe";
 
             if (BuildInfo.IsDebug)
             {
-                Start(Path.Combine(TestContext.CurrentContext.TestDirectory, "..", "_output", "Gamearr.Console.exe"));
+                Start(Path.Combine(TestContext.CurrentContext.TestDirectory, "..", "_output", "Lidarr.Console.exe"));
             }
             else
             {
-                Start(Path.Combine("bin", gamearrConsoleExe));
+                Start(Path.Combine("bin", lidarrConsoleExe));
             }
 
             while (true)
@@ -51,7 +51,7 @@ namespace NzbDrone.Test.Common
 
                 if (_nzbDroneProcess.HasExited)
                 {
-                    TestContext.Progress.WriteLine("Gamearr has exited unexpectedly");
+                    TestContext.Progress.WriteLine("Lidarr has exited unexpectedly");
                     Thread.Sleep(2000);
                     Assert.Fail("Process has exited: ExitCode={0}", _nzbDroneProcess.ExitCode);
                 }
@@ -64,11 +64,11 @@ namespace NzbDrone.Test.Common
 
                 if (statusCall.ResponseStatus == ResponseStatus.Completed)
                 {
-                    TestContext.Progress.WriteLine("Gamearr is started. Running Tests");
+                    TestContext.Progress.WriteLine("Lidarr is started. Running Tests");
                     return;
                 }
 
-                TestContext.Progress.WriteLine("Waiting for Gamearr to start. Response Status : {0}  [{1}] {2}", statusCall.ResponseStatus, statusCall.StatusDescription, statusCall.ErrorException.Message);
+                TestContext.Progress.WriteLine("Waiting for Lidarr to start. Response Status : {0}  [{1}] {2}", statusCall.ResponseStatus, statusCall.StatusDescription, statusCall.ErrorException.Message);
 
                 Thread.Sleep(500);
             }

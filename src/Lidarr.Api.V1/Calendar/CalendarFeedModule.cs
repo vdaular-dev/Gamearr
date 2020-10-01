@@ -2,15 +2,17 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Ical.Net;
-using Ical.Net.CalendarComponents;
 using Ical.Net.DataTypes;
+using Ical.Net.General;
+using Ical.Net.Interfaces.Serialization;
 using Ical.Net.Serialization;
-using Lidarr.Http.Extensions;
+using Ical.Net.Serialization.iCalendar.Factory;
 using Nancy;
 using Nancy.Responses;
 using NzbDrone.Common.Extensions;
-using NzbDrone.Core.Music;
 using NzbDrone.Core.Tags;
+using NzbDrone.Core.Music;
+using Lidarr.Http.Extensions;
 
 namespace Lidarr.Api.V1.Calendar
 {
@@ -27,13 +29,13 @@ namespace Lidarr.Api.V1.Calendar
             _artistService = artistService;
             _tagService = tagService;
 
-            Get("/Lidarr.ics", options => GetCalendarFeed());
+            Get["/Lidarr.ics"] = options => GetCalendarFeed();
         }
 
-        private object GetCalendarFeed()
+        private Response GetCalendarFeed()
         {
             var pastDays = 7;
-            var futureDays = 28;
+            var futureDays = 28;            
             var start = DateTime.Today.AddDays(-pastDays);
             var end = DateTime.Today.AddDays(futureDays);
             var unmonitored = Request.GetBooleanQueryParameter("unmonitored");
@@ -80,12 +82,11 @@ namespace Lidarr.Api.V1.Calendar
                     continue;
                 }
 
-                var occurrence = calendar.Create<CalendarEvent>();
-                occurrence.Uid = "Lidarr_album_" + album.Id;
-
+                var occurrence = calendar.Create<Event>();
+                occurrence.Uid = "NzbDrone_album_" + album.Id;
                 //occurrence.Status = album.HasFile ? EventStatus.Confirmed : EventStatus.Tentative;
-                occurrence.Description = album.Overview;
-                occurrence.Categories = album.Genres;
+                //occurrence.Description = album.Overview;
+                //occurrence.Categories = new List<string>() { album.Series.Network };
 
                 occurrence.Start = new CalDateTime(album.ReleaseDate.Value.ToLocalTime()) { HasTime = false };
 

@@ -47,7 +47,7 @@ namespace NzbDrone.Core.Download.Clients.DownloadStation
 
         public override string Name => "Download Station";
 
-        public override ProviderMessage Message => new ProviderMessage("Gamearr is unable to connect to Download Station if 2-Factor Authentication is enabled on your DSM account", ProviderMessageType.Warning);
+        public override ProviderMessage Message => new ProviderMessage("Lidarr is unable to connect to Download Station if 2-Factor Authentication is enabled on your DSM account", ProviderMessageType.Warning);
 
         protected IEnumerable<DownloadStationTask> GetTasks()
         {
@@ -262,7 +262,7 @@ namespace NzbDrone.Core.Download.Clients.DownloadStation
                 _logger.Error(ex, "Unable to authenticate");
                 return new NzbDroneValidationFailure("Username", "Authentication failure")
                 {
-                    DetailedDescription = $"Please verify your username and password. Also verify if the host running Gamearr isn't blocked from accessing {Name} by WhiteList limitations in the {Name} configuration."
+                    DetailedDescription = $"Please verify your username and password. Also verify if the host running Lidarr isn't blocked from accessing {Name} by WhiteList limitations in the {Name} configuration."
                 };
             }
             catch (WebException ex)

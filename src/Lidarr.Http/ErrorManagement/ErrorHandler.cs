@@ -1,6 +1,6 @@
-﻿using Lidarr.Http.Extensions;
-using Nancy;
+﻿using Nancy;
 using Nancy.ErrorHandling;
+using Lidarr.Http.Extensions;
 
 namespace Lidarr.Http.ErrorManagement
 {
@@ -14,9 +14,7 @@ namespace Lidarr.Http.ErrorManagement
         public void Handle(HttpStatusCode statusCode, NancyContext context)
         {
             if (statusCode == HttpStatusCode.SeeOther || statusCode == HttpStatusCode.OK)
-            {
                 return;
-            }
 
             if (statusCode == HttpStatusCode.Continue)
             {
@@ -25,17 +23,13 @@ namespace Lidarr.Http.ErrorManagement
             }
 
             if (statusCode == HttpStatusCode.Unauthorized)
-            {
                 return;
-            }
 
             if (context.Response.ContentType == "text/html" || context.Response.ContentType == "text/plain")
-            {
                 context.Response = new ErrorModel
-                {
-                    Message = statusCode.ToString()
-                }.AsResponse(context, statusCode);
-            }
+                    {
+                            Message = statusCode.ToString()
+                    }.AsResponse(statusCode);
         }
     }
 }

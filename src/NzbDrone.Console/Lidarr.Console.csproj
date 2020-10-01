@@ -1,13 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks>net462;netcoreapp3.1</TargetFrameworks>
+    <TargetFramework>net462</TargetFramework>
+    <Platforms>x86</Platforms>
 
     <ApplicationIcon>..\NzbDrone.Host\NzbDrone.ico</ApplicationIcon>
     <ApplicationManifest>app.manifest</ApplicationManifest>
-  </PropertyGroup>
-  <PropertyGroup Condition="!$(RuntimeIdentifier.StartsWith('win'))">
-    <AssemblyName>Lidarr</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\NzbDrone.Host\Lidarr.Host.csproj" />

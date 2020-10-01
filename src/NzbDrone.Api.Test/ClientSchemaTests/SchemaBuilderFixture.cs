@@ -1,6 +1,6 @@
 using FluentAssertions;
 using NUnit.Framework;
-using Gamearr.Http.ClientSchema;
+using Lidarr.Http.ClientSchema;
 using NzbDrone.Core.Annotations;
 using NzbDrone.Test.Common;
 

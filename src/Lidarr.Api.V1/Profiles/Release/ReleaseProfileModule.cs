@@ -1,49 +1,38 @@
 using System.Collections.Generic;
-using System.Linq;
-using FluentValidation;
-using Lidarr.Http;
+using FluentValidation.Results;
 using NzbDrone.Common.Extensions;
-using NzbDrone.Core.Indexers;
 using NzbDrone.Core.Profiles.Releases;
+using Lidarr.Http;
 
 namespace Lidarr.Api.V1.Profiles.Release
 {
     public class ReleaseProfileModule : LidarrRestModule<ReleaseProfileResource>
     {
         private readonly IReleaseProfileService _releaseProfileService;
-        private readonly IIndexerFactory _indexerFactory;
 
-        public ReleaseProfileModule(IReleaseProfileService releaseProfileService, IIndexerFactory indexerFactory)
+
+        public ReleaseProfileModule(IReleaseProfileService releaseProfileService)
         {
             _releaseProfileService = releaseProfileService;
-            _indexerFactory = indexerFactory;
 
-            GetResourceById = GetById;
+            GetResourceById = Get;
             GetResourceAll = GetAll;
             CreateResource = Create;
             UpdateResource = Update;
-            DeleteResource = DeleteById;
+            DeleteResource = Delete;
 
-            SharedValidator.RuleFor(r => r).Custom((restriction, context) =>
+            SharedValidator.Custom(restriction =>
             {
                 if (restriction.Ignored.IsNullOrWhiteSpace() && restriction.Required.IsNullOrWhiteSpace() && restriction.Preferred.Empty())
                 {
-                    context.AddFailure("Either 'Must contain' or 'Must not contain' is required");
+                    return new ValidationFailure("", "'Must contain', 'Must not contain' or 'Preferred' is required");
                 }
 
-                if (restriction.Enabled && restriction.IndexerId != 0 && !_indexerFactory.Exists(restriction.IndexerId))
-                {
-                    context.AddFailure(nameof(ReleaseProfile.IndexerId), "Indexer does not exist");
-                }
-
-                if (restriction.Preferred.Any(p => p.Key.IsNullOrWhiteSpace()))
-                {
-                    context.AddFailure("Preferred", "Term cannot be empty or consist of only spaces");
-                }
+                return null;
             });
         }
 
-        private ReleaseProfileResource GetById(int id)
+        private ReleaseProfileResource Get(int id)
         {
             return _releaseProfileService.Get(id).ToResource();
         }
@@ -63,7 +52,7 @@ namespace Lidarr.Api.V1.Profiles.Release
             _releaseProfileService.Update(resource.ToModel());
         }
 
-        private void DeleteById(int id)
+        private void Delete(int id)
         {
             _releaseProfileService.Delete(id);
         }

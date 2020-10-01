@@ -1,66 +1,42 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using FluentValidation;
-using Lidarr.Http.Extensions;
 using Nancy;
-using NzbDrone.Common.Extensions;
-using NzbDrone.Core.ArtistStats;
 using NzbDrone.Core.Datastore.Events;
 using NzbDrone.Core.DecisionEngine.Specifications;
-using NzbDrone.Core.Download;
-using NzbDrone.Core.MediaCover;
-using NzbDrone.Core.MediaFiles;
-using NzbDrone.Core.MediaFiles.Events;
-using NzbDrone.Core.Messaging.Events;
 using NzbDrone.Core.Music;
-using NzbDrone.Core.Music.Events;
-using NzbDrone.Core.Validation;
-using NzbDrone.Core.Validation.Paths;
 using NzbDrone.SignalR;
+using Lidarr.Http.Extensions;
+using NzbDrone.Core.ArtistStats;
+using NzbDrone.Core.Messaging.Events;
+using NzbDrone.Core.Download;
+using NzbDrone.Core.Music.Events;
+using NzbDrone.Core.MediaFiles.Events;
+using NzbDrone.Core.MediaCover;
 
 namespace Lidarr.Api.V1.Albums
 {
     public class AlbumModule : AlbumModuleWithSignalR,
         IHandle<AlbumGrabbedEvent>,
         IHandle<AlbumEditedEvent>,
-        IHandle<AlbumUpdatedEvent>,
         IHandle<AlbumImportedEvent>,
-        IHandle<TrackImportedEvent>,
-        IHandle<TrackFileDeletedEvent>
-    {
-        protected readonly IArtistService _artistService;
-        protected readonly IReleaseService _releaseService;
-        protected readonly IAddAlbumService _addAlbumService;
+        IHandle<TrackImportedEvent>
 
-        public AlbumModule(IArtistService artistService,
-                           IAlbumService albumService,
-                           IAddAlbumService addAlbumService,
+    {
+        protected readonly IReleaseService _releaseService;
+
+        public AlbumModule(IAlbumService albumService,
                            IReleaseService releaseService,
                            IArtistStatisticsService artistStatisticsService,
                            IMapCoversToLocal coverMapper,
                            IUpgradableSpecification upgradableSpecification,
-                           IBroadcastSignalRMessage signalRBroadcaster,
-                           QualityProfileExistsValidator qualityProfileExistsValidator,
-                           MetadataProfileExistsValidator metadataProfileExistsValidator)
-
+                           IBroadcastSignalRMessage signalRBroadcaster)
         : base(albumService, artistStatisticsService, coverMapper, upgradableSpecification, signalRBroadcaster)
         {
-            _artistService = artistService;
             _releaseService = releaseService;
-            _addAlbumService = addAlbumService;
-
             GetResourceAll = GetAlbums;
-            CreateResource = AddAlbum;
             UpdateResource = UpdateAlbum;
-            DeleteResource = DeleteAlbum;
-            Put("/monitor", x => SetAlbumsMonitored());
-
-            PostValidator.RuleFor(s => s.ForeignAlbumId).NotEmpty();
-            PostValidator.RuleFor(s => s.Artist.QualityProfileId).SetValidator(qualityProfileExistsValidator);
-            PostValidator.RuleFor(s => s.Artist.MetadataProfileId).SetValidator(metadataProfileExistsValidator);
-            PostValidator.RuleFor(s => s.Artist.RootFolderPath).IsValidPath().When(s => s.Artist.Path.IsNullOrWhiteSpace());
-            PostValidator.RuleFor(s => s.Artist.ForeignArtistId).NotEmpty();
+            Put["/monitor"] = x => SetAlbumsMonitored();
         }
 
         private List<AlbumResource> GetAlbums()
@@ -72,25 +48,7 @@ namespace Lidarr.Api.V1.Albums
 
             if (!Request.Query.ArtistId.HasValue && !albumIdsQuery.HasValue && !foreignIdQuery.HasValue)
             {
-                var albums = _albumService.GetAllAlbums();
-
-                var artists = _artistService.GetAllArtists().ToDictionary(x => x.ArtistMetadataId);
-                var releases = _releaseService.GetAllReleases().GroupBy(x => x.AlbumId).ToDictionary(x => x.Key, y => y.ToList());
-
-                foreach (var album in albums)
-                {
-                    album.Artist = artists[album.ArtistMetadataId];
-                    if (releases.TryGetValue(album.Id, out var albumReleases))
-                    {
-                        album.AlbumReleases = albumReleases;
-                    }
-                    else
-                    {
-                        album.AlbumReleases = new List<AlbumRelease>();
-                    }
-                }
-
-                return MapToResource(albums, false);
+                return MapToResource(_albumService.GetAllAlbums(), false);
             }
 
             if (artistIdQuery.HasValue)
@@ -105,11 +63,6 @@ namespace Lidarr.Api.V1.Albums
                 string foreignAlbumId = foreignIdQuery.Value.ToString();
 
                 var album = _albumService.FindById(foreignAlbumId);
-
-                if (album == null)
-                {
-                    return MapToResource(new List<Album>(), false);
-                }
 
                 if (includeAllArtistAlbumsQuery.HasValue && Convert.ToBoolean(includeAllArtistAlbumsQuery.Value))
                 {
@@ -130,13 +83,6 @@ namespace Lidarr.Api.V1.Albums
             return MapToResource(_albumService.GetAlbums(albumIds), false);
         }
 
-        private int AddAlbum(AlbumResource albumResource)
-        {
-            var album = _addAlbumService.AddAlbum(albumResource.ToModel());
-
-            return album.Id;
-        }
-
         private void UpdateAlbum(AlbumResource albumResource)
         {
             var album = _albumService.GetAlbum(albumResource.Id);
@@ -149,21 +95,13 @@ namespace Lidarr.Api.V1.Albums
             BroadcastResourceChange(ModelAction.Updated, model.Id);
         }
 
-        private void DeleteAlbum(int id)
-        {
-            var deleteFiles = Request.GetBooleanQueryParameter("deleteFiles");
-            var addImportListExclusion = Request.GetBooleanQueryParameter("addImportListExclusion");
-
-            _albumService.DeleteAlbum(id, deleteFiles, addImportListExclusion);
-        }
-
-        private object SetAlbumsMonitored()
+        private Response SetAlbumsMonitored()
         {
             var resource = Request.Body.FromJson<AlbumsMonitoredResource>();
 
             _albumService.SetMonitored(resource.AlbumIds, resource.Monitored);
 
-            return ResponseWithCode(MapToResource(_albumService.GetAlbums(resource.AlbumIds), false), HttpStatusCode.Accepted);
+            return MapToResource(_albumService.GetAlbums(resource.AlbumIds), false).AsResponse(HttpStatusCode.Accepted);
         }
 
         public void Handle(AlbumGrabbedEvent message)
@@ -176,20 +114,10 @@ namespace Lidarr.Api.V1.Albums
                 BroadcastResourceChange(ModelAction.Updated, resource);
             }
         }
-
+        
         public void Handle(AlbumEditedEvent message)
         {
             BroadcastResourceChange(ModelAction.Updated, MapToResource(message.Album, true));
-        }
-
-        public void Handle(AlbumUpdatedEvent message)
-        {
-            BroadcastResourceChange(ModelAction.Updated, MapToResource(message.Album, true));
-        }
-
-        public void Handle(AlbumDeletedEvent message)
-        {
-            BroadcastResourceChange(ModelAction.Deleted, message.Album.ToResource());
         }
 
         public void Handle(AlbumImportedEvent message)
@@ -200,16 +128,6 @@ namespace Lidarr.Api.V1.Albums
         public void Handle(TrackImportedEvent message)
         {
             BroadcastResourceChange(ModelAction.Updated, message.TrackInfo.Album.ToResource());
-        }
-
-        public void Handle(TrackFileDeletedEvent message)
-        {
-            if (message.Reason == DeleteMediaFileReason.Upgrade)
-            {
-                return;
-            }
-
-            BroadcastResourceChange(ModelAction.Updated, MapToResource(message.TrackFile.Album.Value, true));
         }
     }
 }

@@ -1,11 +1,12 @@
 using System.Collections.Generic;
 using System.Linq;
-using Lidarr.Http;
+using System.Text.RegularExpressions;
 using NzbDrone.Common.Extensions;
 using NzbDrone.Core.Datastore.Events;
 using NzbDrone.Core.Jobs;
 using NzbDrone.Core.Messaging.Events;
 using NzbDrone.SignalR;
+using Lidarr.Http;
 
 namespace Lidarr.Api.V1.System.Tasks
 {
@@ -47,15 +48,14 @@ namespace Lidarr.Api.V1.System.Tasks
             var taskName = scheduledTask.TypeName.Split('.').Last().Replace("Command", "");
 
             return new TaskResource
-            {
-                Id = scheduledTask.Id,
-                Name = taskName.SplitCamelCase(),
-                TaskName = taskName,
-                Interval = scheduledTask.Interval,
-                LastExecution = scheduledTask.LastExecution,
-                LastStartTime = scheduledTask.LastStartTime,
-                NextExecution = scheduledTask.LastExecution.AddMinutes(scheduledTask.Interval)
-            };
+                   {
+                       Id = scheduledTask.Id,
+                       Name = taskName.SplitCamelCase(),
+                       TaskName = taskName,
+                       Interval = scheduledTask.Interval,
+                       LastExecution = scheduledTask.LastExecution,
+                       NextExecution = scheduledTask.LastExecution.AddMinutes(scheduledTask.Interval)
+                   };
         }
 
         public void Handle(CommandExecutedEvent message)

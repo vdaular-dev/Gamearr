@@ -10,25 +10,24 @@ namespace Lidarr.Api.V1.MediaCovers
 {
     public class MediaCoverModule : LidarrV1Module
     {
+        private static readonly Regex RegexResizedImage = new Regex(@"-\d+(?=\.(jpg|png|gif)$)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
         private const string MEDIA_COVER_ARTIST_ROUTE = @"/Artist/(?<artistId>\d+)/(?<filename>(.+)\.(jpg|png|gif))";
         private const string MEDIA_COVER_ALBUM_ROUTE = @"/Album/(?<artistId>\d+)/(?<filename>(.+)\.(jpg|png|gif))";
-
-        private static readonly Regex RegexResizedImage = new Regex(@"-\d+(?=\.(jpg|png|gif)$)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         private readonly IAppFolderInfo _appFolderInfo;
         private readonly IDiskProvider _diskProvider;
 
-        public MediaCoverModule(IAppFolderInfo appFolderInfo, IDiskProvider diskProvider)
-            : base("MediaCover")
+        public MediaCoverModule(IAppFolderInfo appFolderInfo, IDiskProvider diskProvider) : base("MediaCover")
         {
             _appFolderInfo = appFolderInfo;
             _diskProvider = diskProvider;
 
-            Get(MEDIA_COVER_ARTIST_ROUTE, options => GetArtistMediaCover(options.artistId, options.filename));
-            Get(MEDIA_COVER_ALBUM_ROUTE, options => GetAlbumMediaCover(options.artistId, options.filename));
+            Get[MEDIA_COVER_ARTIST_ROUTE] = options => GetArtistMediaCover(options.artistId, options.filename);
+            Get[MEDIA_COVER_ALBUM_ROUTE] = options => GetAlbumMediaCover(options.artistId, options.filename);
         }
 
-        private object GetArtistMediaCover(int artistId, string filename)
+        private Response GetArtistMediaCover(int artistId, string filename)
         {
             var filePath = Path.Combine(_appFolderInfo.GetAppDataPath(), "MediaCover", artistId.ToString(), filename);
 
@@ -41,14 +40,13 @@ namespace Lidarr.Api.V1.MediaCovers
                 {
                     return new NotFoundResponse();
                 }
-
                 filePath = basefilePath;
             }
 
             return new StreamResponse(() => File.OpenRead(filePath), MimeTypes.GetMimeType(filePath));
         }
 
-        private object GetAlbumMediaCover(int albumId, string filename)
+        private Response GetAlbumMediaCover(int albumId, string filename)
         {
             var filePath = Path.Combine(_appFolderInfo.GetAppDataPath(), "MediaCover", "Albums", albumId.ToString(), filename);
 
@@ -61,7 +59,6 @@ namespace Lidarr.Api.V1.MediaCovers
                 {
                     return new NotFoundResponse();
                 }
-
                 filePath = basefilePath;
             }
 

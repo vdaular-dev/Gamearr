@@ -1,3 +1,4 @@
+using System;
 using Nancy;
 using Nancy.Bootstrapper;
 using NzbDrone.Common.EnvironmentInfo;
@@ -10,7 +11,7 @@ namespace Lidarr.Http.Extensions.Pipelines
 
         public void Register(IPipelines pipelines)
         {
-            pipelines.AfterRequest.AddItemToStartOfPipeline(Handle);
+            pipelines.AfterRequest.AddItemToStartOfPipeline((Action<NancyContext>) Handle);
         }
 
         private void Handle(NancyContext context)

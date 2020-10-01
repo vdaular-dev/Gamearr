@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
-import { saveInteractiveImportItem, updateInteractiveImportItem } from 'Store/Actions/interactiveImportActions';
+import { updateInteractiveImportItem, saveInteractiveImportItem } from 'Store/Actions/interactiveImportActions';
 import createAllArtistSelector from 'Store/Selectors/createAllArtistSelector';
 import SelectArtistModalContent from './SelectArtistModalContent';
 
@@ -12,7 +12,7 @@ function createMapStateToProps() {
     createAllArtistSelector(),
     (items) => {
       return {
-        items: [...items].sort((a, b) => {
+        items: items.sort((a, b) => {
           if (a.sortName < b.sortName) {
             return -1;
           }

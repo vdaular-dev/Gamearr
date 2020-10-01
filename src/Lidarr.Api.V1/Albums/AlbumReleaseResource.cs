@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using NzbDrone.Core.Music;
@@ -26,7 +27,6 @@ namespace Lidarr.Api.V1.Albums
                 return Media.Where(s => s.MediumNumber > 0).Count();
             }
         }
-
         public string Disambiguation { get; set; }
         public List<string> Country { get; set; }
         public List<string> Label { get; set; }
@@ -62,6 +62,7 @@ namespace Lidarr.Api.V1.Albums
                                      .GroupBy(x => x.Format)
                                      .Select(g => MediaFormatHelper(g.Key, g.Count()))
                                      .ToList())
+
             };
         }
 
@@ -91,7 +92,7 @@ namespace Lidarr.Api.V1.Albums
 
         private static string MediaFormatHelper(string name, int count)
         {
-            return count == 1 ? name : string.Join("x", new List<string> { count.ToString(), name });
+            return count == 1 ? name : string.Join("x", new List<string> {count.ToString(), name});
         }
 
         public static List<AlbumReleaseResource> ToResource(this IEnumerable<AlbumRelease> models)

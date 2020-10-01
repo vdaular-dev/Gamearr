@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json;
+using NzbDrone.Core.Music;
 using Lidarr.Api.V1.Artist;
 using Lidarr.Http.REST;
-using Newtonsoft.Json;
 using NzbDrone.Core.MediaCover;
-using NzbDrone.Core.Music;
 
 namespace Lidarr.Api.V1.Albums
 {
@@ -34,7 +34,6 @@ namespace Lidarr.Api.V1.Albums
                 return Media.Where(s => s.MediumNumber > 0).Count();
             }
         }
-
         public Ratings Ratings { get; set; }
         public DateTime? ReleaseDate { get; set; }
         public List<AlbumReleaseResource> Releases { get; set; }
@@ -44,7 +43,7 @@ namespace Lidarr.Api.V1.Albums
         public List<MediaCover> Images { get; set; }
         public List<Links> Links { get; set; }
         public AlbumStatisticsResource Statistics { get; set; }
-        public AddAlbumOptions AddOptions { get; set; }
+
         public string RemoteCover { get; set; }
 
         //Hiding this so people don't think its usable (only used to set the initial state)
@@ -56,10 +55,7 @@ namespace Lidarr.Api.V1.Albums
     {
         public static AlbumResource ToResource(this Album model)
         {
-            if (model == null)
-            {
-                return null;
-            }
+            if (model == null) return null;
 
             var selectedRelease = model.AlbumReleases?.Value.Where(x => x.Monitored).SingleOrDefault();
 
@@ -90,12 +86,7 @@ namespace Lidarr.Api.V1.Albums
 
         public static Album ToModel(this AlbumResource resource)
         {
-            if (resource == null)
-            {
-                return null;
-            }
-
-            var artist = resource.Artist?.ToModel() ?? new NzbDrone.Core.Music.Artist();
+            if (resource == null) return null;
 
             return new Album
             {
@@ -105,13 +96,9 @@ namespace Lidarr.Api.V1.Albums
                 Disambiguation = resource.Disambiguation,
                 Overview = resource.Overview,
                 Images = resource.Images,
-                AlbumType = resource.AlbumType,
                 Monitored = resource.Monitored,
                 AnyReleaseOk = resource.AnyReleaseOk,
-                AlbumReleases = resource.Releases.ToModel(),
-                AddOptions = resource.AddOptions,
-                Artist = artist,
-                ArtistMetadata = artist.Metadata.Value
+                AlbumReleases = resource.Releases.ToModel()
             };
         }
 

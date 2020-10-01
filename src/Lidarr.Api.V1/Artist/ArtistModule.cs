@@ -2,35 +2,37 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using FluentValidation;
-using Lidarr.Http;
-using Lidarr.Http.Extensions;
 using NzbDrone.Common.Extensions;
-using NzbDrone.Core.ArtistStats;
 using NzbDrone.Core.Datastore.Events;
 using NzbDrone.Core.MediaCover;
 using NzbDrone.Core.MediaFiles;
 using NzbDrone.Core.MediaFiles.Events;
 using NzbDrone.Core.Messaging.Commands;
 using NzbDrone.Core.Messaging.Events;
+using NzbDrone.Core.RootFolders;
+using NzbDrone.Core.ArtistStats;
 using NzbDrone.Core.Music;
 using NzbDrone.Core.Music.Commands;
 using NzbDrone.Core.Music.Events;
-using NzbDrone.Core.RootFolders;
 using NzbDrone.Core.Validation;
 using NzbDrone.Core.Validation.Paths;
+using Lidarr.Api.V1.Albums;
 using NzbDrone.SignalR;
+using Lidarr.Http;
+using Lidarr.Http.Extensions;
 
 namespace Lidarr.Api.V1.Artist
 {
-    public class ArtistModule : LidarrRestModuleWithSignalR<ArtistResource, NzbDrone.Core.Music.Artist>,
+    public class ArtistModule : LidarrRestModuleWithSignalR<ArtistResource, NzbDrone.Core.Music.Artist>, 
                                 IHandle<AlbumImportedEvent>,
                                 IHandle<AlbumEditedEvent>,
                                 IHandle<TrackFileDeletedEvent>,
-                                IHandle<ArtistUpdatedEvent>,
-                                IHandle<ArtistEditedEvent>,
+                                IHandle<ArtistUpdatedEvent>,       
+                                IHandle<ArtistEditedEvent>,  
                                 IHandle<ArtistDeletedEvent>,
                                 IHandle<ArtistRenamedEvent>,
                                 IHandle<MediaCoversUpdatedEvent>
+
     {
         private readonly IArtistService _artistService;
         private readonly IAlbumService _albumService;
@@ -54,8 +56,9 @@ namespace Lidarr.Api.V1.Artist
                             ArtistExistsValidator artistExistsValidator,
                             ArtistAncestorValidator artistAncestorValidator,
                             SystemFolderValidator systemFolderValidator,
-                            QualityProfileExistsValidator qualityProfileExistsValidator,
-                            MetadataProfileExistsValidator metadataProfileExistsValidator)
+                            ProfileExistsValidator profileExistsValidator,
+                            MetadataProfileExistsValidator metadataProfileExistsValidator
+            )
             : base(signalRBroadcaster)
         {
             _artistService = artistService;
@@ -86,7 +89,7 @@ namespace Lidarr.Api.V1.Artist
                            .SetValidator(systemFolderValidator)
                            .When(s => !s.Path.IsNullOrWhiteSpace());
 
-            SharedValidator.RuleFor(s => s.QualityProfileId).SetValidator(qualityProfileExistsValidator);
+            SharedValidator.RuleFor(s => s.QualityProfileId).SetValidator(profileExistsValidator);
             SharedValidator.RuleFor(s => s.MetadataProfileId).SetValidator(metadataProfileExistsValidator);
 
             PostValidator.RuleFor(s => s.Path).IsValidPath().When(s => s.RootFolderPath.IsNullOrWhiteSpace());
@@ -105,16 +108,12 @@ namespace Lidarr.Api.V1.Artist
 
         private ArtistResource GetArtistResource(NzbDrone.Core.Music.Artist artist)
         {
-            if (artist == null)
-            {
-                return null;
-            }
+            if (artist == null) return null;
 
             var resource = artist.ToResource();
             MapCoversToLocal(resource);
             FetchAndLinkArtistStatistics(resource);
             LinkNextPreviousAlbums(resource);
-
             //PopulateAlternateTitles(resource);
             LinkRootFolderPath(resource);
 
@@ -123,24 +122,14 @@ namespace Lidarr.Api.V1.Artist
 
         private List<ArtistResource> AllArtists()
         {
-            var mbId = Request.GetGuidQueryParameter("mbId");
             var artistStats = _artistStatisticsService.ArtistStatistics();
-            var artistsResources = new List<ArtistResource>();
-
-            if (mbId != Guid.Empty)
-            {
-                artistsResources.AddIfNotNull(_artistService.FindById(mbId.ToString()).ToResource());
-            }
-            else
-            {
-                artistsResources.AddRange(_artistService.GetAllArtists().ToResource());
-            }
+            var artistsResources = _artistService.GetAllArtists().ToResource();
 
             MapCoversToLocal(artistsResources.ToArray());
             LinkNextPreviousAlbums(artistsResources.ToArray());
             LinkArtistStatistics(artistsResources, artistStats);
-
             //PopulateAlternateTitles(seriesResources);
+
             return artistsResources;
         }
 
@@ -156,17 +145,19 @@ namespace Lidarr.Api.V1.Artist
             var moveFiles = Request.GetBooleanQueryParameter("moveFiles");
             var artist = _artistService.GetArtist(artistResource.Id);
 
-            var sourcePath = artist.Path;
-            var destinationPath = artistResource.Path;
-
-            _commandQueueManager.Push(new MoveArtistCommand
+            if (moveFiles)
             {
-                ArtistId = artist.Id,
-                SourcePath = sourcePath,
-                DestinationPath = destinationPath,
-                MoveFiles = moveFiles,
-                Trigger = CommandTrigger.Manual
-            });
+                var sourcePath = artist.Path;
+                var destinationPath = artistResource.Path;
+
+                _commandQueueManager.Push(new MoveArtistCommand
+                {
+                    ArtistId = artist.Id,
+                    SourcePath = sourcePath,
+                    DestinationPath = destinationPath,
+                    Trigger = CommandTrigger.Manual
+                });
+            }
 
             var model = artistResource.ToModel(artist);
 
@@ -213,10 +204,7 @@ namespace Lidarr.Api.V1.Artist
             foreach (var artist in resources)
             {
                 var stats = artistStatistics.SingleOrDefault(ss => ss.ArtistId == artist.Id);
-                if (stats == null)
-                {
-                    continue;
-                }
+                if (stats == null) continue;
 
                 LinkArtistStatistics(artist, stats);
             }
@@ -243,6 +231,7 @@ namespace Lidarr.Api.V1.Artist
 
         //    resource.AlternateTitles = mappings.Select(v => new AlternateTitleResource { Title = v.Title, SeasonNumber = v.SeasonNumber, SceneSeasonNumber = v.SceneSeasonNumber }).ToList();
         //}
+
         private void LinkRootFolderPath(ArtistResource resource)
         {
             resource.RootFolderPath = _rootFolderService.GetBestRootFolderPath(resource.Path);
@@ -260,10 +249,7 @@ namespace Lidarr.Api.V1.Artist
 
         public void Handle(TrackFileDeletedEvent message)
         {
-            if (message.Reason == DeleteMediaFileReason.Upgrade)
-            {
-                return;
-            }
+            if (message.Reason == DeleteMediaFileReason.Upgrade) return;
 
             BroadcastResourceChange(ModelAction.Updated, GetArtistResource(message.TrackFile.Artist.Value));
         }

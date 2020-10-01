@@ -1,8 +1,12 @@
+using System;
+using System.IO;
+using System.IO.Abstractions;
 using System.Linq;
-using Lidarr.Http.Extensions;
 using Nancy;
 using NzbDrone.Common.Disk;
+using NzbDrone.Common.Extensions;
 using NzbDrone.Core.MediaFiles;
+using Lidarr.Http.Extensions;
 
 namespace Lidarr.Api.V1.FileSystem
 {
@@ -20,49 +24,49 @@ namespace Lidarr.Api.V1.FileSystem
             _fileSystemLookupService = fileSystemLookupService;
             _diskProvider = diskProvider;
             _diskScanService = diskScanService;
-            Get("/", x => GetContents());
-            Get("/type", x => GetEntityType());
-            Get("/mediafiles", x => GetMediaFiles());
+            Get["/"] = x => GetContents();
+            Get["/type"] = x => GetEntityType();
+            Get["/mediafiles"] = x => GetMediaFiles();
         }
 
-        private object GetContents()
+        private Response GetContents()
         {
             var pathQuery = Request.Query.path;
             var includeFiles = Request.GetBooleanQueryParameter("includeFiles");
             var allowFoldersWithoutTrailingSlashes = Request.GetBooleanQueryParameter("allowFoldersWithoutTrailingSlashes");
 
-            return _fileSystemLookupService.LookupContents((string)pathQuery.Value, includeFiles, allowFoldersWithoutTrailingSlashes);
+            return _fileSystemLookupService.LookupContents((string)pathQuery.Value, includeFiles, allowFoldersWithoutTrailingSlashes).AsResponse();
         }
 
-        private object GetEntityType()
+        private Response GetEntityType()
         {
             var pathQuery = Request.Query.path;
             var path = (string)pathQuery.Value;
 
             if (_diskProvider.FileExists(path))
             {
-                return new { type = "file" };
+                return new { type = "file" }.AsResponse();
             }
 
             //Return folder even if it doesn't exist on disk to avoid leaking anything from the UI about the underlying system
-            return new { type = "folder" };
+            return new { type = "folder" }.AsResponse();
         }
 
-        private object GetMediaFiles()
+        private Response GetMediaFiles()
         {
             var pathQuery = Request.Query.path;
             var path = (string)pathQuery.Value;
 
             if (!_diskProvider.FolderExists(path))
             {
-                return new string[0];
+                return new string[0].AsResponse();
             }
 
-            return _diskScanService.GetAudioFiles(path).Select(f => new
-            {
+            return _diskScanService.GetAudioFiles(path).Select(f => new {
                 Path = f.FullName,
+                RelativePath = path.GetRelativePath(f.FullName),
                 Name = f.Name
-            });
+            }).AsResponse();
         }
     }
 }

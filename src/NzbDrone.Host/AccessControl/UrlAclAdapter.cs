@@ -61,7 +61,7 @@ namespace NzbDrone.Host.AccessControl
 
             if (enableSsl && sslPort == port)
             {
-                throw new GamearrStartupException("Cannot use the same port for HTTP and HTTPS. Port {0}", port);
+                throw new LidarrStartupException("Cannot use the same port for HTTP and HTTPS. Port {0}", port);
             }
 
             if (RegisteredUrls.Empty())

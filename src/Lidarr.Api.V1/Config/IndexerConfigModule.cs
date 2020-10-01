@@ -1,11 +1,12 @@
 using FluentValidation;
-using Lidarr.Http.Validation;
 using NzbDrone.Core.Configuration;
+using Lidarr.Http.Validation;
 
 namespace Lidarr.Api.V1.Config
 {
     public class IndexerConfigModule : LidarrConfigModule<IndexerConfigResource>
     {
+
         public IndexerConfigModule(IConfigService configService)
             : base(configService)
         {

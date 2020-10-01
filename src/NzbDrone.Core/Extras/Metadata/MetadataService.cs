@@ -383,13 +383,13 @@ namespace NzbDrone.Core.Extras.Metadata
 
                 _otherExtraFileRenamer.RenameOtherExtraFile(artist, fullPath);
 
-                var metadata = GetMetadataFile(artist, existingMetadataFiles, c => c.Type == MetadataType.GameImage &&
+                var metadata = GetMetadataFile(artist, existingMetadataFiles, c => c.Type == MetadataType.ArtistImage &&
                                                                               c.RelativePath == image.RelativePath) ??
                                new MetadataFile
                                {
                                    ArtistId = artist.Id,
                                    Consumer = consumer.GetType().Name,
-                                   Type = MetadataType.GameImage,
+                                   Type = MetadataType.ArtistImage,
                                    RelativePath = image.RelativePath,
                                    Extension = Path.GetExtension(fullPath)
                                };

@@ -122,9 +122,9 @@ namespace NzbDrone.Common.Instrumentation
 
         private static void RegisterAppFile(IAppFolderInfo appFolderInfo)
         {
-            RegisterAppFile(appFolderInfo, "appFileInfo", "Gamearr.txt", 5, LogLevel.Info);
-            RegisterAppFile(appFolderInfo, "appFileDebug", "Gamearr.debug.txt", 50, LogLevel.Off);
-            RegisterAppFile(appFolderInfo, "appFileTrace", "Gamearr.trace.txt", 50, LogLevel.Off);
+            RegisterAppFile(appFolderInfo, "appFileInfo", "Lidarr.txt", 5, LogLevel.Info);
+            RegisterAppFile(appFolderInfo, "appFileDebug", "Lidarr.debug.txt", 50, LogLevel.Off);
+            RegisterAppFile(appFolderInfo, "appFileTrace", "Lidarr.trace.txt", 50, LogLevel.Off);
         }
 
         private static void RegisterAppFile(IAppFolderInfo appFolderInfo, string name, string fileName, int maxArchiveFiles, LogLevel minLogLevel)

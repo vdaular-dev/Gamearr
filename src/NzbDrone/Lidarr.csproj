@@ -1,20 +1,16 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFrameworks>net462;netcoreapp3.1</TargetFrameworks>
-    <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
-    <UseWindowsForms>true</UseWindowsForms>
+    <TargetFramework>net462</TargetFramework>
+    <Platforms>x86</Platforms>
+    
     <ApplicationIcon>..\NzbDrone.Host\NzbDrone.ico</ApplicationIcon>
     <ApplicationManifest>app.manifest</ApplicationManifest>
-    <GenerateResourceUsePreserializedResources>true</GenerateResourceUsePreserializedResources>
   </PropertyGroup>
-  <ItemGroup>
-    <PackageReference Include="System.Resources.Extensions" Version="4.7.0" />
-  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\NzbDrone.Host\Lidarr.Host.csproj" />
   </ItemGroup>
-  <ItemGroup Condition="'$(TargetFramework)' == 'net462'">
+  <ItemGroup>
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>

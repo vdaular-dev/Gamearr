@@ -11,7 +11,7 @@ using NzbDrone.Core.Music.Events;
 
 namespace NzbDrone.Core.Music
 {
-    public class MoveGameService : IExecute<MoveGameCommand>, IExecute<BulkMoveGameCommand>
+    public class MoveArtistService : IExecute<MoveArtistCommand>, IExecute<BulkMoveArtistCommand>
     {
         private readonly IArtistService _artistService;
         private readonly IBuildFileNames _filenameBuilder;
@@ -20,7 +20,7 @@ namespace NzbDrone.Core.Music
         private readonly IEventAggregator _eventAggregator;
         private readonly Logger _logger;
 
-        public MoveGameService(IArtistService artistService,
+        public MoveArtistService(IArtistService artistService,
                                  IBuildFileNames filenameBuilder,
                                  IDiskProvider diskProvider,
                                  IDiskTransferService diskTransferService,
@@ -76,13 +76,13 @@ namespace NzbDrone.Core.Music
             _artistService.UpdateArtist(artist);
         }
 
-        public void Execute(MoveGameCommand message)
+        public void Execute(MoveArtistCommand message)
         {
             var artist = _artistService.GetArtist(message.ArtistId);
             MoveSingleArtist(artist, message.SourcePath, message.DestinationPath);
         }
 
-        public void Execute(BulkMoveGameCommand message)
+        public void Execute(BulkMoveArtistCommand message)
         {
             var artistToMove = message.Artist;
             var destinationRootFolder = message.DestinationRootFolder;

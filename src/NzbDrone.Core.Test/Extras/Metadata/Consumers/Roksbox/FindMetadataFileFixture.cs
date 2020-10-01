@@ -72,7 +72,7 @@ namespace NzbDrone.Core.Test.Extras.Metadata.Consumers.Roksbox
         {
             var path = Path.Combine(_artist.Path, new DirectoryInfo(_artist.Path).Name + ".jpg");
 
-            Subject.FindMetadataFile(_artist, path).Type.Should().Be(MetadataType.GameImage);
+            Subject.FindMetadataFile(_artist, path).Type.Should().Be(MetadataType.ArtistImage);
         }
     }
 }

@@ -18,11 +18,12 @@ namespace Lidarr.Http.REST
             rule.DisplayName = new StaticStringSource(fieldName);
 
             AddRule(rule);
-            return new RuleBuilder<TResource, TProperty>(rule, this);
+            return new RuleBuilder<TResource, TProperty>(rule);
         }
 
         private static object GetValue(object container, Func<TResource, IEnumerable<Field>> fieldListAccessor, string fieldName)
         {
+
             var resource = fieldListAccessor((TResource)container).SingleOrDefault(c => c.Name == fieldName);
 
             if (resource == null)

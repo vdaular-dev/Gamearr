@@ -1,6 +1,6 @@
 using FluentAssertions;
 using NUnit.Framework;
-using Gamearr.Api.V1.Albums;
+using Lidarr.Api.V1.Albums;
 using NzbDrone.Integration.Test.Client;
 using System;
 using System.Collections.Generic;

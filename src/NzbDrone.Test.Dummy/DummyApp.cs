@@ -5,7 +5,7 @@ namespace NzbDrone.Test.Dummy
 {
     public class DummyApp
     {
-        public const string DUMMY_PROCCESS_NAME = "Gamearr.Test.Dummy";
+        public const string DUMMY_PROCCESS_NAME = "Lidarr.Test.Dummy";
 
         static void Main(string[] args)
         {

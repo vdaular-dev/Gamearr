@@ -1,13 +1,15 @@
 using System.Collections.Generic;
-using Lidarr.Api.V1.Artist;
-using Lidarr.Api.V1.TrackFiles;
-using Lidarr.Http;
+using NzbDrone.Common.Extensions;
 using NzbDrone.Core.Datastore.Events;
 using NzbDrone.Core.DecisionEngine.Specifications;
-using NzbDrone.Core.MediaFiles.Events;
+using NzbDrone.Core.MediaFiles;
 using NzbDrone.Core.Messaging.Events;
 using NzbDrone.Core.Music;
 using NzbDrone.SignalR;
+using Lidarr.Api.V1.TrackFiles;
+using Lidarr.Api.V1.Artist;
+using Lidarr.Http;
+using NzbDrone.Core.MediaFiles.Events;
 
 namespace Lidarr.Api.V1.Tracks
 {
@@ -65,7 +67,6 @@ namespace Lidarr.Api.V1.Tracks
                 {
                     resource.Artist = artist.ToResource();
                 }
-
                 if (includeTrackFile && track.TrackFileId != 0)
                 {
                     resource.TrackFile = track.TrackFile.Value.ToResource(artist, _upgradableSpecification);
@@ -92,7 +93,6 @@ namespace Lidarr.Api.V1.Tracks
                     {
                         resource.Artist = artist.ToResource();
                     }
-
                     if (includeTrackFile && tracks[i].TrackFileId != 0)
                     {
                         resource.TrackFile = tracks[i].TrackFile.Value.ToResource(artist, _upgradableSpecification);
@@ -120,5 +120,6 @@ namespace Lidarr.Api.V1.Tracks
                 BroadcastResourceChange(ModelAction.Updated, MapToResource(track, true, true));
             }
         }
+
     }
 }

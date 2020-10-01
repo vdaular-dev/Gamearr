@@ -128,7 +128,7 @@ class ArtistSearchInput extends Component {
     } = this._autosuggest.state;
 
     if (!suggestions.length || highlightedSectionIndex && (event.key !== 'ArrowDown' || event.key !== 'ArrowUp')) {
-      this.props.onGoToAddNewGame(value);
+      this.props.onGoToAddNewArtist(value);
       this._autosuggest.input.blur();
       this.reset();
 
@@ -167,7 +167,7 @@ class ArtistSearchInput extends Component {
 
   onSuggestionSelected = (event, { suggestion }) => {
     if (suggestion.type === ADD_NEW_TYPE) {
-      this.props.onGoToAddNewGame(this.state.value);
+      this.props.onGoToAddNewArtist(this.state.value);
     } else {
       this.goToArtist(suggestion);
     }
@@ -192,7 +192,7 @@ class ArtistSearchInput extends Component {
     }
 
     suggestionGroups.push({
-      title: 'Add New Game',
+      title: 'Add New Artist',
       suggestions: [
         {
           type: ADD_NEW_TYPE,
@@ -252,7 +252,7 @@ class ArtistSearchInput extends Component {
 ArtistSearchInput.propTypes = {
   artists: PropTypes.arrayOf(PropTypes.object).isRequired,
   onGoToArtist: PropTypes.func.isRequired,
-  onGoToAddNewGame: PropTypes.func.isRequired,
+  onGoToAddNewArtist: PropTypes.func.isRequired,
   bindShortcut: PropTypes.func.isRequired
 };
 

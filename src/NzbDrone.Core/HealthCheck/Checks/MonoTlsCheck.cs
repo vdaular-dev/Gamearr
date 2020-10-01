@@ -35,7 +35,7 @@ namespace NzbDrone.Core.HealthCheck.Checks
                        .WriteSentryDebug("LegacyTlsProvider", monoVersion.ToString())
                        .Write();
 
-                return new HealthCheck(GetType(), HealthCheckResult.Warning, "Gamearr Mono 4.x tls workaround still enabled, consider removing MONO_TLS_PROVIDER=legacy environment option");
+                return new HealthCheck(GetType(), HealthCheckResult.Warning, "Lidarr Mono 4.x tls workaround still enabled, consider removing MONO_TLS_PROVIDER=legacy environment option");
             }
 
             return new HealthCheck(GetType());

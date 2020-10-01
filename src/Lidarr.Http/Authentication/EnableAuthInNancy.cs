@@ -1,17 +1,17 @@
 using System;
 using System.Text;
-using Lidarr.Http.Extensions;
-using Lidarr.Http.Extensions.Pipelines;
 using Nancy;
 using Nancy.Authentication.Basic;
 using Nancy.Authentication.Forms;
 using Nancy.Bootstrapper;
 using Nancy.Cookies;
 using Nancy.Cryptography;
-using NzbDrone.Common.EnvironmentInfo;
 using NzbDrone.Common.Extensions;
 using NzbDrone.Core.Authentication;
 using NzbDrone.Core.Configuration;
+using Lidarr.Http.Extensions;
+using Lidarr.Http.Extensions.Pipelines;
+using NzbDrone.Common.EnvironmentInfo;
 
 namespace Lidarr.Http.Authentication
 {
@@ -20,7 +20,7 @@ namespace Lidarr.Http.Authentication
         private readonly IAuthenticationService _authenticationService;
         private readonly IConfigService _configService;
         private readonly IConfigFileProvider _configFileProvider;
-        private FormsAuthenticationConfiguration _formsAuthConfig;
+        private FormsAuthenticationConfiguration FormsAuthConfig;
 
         public EnableAuthInNancy(IAuthenticationService authenticationService,
                                  IConfigService configService,
@@ -38,16 +38,17 @@ namespace Lidarr.Http.Authentication
             if (_configFileProvider.AuthenticationMethod == AuthenticationType.Forms)
             {
                 RegisterFormsAuth(pipelines);
-                pipelines.AfterRequest.AddItemToEndOfPipeline(SlidingAuthenticationForFormsAuth);
+                pipelines.AfterRequest.AddItemToEndOfPipeline((Action<NancyContext>)SlidingAuthenticationForFormsAuth);
             }
+
             else if (_configFileProvider.AuthenticationMethod == AuthenticationType.Basic)
             {
                 pipelines.EnableBasicAuthentication(new BasicAuthenticationConfiguration(_authenticationService, BuildInfo.AppName));
                 pipelines.BeforeRequest.AddItemToStartOfPipeline(CaptureContext);
             }
 
-            pipelines.BeforeRequest.AddItemToEndOfPipeline(RequiresAuthentication);
-            pipelines.AfterRequest.AddItemToEndOfPipeline(RemoveLoginHooksForApiCalls);
+            pipelines.BeforeRequest.AddItemToEndOfPipeline((Func<NancyContext, Response>)RequiresAuthentication);
+            pipelines.AfterRequest.AddItemToEndOfPipeline((Action<NancyContext>)RemoveLoginHooksForApiCalls);
         }
 
         private Response CaptureContext(NancyContext context)
@@ -56,6 +57,7 @@ namespace Lidarr.Http.Authentication
 
             return null;
         }
+
 
         private Response RequiresAuthentication(NancyContext context)
         {
@@ -75,10 +77,11 @@ namespace Lidarr.Http.Authentication
             FormsAuthentication.FormsAuthenticationCookieName = "LidarrAuth";
 
             var cryptographyConfiguration = new CryptographyConfiguration(
-                    new AesEncryptionProvider(new PassphraseKeyGenerator(_configService.RijndaelPassphrase, Encoding.ASCII.GetBytes(_configService.RijndaelSalt))),
-                    new DefaultHmacProvider(new PassphraseKeyGenerator(_configService.HmacPassphrase, Encoding.ASCII.GetBytes(_configService.HmacSalt))));
+                    new RijndaelEncryptionProvider(new PassphraseKeyGenerator(_configService.RijndaelPassphrase, Encoding.ASCII.GetBytes(_configService.RijndaelSalt))),
+                    new DefaultHmacProvider(new PassphraseKeyGenerator(_configService.HmacPassphrase, Encoding.ASCII.GetBytes(_configService.HmacSalt)))
+                );
 
-            _formsAuthConfig = new FormsAuthenticationConfiguration
+            FormsAuthConfig = new FormsAuthenticationConfiguration
             {
                 RedirectUrl = _configFileProvider.UrlBase + "/login",
                 UserMapper = _authenticationService,
@@ -86,7 +89,7 @@ namespace Lidarr.Http.Authentication
                 CryptographyConfiguration = cryptographyConfiguration
             };
 
-            FormsAuthentication.Enable(pipelines, _formsAuthConfig);
+            FormsAuthentication.Enable(pipelines, FormsAuthConfig);
         }
 
         private void RemoveLoginHooksForApiCalls(NancyContext context)
@@ -97,7 +100,7 @@ namespace Lidarr.Http.Authentication
                      context.Response.Headers["Location"].StartsWith($"{_configFileProvider.UrlBase}/login", StringComparison.InvariantCultureIgnoreCase)) ||
                     context.Response.StatusCode == HttpStatusCode.Unauthorized)
                 {
-                    context.Response = new { Error = "Unauthorized" }.AsResponse(context, HttpStatusCode.Unauthorized);
+                    context.Response = new { Error = "Unauthorized" }.AsResponse(HttpStatusCode.Unauthorized);
                 }
             }
         }
@@ -116,7 +119,7 @@ namespace Lidarr.Http.Authentication
             {
                 var formsAuthCookieValue = context.Request.Cookies[formsAuthCookieName];
 
-                if (FormsAuthentication.DecryptAndValidateAuthenticationCookie(formsAuthCookieValue, _formsAuthConfig).IsNotNullOrWhiteSpace())
+                if (FormsAuthentication.DecryptAndValidateAuthenticationCookie(formsAuthCookieValue, FormsAuthConfig).IsNotNullOrWhiteSpace())
                 {
                     var formsAuthCookie = new NancyCookie(formsAuthCookieName, formsAuthCookieValue, true, false, DateTime.UtcNow.AddDays(7))
                     {

@@ -16,7 +16,7 @@ namespace NzbDrone.Core.Music
         Artist GetArtist(int artistId);
         Artist GetArtistByMetadataId(int artistMetadataId);
         List<Artist> GetArtists(IEnumerable<int> artistIds);
-        Artist AddGame(Artist newArtist);
+        Artist AddArtist(Artist newArtist);
         List<Artist> AddArtists(List<Artist> newArtists);
         Artist FindById(string foreignArtistId);
         Artist FindByName(string title);
@@ -58,7 +58,7 @@ namespace NzbDrone.Core.Music
             _logger = logger;
         }
 
-        public Artist AddGame(Artist newArtist)
+        public Artist AddArtist(Artist newArtist)
         {
             _cache.Clear();
             _artistRepository.Insert(newArtist);

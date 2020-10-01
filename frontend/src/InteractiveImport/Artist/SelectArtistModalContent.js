@@ -1,13 +1,13 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import TextInput from 'Components/Form/TextInput';
-import Button from 'Components/Link/Button';
-import ModalBody from 'Components/Modal/ModalBody';
-import ModalContent from 'Components/Modal/ModalContent';
-import ModalFooter from 'Components/Modal/ModalFooter';
-import ModalHeader from 'Components/Modal/ModalHeader';
-import Scroller from 'Components/Scroller/Scroller';
 import { scrollDirections } from 'Helpers/Props';
+import Button from 'Components/Link/Button';
+import Scroller from 'Components/Scroller/Scroller';
+import TextInput from 'Components/Form/TextInput';
+import ModalContent from 'Components/Modal/ModalContent';
+import ModalHeader from 'Components/Modal/ModalHeader';
+import ModalBody from 'Components/Modal/ModalBody';
+import ModalFooter from 'Components/Modal/ModalFooter';
 import SelectArtistRow from './SelectArtistRow';
 import styles from './SelectArtistModalContent.css';
 

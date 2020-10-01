@@ -1,16 +1,15 @@
 ﻿using System;
 using System.Linq;
-using System.Net;
-using System.Security.Claims;
-using System.Security.Principal;
-using Lidarr.Http.Extensions;
 using Nancy;
 using Nancy.Authentication.Basic;
 using Nancy.Authentication.Forms;
+using Nancy.Security;
 using NLog;
 using NzbDrone.Common.Extensions;
+using NzbDrone.Common.Instrumentation;
 using NzbDrone.Core.Authentication;
 using NzbDrone.Core.Configuration;
+using Lidarr.Http.Extensions;
 
 namespace Lidarr.Http.Authentication
 {
@@ -26,19 +25,21 @@ namespace Lidarr.Http.Authentication
 
     public class AuthenticationService : IAuthenticationService
     {
-        private const string AnonymousUser = "Anonymous";
         private static readonly Logger _authLogger = LogManager.GetLogger("Auth");
+        private static readonly NzbDroneUser AnonymousUser = new NzbDroneUser { UserName = "Anonymous" };
         private readonly IUserService _userService;
+        private readonly NancyContext _nancyContext;
 
         private static string API_KEY;
         private static AuthenticationType AUTH_METHOD;
 
         [ThreadStatic]
-        private static NancyContext _context;
+        private static NancyContext _context; 
 
-        public AuthenticationService(IConfigFileProvider configFileProvider, IUserService userService)
+        public AuthenticationService(IConfigFileProvider configFileProvider, IUserService userService, NancyContext nancyContext)
         {
             _userService = userService;
+            _nancyContext = nancyContext;
             API_KEY = configFileProvider.ApiKey;
             AUTH_METHOD = configFileProvider.AuthenticationMethod;
         }
@@ -79,15 +80,15 @@ namespace Lidarr.Http.Authentication
 
             if (context.CurrentUser != null)
             {
-                LogLogout(context, context.CurrentUser.Identity.Name);
+                LogLogout(context, context.CurrentUser.UserName);
             }
         }
 
-        public ClaimsPrincipal Validate(string username, string password)
+        public IUserIdentity Validate(string username, string password)
         {
             if (AUTH_METHOD == AuthenticationType.None)
             {
-                return new ClaimsPrincipal(new GenericIdentity(AnonymousUser));
+                return AnonymousUser;
             }
 
             var user = _userService.FindUser(username, password);
@@ -100,7 +101,7 @@ namespace Lidarr.Http.Authentication
                     LogSuccess(_context, username);
                 }
 
-                return new ClaimsPrincipal(new GenericIdentity(user.Username));
+                return new NzbDroneUser { UserName = user.Username };
             }
 
             LogFailure(_context, username);
@@ -108,18 +109,18 @@ namespace Lidarr.Http.Authentication
             return null;
         }
 
-        public ClaimsPrincipal GetUserFromIdentifier(Guid identifier, NancyContext context)
+        public IUserIdentity GetUserFromIdentifier(Guid identifier, NancyContext context)
         {
             if (AUTH_METHOD == AuthenticationType.None)
             {
-                return new ClaimsPrincipal(new GenericIdentity(AnonymousUser));
+                return AnonymousUser;
             }
 
             var user = _userService.FindUser(identifier);
 
             if (user != null)
             {
-                return new ClaimsPrincipal(new GenericIdentity(user.Username));
+                return new NzbDroneUser { UserName = user.Username };
             }
 
             LogInvalidated(_context);
@@ -171,20 +172,14 @@ namespace Lidarr.Http.Authentication
 
         private bool ValidUser(NancyContext context)
         {
-            if (context.CurrentUser != null)
-            {
-                return true;
-            }
+            if (context.CurrentUser != null) return true;
 
             return false;
         }
 
         private bool ValidApiKey(string apiKey)
         {
-            if (API_KEY.Equals(apiKey))
-            {
-                return true;
-            }
+            if (API_KEY.Equals(apiKey)) return true;
 
             return false;
         }
@@ -209,70 +204,27 @@ namespace Lidarr.Http.Authentication
 
         public void LogUnauthorized(NancyContext context)
         {
-            _authLogger.Info("Auth-Unauthorized ip {0} url '{1}'", GetRemoteIP(context), context.Request.Url.ToString());
+            _authLogger.Info("Auth-Unauthorized ip {0} url '{1}'", context.Request.UserHostAddress, context.Request.Url.ToString());
         }
 
         private void LogInvalidated(NancyContext context)
         {
-            _authLogger.Info("Auth-Invalidated ip {0}", GetRemoteIP(context));
+            _authLogger.Info("Auth-Invalidated ip {0}", context.Request.UserHostAddress);
         }
 
         private void LogFailure(NancyContext context, string username)
         {
-            _authLogger.Warn("Auth-Failure ip {0} username '{1}'", GetRemoteIP(context), username);
+            _authLogger.Warn("Auth-Failure ip {0} username '{1}'", context.Request.UserHostAddress, username);
         }
 
         private void LogSuccess(NancyContext context, string username)
         {
-            _authLogger.Info("Auth-Success ip {0} username '{1}'", GetRemoteIP(context), username);
+            _authLogger.Info("Auth-Success ip {0} username '{1}'", context.Request.UserHostAddress, username);
         }
 
         private void LogLogout(NancyContext context, string username)
         {
-            _authLogger.Info("Auth-Logout ip {0} username '{1}'", GetRemoteIP(context), username);
-        }
-
-        private string GetRemoteIP(NancyContext context)
-        {
-            if (context == null || context.Request == null)
-            {
-                return "Unknown";
-            }
-
-            var remoteAddress = context.Request.UserHostAddress;
-            IPAddress remoteIP;
-
-            // Only check if forwarded by a local network reverse proxy
-            if (IPAddress.TryParse(remoteAddress, out remoteIP) && remoteIP.IsLocalAddress())
-            {
-                var realIPHeader = context.Request.Headers["X-Real-IP"];
-                if (realIPHeader.Any())
-                {
-                    return realIPHeader.First().ToString();
-                }
-
-                var forwardedForHeader = context.Request.Headers["X-Forwarded-For"];
-                if (forwardedForHeader.Any())
-                {
-                    // Get the first address that was forwarded by a local IP to prevent remote clients faking another proxy
-                    foreach (var forwardedForAddress in forwardedForHeader.SelectMany(v => v.Split(',')).Select(v => v.Trim()).Reverse())
-                    {
-                        if (!IPAddress.TryParse(forwardedForAddress, out remoteIP))
-                        {
-                            return remoteAddress;
-                        }
-
-                        if (!remoteIP.IsLocalAddress())
-                        {
-                            return forwardedForAddress;
-                        }
-
-                        remoteAddress = forwardedForAddress;
-                    }
-                }
-            }
-
-            return remoteAddress;
+            _authLogger.Info("Auth-Logout ip {0} username '{1}'", context.Request.UserHostAddress, username);
         }
     }
 }

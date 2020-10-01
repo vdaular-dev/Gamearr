@@ -7,6 +7,6 @@ namespace NzbDrone.Core.MetadataSource
 {
     public interface IProvideArtistInfo
     {
-        Artist GetArtistInfo(string gamearrId, int metadataProfileId);
+        Artist GetArtistInfo(string lidarrId, int metadataProfileId);
     }
 }

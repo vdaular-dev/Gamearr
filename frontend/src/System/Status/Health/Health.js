@@ -39,7 +39,7 @@ function getInternalLink(source) {
     case 'RootFolderCheck':
       return (
         <IconButton
-          name={icons.GAME_CONTINUING}
+          name={icons.ARTIST_CONTINUING}
           title="Artist Editor"
           to="/artisteditor"
         />

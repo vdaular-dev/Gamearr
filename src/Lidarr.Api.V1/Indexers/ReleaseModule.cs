@@ -4,57 +4,46 @@ using FluentValidation;
 using Nancy;
 using NLog;
 using NzbDrone.Common.Cache;
-using NzbDrone.Common.Extensions;
 using NzbDrone.Core.DecisionEngine;
 using NzbDrone.Core.Download;
 using NzbDrone.Core.Exceptions;
 using NzbDrone.Core.Indexers;
 using NzbDrone.Core.IndexerSearch;
-using NzbDrone.Core.Music;
-using NzbDrone.Core.Parser;
 using NzbDrone.Core.Parser.Model;
 using NzbDrone.Core.Validation;
+using Lidarr.Http.Extensions;
 using HttpStatusCode = System.Net.HttpStatusCode;
 
 namespace Lidarr.Api.V1.Indexers
 {
     public class ReleaseModule : ReleaseModuleBase
     {
-        private readonly IAlbumService _albumService;
-        private readonly IArtistService _artistService;
         private readonly IFetchAndParseRss _rssFetcherAndParser;
         private readonly ISearchForNzb _nzbSearchService;
         private readonly IMakeDownloadDecision _downloadDecisionMaker;
         private readonly IPrioritizeDownloadDecision _prioritizeDownloadDecision;
-        private readonly IParsingService _parsingService;
         private readonly IDownloadService _downloadService;
         private readonly Logger _logger;
 
         private readonly ICached<RemoteAlbum> _remoteAlbumCache;
 
-        public ReleaseModule(IAlbumService albumService,
-                             IArtistService artistService,
-                             IFetchAndParseRss rssFetcherAndParser,
+        public ReleaseModule(IFetchAndParseRss rssFetcherAndParser,
                              ISearchForNzb nzbSearchService,
                              IMakeDownloadDecision downloadDecisionMaker,
                              IPrioritizeDownloadDecision prioritizeDownloadDecision,
-                             IParsingService parsingService,
                              IDownloadService downloadService,
                              ICacheManager cacheManager,
                              Logger logger)
         {
-            _albumService = albumService;
-            _artistService = artistService;
             _rssFetcherAndParser = rssFetcherAndParser;
             _nzbSearchService = nzbSearchService;
             _downloadDecisionMaker = downloadDecisionMaker;
             _prioritizeDownloadDecision = prioritizeDownloadDecision;
-            _parsingService = parsingService;
             _downloadService = downloadService;
             _logger = logger;
 
             GetResourceAll = GetReleases;
-            Post("/", x => DownloadRelease(ReadResourceFromRequest()));
+            Post["/"] = x => DownloadRelease(ReadResourceFromRequest());
 
             PostValidator.RuleFor(s => s.IndexerId).ValidId();
             PostValidator.RuleFor(s => s.Guid).NotEmpty();
@@ -62,7 +51,7 @@ namespace Lidarr.Api.V1.Indexers
             _remoteAlbumCache = cacheManager.GetCache<RemoteAlbum>(GetType(), "remoteAlbums");
         }
 
-        private object DownloadRelease(ReleaseResource release)
+        private Response DownloadRelease(ReleaseResource release)
         {
             var remoteAlbum = _remoteAlbumCache.Find(GetCacheKey(release));
 
@@ -75,61 +64,15 @@ namespace Lidarr.Api.V1.Indexers
 
             try
             {
-                if (remoteAlbum.Artist == null)
-                {
-                    if (release.AlbumId.HasValue)
-                    {
-                        var album = _albumService.GetAlbum(release.AlbumId.Value);
-
-                        remoteAlbum.Artist = _artistService.GetArtist(album.ArtistId);
-                        remoteAlbum.Albums = new List<Album> { album };
-                    }
-                    else if (release.ArtistId.HasValue)
-                    {
-                        var artist = _artistService.GetArtist(release.ArtistId.Value);
-                        var albums = _parsingService.GetAlbums(remoteAlbum.ParsedAlbumInfo, artist);
-
-                        if (albums.Empty())
-                        {
-                            throw new NzbDroneClientException(HttpStatusCode.NotFound, "Unable to parse albums in the release");
-                        }
-
-                        remoteAlbum.Artist = artist;
-                        remoteAlbum.Albums = albums;
-                    }
-                    else
-                    {
-                        throw new NzbDroneClientException(HttpStatusCode.NotFound, "Unable to find matching artist and albums");
-                    }
-                }
-                else if (remoteAlbum.Albums.Empty())
-                {
-                    var albums = _parsingService.GetAlbums(remoteAlbum.ParsedAlbumInfo, remoteAlbum.Artist);
-
-                    if (albums.Empty() && release.AlbumId.HasValue)
-                    {
-                        var album = _albumService.GetAlbum(release.AlbumId.Value);
-
-                        albums = new List<Album> { album };
-                    }
-
-                    remoteAlbum.Albums = albums;
-                }
-
-                if (remoteAlbum.Albums.Empty())
-                {
-                    throw new NzbDroneClientException(HttpStatusCode.NotFound, "Unable to parse albums in the release");
-                }
-
                 _downloadService.DownloadReport(remoteAlbum);
             }
             catch (ReleaseDownloadException ex)
             {
-                _logger.Error(ex, ex.Message);
+                _logger.Error(ex, "Getting release from indexer failed");
                 throw new NzbDroneClientException(HttpStatusCode.Conflict, "Getting release from indexer failed");
             }
 
-            return release;
+            return release.AsResponse();
         }
 
         private List<ReleaseResource> GetReleases()
@@ -159,8 +102,9 @@ namespace Lidarr.Api.V1.Indexers
             catch (Exception ex)
             {
                 _logger.Error(ex, "Album search failed");
-                throw new NzbDroneClientException(HttpStatusCode.InternalServerError, ex.Message);
             }
+
+            return new List<ReleaseResource>();
         }
 
         private List<ReleaseResource> GetArtistReleases(int artistId)
@@ -175,8 +119,9 @@ namespace Lidarr.Api.V1.Indexers
             catch (Exception ex)
             {
                 _logger.Error(ex, "Artist search failed");
-                throw new NzbDroneClientException(HttpStatusCode.InternalServerError, ex.Message);
             }
+
+            return new List<ReleaseResource>();
         }
 
         private List<ReleaseResource> GetRss()

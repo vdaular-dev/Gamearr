@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { kinds } from 'Helpers/Props';
 import Label from 'Components/Label';
-import GamePoster from 'Game/GamePoster';
+import ArtistPoster from 'Artist/ArtistPoster';
 import styles from './ArtistSearchResult.css';
 
 function ArtistSearchResult(props) {
@@ -21,7 +21,7 @@ function ArtistSearchResult(props) {
 
   return (
     <div className={styles.result}>
-      <GamePoster
+      <ArtistPoster
         className={styles.poster}
         images={images}
         size={250}

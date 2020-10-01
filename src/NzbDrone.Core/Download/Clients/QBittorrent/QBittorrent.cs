@@ -253,7 +253,7 @@ namespace NzbDrone.Core.Download.Clients.QBittorrent
                     return new NzbDroneValidationFailure("MusicCategory", "Category is recommended")
                     {
                         IsWarning = true,
-                        DetailedDescription = "Gamearr will not attempt to import completed downloads without a category."
+                        DetailedDescription = "Lidarr will not attempt to import completed downloads without a category."
                     };
                 }
 
@@ -263,7 +263,7 @@ namespace NzbDrone.Core.Download.Clients.QBittorrent
                 {
                     return new NzbDroneValidationFailure(String.Empty, "qBittorrent is configured to remove torrents when they reach their Share Ratio Limit")
                     {
-                        DetailedDescription = "Gamearr will be unable to perform Completed Download Handling as configured. You can fix this in qBittorrent ('Tools -> Options...' in the menu) by changing 'Options -> BitTorrent -> Share Ratio Limiting' from 'Remove them' to 'Pause them'."
+                        DetailedDescription = "Lidarr will be unable to perform Completed Download Handling as configured. You can fix this in qBittorrent ('Tools -> Options...' in the menu) by changing 'Options -> BitTorrent -> Share Ratio Limiting' from 'Remove them' to 'Pause them'."
                     };
                 }
             }

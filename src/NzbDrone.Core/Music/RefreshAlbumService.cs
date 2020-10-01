@@ -124,7 +124,7 @@ namespace NzbDrone.Core.Music
                     Tags = oldArtist.Tags
                 };
                 _logger.Debug($"Adding missing parent artist {addArtist}");
-                _addArtistService.AddGame(addArtist);
+                _addArtistService.AddArtist(addArtist);
             }
         }
 

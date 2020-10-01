@@ -9,7 +9,7 @@ import PageToolbar from 'Components/Page/Toolbar/PageToolbar';
 import PageToolbarSection from 'Components/Page/Toolbar/PageToolbarSection';
 import PageToolbarButton from 'Components/Page/Toolbar/PageToolbarButton';
 import FilterMenu from 'Components/Menu/FilterMenu';
-import NoGame from 'Game/NoGame';
+import NoArtist from 'Artist/NoArtist';
 import CalendarLinkModal from './iCal/CalendarLinkModal';
 import CalendarOptionsModal from './Options/CalendarOptionsModal';
 import LegendConnector from './Legend/LegendConnector';
@@ -90,7 +90,7 @@ class CalendarPage extends Component {
 
     const isMeasured = this.state.width > 0;
 
-    const PageComponent = hasArtist ? CalendarConnector : NoGame;
+    const PageComponent = hasArtist ? CalendarConnector : NoArtist;
 
     return (
       <PageContent title="Calendar">

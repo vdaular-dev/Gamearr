@@ -1,28 +1,25 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net462;netcoreapp3.1</TargetFrameworks>
+    <TargetFramework>net462</TargetFramework>
+    <Platforms>x86</Platforms>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.6.1" />
-    <PackageReference Include="NUnit" Version="3.12.0" />
-    <PackageReference Include="NUnit3TestAdapter" Version="3.16.1" />
-    <PackageReference Include="NunitXml.TestLogger" Version="2.1.41" />
-    <PackageReference Include="NBuilder" Version="6.1.0" />
-    <PackageReference Include="System.IO.Abstractions.TestingHelpers" Version="7.0.15" />
+    <PackageReference Include="NBuilder" Version="6.0.0" />
+    <PackageReference Include="System.IO.Abstractions.TestingHelpers" Version="4.0.11" />
     <PackageReference Include="AutoFixture" Version="4.11.0" />
-  </ItemGroup>
-  <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp3.1'">
-    <PackageReference Include="coverlet.collector" Version="1.2.1" PrivateAssets="all" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\NzbDrone.Test.Common\Lidarr.Test.Common.csproj" />
     <ProjectReference Include="..\NzbDrone.Core\Lidarr.Core.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\Logo\1024.png">
+    <Content Include="..\..\Logo\1024.png">
       <Link>Files\1024.png</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Reference Include="System.Data.SQLite">
+      <HintPath>..\Libraries\Sqlite\System.Data.SQLite.dll</HintPath>
+    </Reference>
     <None Update="Files\**\*.*">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

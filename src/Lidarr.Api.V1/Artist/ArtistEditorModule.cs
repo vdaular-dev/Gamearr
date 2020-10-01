@@ -1,11 +1,11 @@
 using System.Collections.Generic;
 using System.Linq;
-using Lidarr.Http.Extensions;
 using Nancy;
 using NzbDrone.Common.Extensions;
 using NzbDrone.Core.Messaging.Commands;
 using NzbDrone.Core.Music;
 using NzbDrone.Core.Music.Commands;
+using Lidarr.Http.Extensions;
 
 namespace Lidarr.Api.V1.Artist
 {
@@ -19,11 +19,11 @@ namespace Lidarr.Api.V1.Artist
         {
             _artistService = artistService;
             _commandQueueManager = commandQueueManager;
-            Put("/", artist => SaveAll());
-            Delete("/", artist => DeleteArtist());
+            Put["/"] = artist => SaveAll();
+            Delete["/"] = artist => DeleteArtist();
         }
 
-        private object SaveAll()
+        private Response SaveAll()
         {
             var resource = Request.Body.FromJson<ArtistEditorResource>();
             var artistToUpdate = _artistService.GetArtists(resource.ArtistIds);
@@ -59,6 +59,7 @@ namespace Lidarr.Api.V1.Artist
                         ArtistId = artist.Id,
                         SourcePath = artist.Path
                     });
+
                 }
 
                 if (resource.Tags != null)
@@ -81,31 +82,30 @@ namespace Lidarr.Api.V1.Artist
                 }
             }
 
-            if (artistToMove.Any())
+            if (resource.MoveFiles && artistToMove.Any())
             {
                 _commandQueueManager.Push(new BulkMoveArtistCommand
                 {
                     DestinationRootFolder = resource.RootFolderPath,
-                    Artist = artistToMove,
-                    MoveFiles = resource.MoveFiles
+                    Artist = artistToMove
                 });
             }
 
-            return ResponseWithCode(_artistService.UpdateArtists(artistToUpdate, !resource.MoveFiles)
-                                 .ToResource(),
-                                 HttpStatusCode.Accepted);
+            return _artistService.UpdateArtists(artistToUpdate, !resource.MoveFiles)
+                                 .ToResource()
+                                 .AsResponse(HttpStatusCode.Accepted);
         }
 
-        private object DeleteArtist()
+        private Response DeleteArtist()
         {
             var resource = Request.Body.FromJson<ArtistEditorResource>();
 
             foreach (var artistId in resource.ArtistIds)
             {
-                _artistService.DeleteArtist(artistId, resource.DeleteFiles);
+                _artistService.DeleteArtist(artistId, false);
             }
 
-            return new object();
+            return new object().AsResponse();
         }
     }
 }

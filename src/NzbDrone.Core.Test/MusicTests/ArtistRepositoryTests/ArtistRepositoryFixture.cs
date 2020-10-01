@@ -28,7 +28,7 @@ namespace NzbDrone.Core.Test.MusicTests.ArtistRepositoryTests
             _artistMetadataRepo = Mocker.Resolve<ArtistMetadataRepository>();
         }
 
-        private void AddGame(string name)
+        private void AddArtist(string name)
         {
             var metadata = Builder<ArtistMetadata>.CreateNew()
                 .With(a => a.Id = 0)
@@ -50,8 +50,8 @@ namespace NzbDrone.Core.Test.MusicTests.ArtistRepositoryTests
 
         private void GivenArtists()
         {
-            AddGame("The Black Eyed Peas");
-            AddGame("The Black Keys");
+            AddArtist("The Black Eyed Peas");
+            AddArtist("The Black Keys");
         }
 
         [Test]
@@ -106,8 +106,8 @@ namespace NzbDrone.Core.Test.MusicTests.ArtistRepositoryTests
             GivenArtists();
 
             string name = "Alice Cooper";
-            AddGame(name);
-            AddGame(name);
+            AddArtist(name);
+            AddArtist(name);
 
             _artistRepo.All().Should().HaveCount(4);
             

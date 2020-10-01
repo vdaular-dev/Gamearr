@@ -64,7 +64,7 @@ namespace NzbDrone.Core.Notifications.Email
 
             try
             {
-                SendEmail(settings, "Gamearr - Test Notification", body);
+                SendEmail(settings, "Lidarr - Test Notification", body);
             }
             catch (Exception ex)
             {

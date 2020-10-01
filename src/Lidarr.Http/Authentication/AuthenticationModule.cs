@@ -3,6 +3,11 @@ using Nancy;
 using Nancy.Authentication.Forms;
 using Nancy.Extensions;
 using Nancy.ModelBinding;
+using NzbDrone.Common.EnsureThat;
+using NzbDrone.Common.Extensions;
+using NLog;
+using NzbDrone.Common.Instrumentation;
+using NzbDrone.Core.Authentication;
 using NzbDrone.Core.Configuration;
 
 namespace Lidarr.Http.Authentication
@@ -16,8 +21,8 @@ namespace Lidarr.Http.Authentication
         {
             _authService = authService;
             _configFileProvider = configFileProvider;
-            Post("/login", x => Login(this.Bind<LoginResource>()));
-            Get("/logout", x => Logout());
+            Post["/login"] = x => Login(this.Bind<LoginResource>());
+            Get["/logout"] = x => Logout();
         }
 
         private Response Login(LoginResource resource)
@@ -26,8 +31,7 @@ namespace Lidarr.Http.Authentication
 
             if (user == null)
             {
-                var returnUrl = (string)Request.Query.returnUrl;
-                return Context.GetRedirect($"~/login?returnUrl={returnUrl}&loginFailed=true");
+                return LoginFailed();
             }
 
             DateTime? expiry = null;
@@ -45,6 +49,12 @@ namespace Lidarr.Http.Authentication
             _authService.Logout(Context);
 
             return this.LogoutAndRedirect(_configFileProvider.UrlBase + "/");
+        }
+
+        private Response LoginFailed()
+        {
+            var returnUrl = (string)Request.Query.returnUrl;
+            return Context.GetRedirect($"~/login?returnUrl={returnUrl}&loginFailed=true");
         }
     }
 }

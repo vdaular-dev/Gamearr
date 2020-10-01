@@ -21,7 +21,7 @@ import ModalFooter from 'Components/Modal/ModalFooter';
 import Table from 'Components/Table/Table';
 import TableBody from 'Components/Table/TableBody';
 import SelectQualityModal from 'InteractiveImport/Quality/SelectQualityModal';
-import SelectGameModal from 'InteractiveImport/Game/SelectGameModal';
+import SelectArtistModal from 'InteractiveImport/Artist/SelectArtistModal';
 import SelectAlbumModal from 'InteractiveImport/Album/SelectAlbumModal';
 import SelectAlbumReleaseModal from 'InteractiveImport/AlbumRelease/SelectAlbumReleaseModal';
 import ConfirmImportModal from 'InteractiveImport/Confirmation/ConfirmImportModal';
@@ -490,7 +490,7 @@ class InteractiveImportModalContent extends Component {
           </div>
         </ModalFooter>
 
-        <SelectGameModal
+        <SelectArtistModal
           isOpen={selectModalOpen === ARTIST}
           ids={selectedIds}
           onModalClose={this.onSelectModalClose}

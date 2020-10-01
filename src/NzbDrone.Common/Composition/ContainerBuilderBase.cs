@@ -18,8 +18,8 @@ namespace NzbDrone.Common.Composition
         {
             _loadedTypes = new List<Type>();
 
-            assemblies.Add(OsInfo.IsWindows ? "Gamearr.Windows" : "Gamearr.Mono");
-            assemblies.Add("Gamearr.Common");
+            assemblies.Add(OsInfo.IsWindows ? "Lidarr.Windows" : "Lidarr.Mono");
+            assemblies.Add("Lidarr.Common");
 
             foreach (var assembly in assemblies)
             {

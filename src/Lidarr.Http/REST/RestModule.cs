@@ -2,11 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using FluentValidation;
-using Lidarr.Http.Extensions;
 using Nancy;
-using Nancy.Responses.Negotiation;
-using Newtonsoft.Json;
 using NzbDrone.Core.Datastore;
+using Lidarr.Http.Extensions;
+using Newtonsoft.Json;
 
 namespace Lidarr.Http.REST
 {
@@ -16,7 +15,7 @@ namespace Lidarr.Http.REST
         private const string ROOT_ROUTE = "/";
         private const string ID_ROUTE = @"/(?<id>[\d]{1,10})";
 
-        private readonly HashSet<string> _excludedKeys = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase)
+        private HashSet<string> EXCLUDED_KEYS = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase)
         {
             "page",
             "pageSize",
@@ -56,12 +55,10 @@ namespace Lidarr.Http.REST
             SharedValidator = new ResourceValidator<TResource>();
         }
 
+
         private void ValidateModule()
         {
-            if (GetResourceById != null)
-            {
-                return;
-            }
+            if (GetResourceById != null) return;
 
             if (CreateResource != null || UpdateResource != null)
             {
@@ -71,35 +68,27 @@ namespace Lidarr.Http.REST
 
         protected Action<int> DeleteResource
         {
-            private get
-            {
-                return _deleteResource;
-            }
-
+            private get { return _deleteResource; }
             set
             {
                 _deleteResource = value;
-                Delete(ID_ROUTE, options =>
+                Delete[ID_ROUTE] = options =>
                 {
                     ValidateId(options.Id);
                     DeleteResource((int)options.Id);
 
-                    return new object();
-                });
+                    return new object().AsResponse();
+                };
             }
         }
 
         protected Func<int, TResource> GetResourceById
         {
-            get
-            {
-                return _getResourceById;
-            }
-
+            get { return _getResourceById; }
             set
             {
                 _getResourceById = value;
-                Get(ID_ROUTE, options =>
+                Get[ID_ROUTE] = options =>
                     {
                         ValidateId(options.Id);
                         try
@@ -111,117 +100,97 @@ namespace Lidarr.Http.REST
                                 return new NotFoundResponse();
                             }
 
-                            return resource;
+                            return resource.AsResponse();
                         }
                         catch (ModelNotFoundException)
                         {
                             return new NotFoundResponse();
                         }
-                    });
+                    };
             }
         }
 
         protected Func<List<TResource>> GetResourceAll
         {
-            private get
-            {
-                return _getResourceAll;
-            }
-
+            private get { return _getResourceAll; }
             set
             {
                 _getResourceAll = value;
-                Get(ROOT_ROUTE, options =>
+
+                Get[ROOT_ROUTE] = options =>
                 {
                     var resource = GetResourceAll();
-                    return resource;
-                });
+                    return resource.AsResponse();
+                };
             }
         }
 
         protected Func<PagingResource<TResource>, PagingResource<TResource>> GetResourcePaged
         {
-            private get
-            {
-                return _getResourcePaged;
-            }
-
+            private get { return _getResourcePaged; }
             set
             {
                 _getResourcePaged = value;
-                Get(ROOT_ROUTE, options =>
+
+                Get[ROOT_ROUTE] = options =>
                 {
                     var resource = GetResourcePaged(ReadPagingResourceFromRequest());
-                    return resource;
-                });
+                    return resource.AsResponse();
+                };
             }
         }
 
         protected Func<TResource> GetResourceSingle
         {
-            private get
-            {
-                return _getResourceSingle;
-            }
-
+            private get { return _getResourceSingle; }
             set
             {
                 _getResourceSingle = value;
-                Get(ROOT_ROUTE, options =>
+
+                Get[ROOT_ROUTE] = options =>
                 {
                     var resource = GetResourceSingle();
-                    return resource;
-                });
+                    return resource.AsResponse();
+                };
             }
         }
 
         protected Func<TResource, int> CreateResource
         {
-            private get
-            {
-                return _createResource;
-            }
-
+            private get { return _createResource; }
             set
             {
                 _createResource = value;
-                Post(ROOT_ROUTE, options =>
+                Post[ROOT_ROUTE] = options =>
                 {
                     var id = CreateResource(ReadResourceFromRequest());
-                    return ResponseWithCode(GetResourceById(id), HttpStatusCode.Created);
-                });
+                    return GetResourceById(id).AsResponse(HttpStatusCode.Created);
+                };
+
             }
         }
 
         protected Action<TResource> UpdateResource
         {
-            private get
-            {
-                return _updateResource;
-            }
-
+            private get { return _updateResource; }
             set
             {
                 _updateResource = value;
-                Put(ROOT_ROUTE, options =>
+                Put[ROOT_ROUTE] = options =>
                     {
                         var resource = ReadResourceFromRequest();
                         UpdateResource(resource);
-                        return ResponseWithCode(GetResourceById(resource.Id), HttpStatusCode.Accepted);
-                    });
-                Put(ID_ROUTE, options =>
+                        return GetResourceById(resource.Id).AsResponse(HttpStatusCode.Accepted);
+                    };
+
+                Put[ID_ROUTE] = options =>
                     {
                         var resource = ReadResourceFromRequest();
                         resource.Id = options.Id;
                         UpdateResource(resource);
-                        return ResponseWithCode(GetResourceById(resource.Id), HttpStatusCode.Accepted);
-                    });
+                        return GetResourceById(resource.Id).AsResponse(HttpStatusCode.Accepted);
+                    };
             }
-        }
-
-        protected Negotiator ResponseWithCode(object model, HttpStatusCode statusCode)
-        {
-            return Negotiate.WithModel(model).WithStatusCode(statusCode);
         }
 
         protected TResource ReadResourceFromRequest(bool skipValidate = false)
@@ -265,17 +234,12 @@ namespace Lidarr.Http.REST
         {
             int pageSize;
             int.TryParse(Request.Query.PageSize.ToString(), out pageSize);
-            if (pageSize == 0)
-            {
-                pageSize = 10;
-            }
+            if (pageSize == 0) pageSize = 10;
 
             int page;
             int.TryParse(Request.Query.Page.ToString(), out page);
-            if (page == 0)
-            {
-                page = 1;
-            }
+            if (page == 0) page = 1;
+
 
             var pagingResource = new PagingResource<TResource>
             {
@@ -324,9 +288,10 @@ namespace Lidarr.Http.REST
             }
 
             // v3 uses filters in key=value format
+
             foreach (var key in Request.Query)
             {
-                if (_excludedKeys.Contains(key))
+                if (EXCLUDED_KEYS.Contains(key))
                 {
                     continue;
                 }

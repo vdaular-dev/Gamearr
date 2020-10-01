@@ -1,6 +1,6 @@
 using System.Linq;
-using Lidarr.Http;
 using NzbDrone.Core.Instrumentation;
+using Lidarr.Http;
 
 namespace Lidarr.Api.V1.Logs
 {

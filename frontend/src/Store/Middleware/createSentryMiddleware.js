@@ -66,7 +66,7 @@ export default function createSentryMiddleware() {
     release,
     userHash,
     isProduction
-  } = window.Gamearr;
+  } = window.Lidarr;
 
   if (!analytics) {
     return;

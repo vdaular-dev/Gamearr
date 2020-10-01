@@ -7,6 +7,7 @@ import { createThunk, handleThunks } from 'Store/thunks';
 import createSetTableOptionReducer from './Creators/Reducers/createSetTableOptionReducer';
 import createSetClientSideCollectionSortReducer from './Creators/Reducers/createSetClientSideCollectionSortReducer';
 import createClearReducer from './Creators/Reducers/createClearReducer';
+import albumEntities from 'Album/albumEntities';
 import createFetchHandler from './Creators/createFetchHandler';
 import createHandleActions from './Creators/createHandleActions';
 import createRemoveItemHandler from './Creators/createRemoveItemHandler';

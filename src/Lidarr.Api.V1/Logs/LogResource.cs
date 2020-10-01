@@ -1,6 +1,6 @@
 using System;
-using Lidarr.Http.REST;
 using NzbDrone.Core.Instrumentation;
+using Lidarr.Http.REST;
 
 namespace Lidarr.Api.V1.Logs
 {
@@ -19,10 +19,7 @@ namespace Lidarr.Api.V1.Logs
     {
         public static LogResource ToResource(this Log model)
         {
-            if (model == null)
-            {
-                return null;
-            }
+            if (model == null) return null;
 
             return new LogResource
             {

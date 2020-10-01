@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using Gamearr.Api.V1.Tracks;
+using Lidarr.Api.V1.Tracks;
 using RestSharp;
 
 namespace NzbDrone.Integration.Test.Client

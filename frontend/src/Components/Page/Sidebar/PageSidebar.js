@@ -19,7 +19,7 @@ const SIDEBAR_WIDTH = parseInt(dimensions.sidebarWidth);
 
 const links = [
   {
-    iconName: icons.GAME_CONTINUING,
+    iconName: icons.ARTIST_CONTINUING,
     title: 'Library',
     to: '/',
     alias: '/artist',
@@ -35,6 +35,10 @@ const links = [
       {
         title: 'Mass Editor',
         to: '/artisteditor'
+      },
+      {
+        title: 'Album Studio',
+        to: '/albumstudio'
       },
       {
         title: 'Unmapped Files',
@@ -96,6 +100,14 @@ const links = [
         to: '/settings/mediamanagement'
       },
       {
+        title: 'Profiles',
+        to: '/settings/profiles'
+      },
+      {
+        title: 'Quality',
+        to: '/settings/quality'
+      },
+      {
         title: 'Indexers',
         to: '/settings/indexers'
       },
@@ -110,6 +122,14 @@ const links = [
       {
         title: 'Connect',
         to: '/settings/connect'
+      },
+      {
+        title: 'Metadata',
+        to: '/settings/metadata'
+      },
+      {
+        title: 'Tags',
+        to: '/settings/tags'
       },
       {
         title: 'General',
@@ -414,7 +434,7 @@ class PageSidebar extends Component {
       transform
     } = this.state;
 
-    const urlBase = window.Gamearr.urlBase;
+    const urlBase = window.Lidarr.urlBase;
     const pathname = urlBase ? location.pathname.substr(urlBase.length) || '/' : location.pathname;
     const activeParent = getActiveParent(pathname);
 

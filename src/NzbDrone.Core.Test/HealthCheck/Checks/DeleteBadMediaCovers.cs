@@ -104,7 +104,7 @@ namespace NzbDrone.Core.Test.HealthCheck.Checks
             var imagePath = "C:\\Music\\Album\\image.jpg".AsOsAgnostic();
             _metadata.First().LastUpdated = new DateTime(2014, 12, 29);
             _metadata.First().RelativePath = "Album\\image.jpg".AsOsAgnostic();
-            _metadata.First().Type = MetadataType.GameImage;
+            _metadata.First().Type = MetadataType.ArtistImage;
 
             Mocker.GetMock<IDiskProvider>()
                 .Setup(c => c.OpenReadStream(imagePath))

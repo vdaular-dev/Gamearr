@@ -1,10 +1,11 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using Lidarr.Api.V1.Artist;
-using Lidarr.Api.V1.TrackFiles;
-using Lidarr.Http.REST;
 using Newtonsoft.Json;
 using NzbDrone.Core.Music;
+using Lidarr.Api.V1.TrackFiles;
+using Lidarr.Api.V1.Artist;
+using Lidarr.Http.REST;
 
 namespace Lidarr.Api.V1.Tracks
 {
@@ -34,10 +35,7 @@ namespace Lidarr.Api.V1.Tracks
     {
         public static TrackResource ToResource(this Track model)
         {
-            if (model == null)
-            {
-                return null;
-            }
+            if (model == null) return null;
 
             return new TrackResource
             {
@@ -59,10 +57,7 @@ namespace Lidarr.Api.V1.Tracks
 
         public static List<TrackResource> ToResource(this IEnumerable<Track> models)
         {
-            if (models == null)
-            {
-                return null;
-            }
+            if (models == null) return null;
 
             return models.Select(ToResource).ToList();
         }

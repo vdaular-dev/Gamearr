@@ -4,12 +4,14 @@ import { Route, Redirect } from 'react-router-dom';
 import getPathWithUrlBase from 'Utilities/getPathWithUrlBase';
 import NotFound from 'Components/NotFound';
 import Switch from 'Components/Router/Switch';
-import GameIndexConnector from 'Game/Index/GameIndexConnector';
-import AddNewGameConnector from 'AddGame/AddNewGame/AddNewGameConnector';
-import ImportGame from 'AddGame/ImportGame/ImportGame';
-import GameEditorConnector from 'Game/Editor/GameEditorConnector';
+import ArtistIndexConnector from 'Artist/Index/ArtistIndexConnector';
+import AddNewArtistConnector from 'AddArtist/AddNewArtist/AddNewArtistConnector';
+import ImportArtist from 'AddArtist/ImportArtist/ImportArtist';
+import ArtistEditorConnector from 'Artist/Editor/ArtistEditorConnector';
+import AlbumStudioConnector from 'AlbumStudio/AlbumStudioConnector';
 import UnmappedFilesTableConnector from 'UnmappedFiles/UnmappedFilesTableConnector';
-import GameDetailsPageConnector from 'Game/Details/GameDetailsPageConnector';
+import ArtistDetailsPageConnector from 'Artist/Details/ArtistDetailsPageConnector';
+import AlbumDetailsPageConnector from 'Album/Details/AlbumDetailsPageConnector';
 import CalendarPageConnector from 'Calendar/CalendarPageConnector';
 import HistoryConnector from 'Activity/History/HistoryConnector';
 import QueueConnector from 'Activity/Queue/QueueConnector';
@@ -49,11 +51,11 @@ function AppRoutes(props) {
       <Route
         exact={true}
         path="/"
-        component={GameIndexConnector}
+        component={ArtistIndexConnector}
       />
 
       {
-        window.Gamearr.urlBase &&
+        window.Lidarr.urlBase &&
           <Route
             exact={true}
             path="/"
@@ -71,22 +73,37 @@ function AppRoutes(props) {
 
       <Route
         path="/add/new"
-        component={AddNewGameConnector}
+        component={AddNewArtistConnector}
       />
 
       <Route
         path="/add/import"
-        component={ImportGame}
+        component={ImportArtist}
       />
 
       <Route
         path="/artisteditor"
-        component={GameEditorConnector}
+        component={ArtistEditorConnector}
+      />
+
+      <Route
+        path="/albumstudio"
+        component={AlbumStudioConnector}
       />
 
       <Route
         path="/unmapped"
         component={UnmappedFilesTableConnector}
+      />
+
+      <Route
+        path="/artist/:foreignArtistId"
+        component={ArtistDetailsPageConnector}
+      />
+
+      <Route
+        path="/album/:foreignAlbumId"
+        component={AlbumDetailsPageConnector}
       />
 
       {/*

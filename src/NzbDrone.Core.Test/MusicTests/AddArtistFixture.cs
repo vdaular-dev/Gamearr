@@ -31,10 +31,10 @@ namespace NzbDrone.Core.Test.MusicTests
             _fakeArtist.Albums = new List<Album>();
         }
 
-        private void GivenValidArtist(string gamearrId)
+        private void GivenValidArtist(string lidarrId)
         {
             Mocker.GetMock<IProvideArtistInfo>()
-                .Setup(s => s.GetArtistInfo(gamearrId, It.IsAny<int>()))
+                .Setup(s => s.GetArtistInfo(lidarrId, It.IsAny<int>()))
                 .Returns(_fakeArtist);
         }
 
@@ -61,7 +61,7 @@ namespace NzbDrone.Core.Test.MusicTests
             GivenValidArtist(newArtist.ForeignArtistId);
             GivenValidPath();
 
-            var artist = Subject.AddGame(newArtist);
+            var artist = Subject.AddArtist(newArtist);
 
             artist.Name.Should().Be(_fakeArtist.Name);
         }
@@ -78,7 +78,7 @@ namespace NzbDrone.Core.Test.MusicTests
             GivenValidArtist(newArtist.ForeignArtistId);
             GivenValidPath();
 
-            var artist = Subject.AddGame(newArtist);
+            var artist = Subject.AddArtist(newArtist);
 
             artist.Path.Should().Be(Path.Combine(newArtist.RootFolderPath, _fakeArtist.Name));
         }
@@ -101,7 +101,7 @@ namespace NzbDrone.Core.Test.MusicTests
                                                     new ValidationFailure("Path", "Test validation failure")
                                                 }));
 
-            Assert.Throws<ValidationException>(() => Subject.AddGame(newArtist));
+            Assert.Throws<ValidationException>(() => Subject.AddArtist(newArtist));
         }
 
         [Test]
@@ -124,7 +124,7 @@ namespace NzbDrone.Core.Test.MusicTests
                                                     new ValidationFailure("Path", "Test validation failure")
                                                 }));
 
-            Assert.Throws<ValidationException>(() => Subject.AddGame(newArtist));
+            Assert.Throws<ValidationException>(() => Subject.AddArtist(newArtist));
 
             ExceptionVerification.ExpectedErrors(1);
         }

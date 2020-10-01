@@ -1,6 +1,7 @@
-using Lidarr.Http.Frontend;
+using System;
 using Nancy;
 using Nancy.Bootstrapper;
+using Lidarr.Http.Frontend;
 
 namespace Lidarr.Http.Extensions.Pipelines
 {
@@ -17,7 +18,7 @@ namespace Lidarr.Http.Extensions.Pipelines
 
         public void Register(IPipelines pipelines)
         {
-            pipelines.BeforeRequest.AddItemToStartOfPipeline(Handle);
+            pipelines.BeforeRequest.AddItemToStartOfPipeline((Func<NancyContext, Response>) Handle);
         }
 
         private Response Handle(NancyContext context)

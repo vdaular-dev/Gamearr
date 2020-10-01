@@ -2,10 +2,13 @@ using System.Collections.Generic;
 using System.Linq;
 using FluentValidation;
 using FluentValidation.Results;
-using Lidarr.Http;
 using Nancy.ModelBinding;
+using Nancy.Responses;
 using NzbDrone.Common.Extensions;
 using NzbDrone.Core.Organizer;
+using Lidarr.Http;
+using Lidarr.Http.Extensions;
+using Lidarr.Http.Mapping;
 
 namespace Lidarr.Api.V1.Config
 {
@@ -30,7 +33,8 @@ namespace Lidarr.Api.V1.Config
             GetResourceById = GetNamingConfig;
             UpdateResource = UpdateNamingConfig;
 
-            Get("/examples", x => GetExamples(this.Bind<NamingConfigResource>()));
+            Get["/examples"] = x => GetExamples(this.Bind<NamingConfigResource>());
+
 
             SharedValidator.RuleFor(c => c.StandardTrackFormat).ValidTrackFormat();
             SharedValidator.RuleFor(c => c.MultiDiscTrackFormat).ValidTrackFormat();
@@ -71,7 +75,7 @@ namespace Lidarr.Api.V1.Config
             return GetNamingConfig();
         }
 
-        private object GetExamples(NamingConfigResource config)
+        private JsonResponse<NamingExampleResource> GetExamples(NamingConfigResource config)
         {
             if (config.Id == 0)
             {
@@ -80,7 +84,7 @@ namespace Lidarr.Api.V1.Config
 
             var nameSpec = config.ToModel();
             var sampleResource = new NamingExampleResource();
-
+            
             var singleTrackSampleResult = _filenameSampleService.GetStandardTrackSample(nameSpec);
             var multiDiscTrackSampleResult = _filenameSampleService.GetMultiDiscTrackSample(nameSpec);
 
@@ -100,7 +104,7 @@ namespace Lidarr.Api.V1.Config
                 ? null
                 : _filenameSampleService.GetAlbumFolderSample(nameSpec);
 
-            return sampleResource;
+            return sampleResource.AsResponse();
         }
 
         private void ValidateFormatResult(NamingConfig nameSpec)

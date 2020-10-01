@@ -1,7 +1,7 @@
 using System.Linq;
-using Lidarr.Http.Extensions;
 using Nancy;
 using NzbDrone.Core.Music;
+using Lidarr.Http.Extensions;
 
 namespace Lidarr.Api.V1.AlbumStudio
 {
@@ -15,10 +15,10 @@ namespace Lidarr.Api.V1.AlbumStudio
         {
             _artistService = artistService;
             _albumMonitoredService = albumMonitoredService;
-            Post("/", artist => UpdateAll());
+            Post["/"] = artist => UpdateAll();
         }
 
-        private object UpdateAll()
+        private Response UpdateAll()
         {
             //Read from request
             var request = Request.Body.FromJson<AlbumStudioResource>();
@@ -41,7 +41,7 @@ namespace Lidarr.Api.V1.AlbumStudio
                 _albumMonitoredService.SetAlbumMonitoredStatus(artist, request.MonitoringOptions);
             }
 
-            return ResponseWithCode("ok", HttpStatusCode.Accepted);
+            return "ok".AsResponse(HttpStatusCode.Accepted);
         }
     }
 }

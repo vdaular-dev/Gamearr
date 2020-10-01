@@ -150,7 +150,7 @@ namespace NzbDrone.Core.Notifications.Slack
         {
             try
             {
-                var message = $"Test message from Gamearr posted at {DateTime.Now}";
+                var message = $"Test message from Lidarr posted at {DateTime.Now}";
                 var payload = CreatePayload(message);
 
                 _proxy.SendPayload(payload, Settings);
@@ -166,7 +166,7 @@ namespace NzbDrone.Core.Notifications.Slack
 
         private SlackPayload CreatePayload(string message, List<Attachment> attachments = null)
         {
-            var icon = GetIcon();
+            var icon = Settings.Icon;
             var channel = Settings.Channel;
 
             var payload = new SlackPayload
@@ -195,11 +195,6 @@ namespace NzbDrone.Core.Notifications.Slack
             }
 
             return payload;
-        }
-
-        private string GetIcon()
-        {
-            return Settings.Icon;
         }
     }
 }

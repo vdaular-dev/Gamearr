@@ -11,8 +11,10 @@ import TableSelectCell from 'Components/Table/Cells/TableSelectCell';
 import Icon from 'Components/Icon';
 import Popover from 'Components/Tooltip/Popover';
 import ProtocolLabel from 'Activity/Queue/ProtocolLabel';
+import AlbumTitleLink from 'Album/AlbumTitleLink';
+import TrackQuality from 'Album/TrackQuality';
 import InteractiveImportModal from 'InteractiveImport/InteractiveImportModal';
-import GameNameLink from 'Game/GameNameLink';
+import ArtistNameLink from 'Artist/ArtistNameLink';
 import QueueStatusCell from './QueueStatusCell';
 import TimeleftCell from './TimeleftCell';
 import RemoveQueueItemModal from './RemoveQueueItemModal';
@@ -138,12 +140,55 @@ class QueueRow extends Component {
                 <TableRowCell key={name}>
                   {
                     artist ?
-                      <GameNameLink
+                      <ArtistNameLink
                         foreignArtistId={artist.foreignArtistId}
                         artistName={artist.artistName}
                       /> :
                       title
                   }
+                </TableRowCell>
+              );
+            }
+
+            if (name === 'album.title') {
+              return (
+                <TableRowCell key={name}>
+                  {
+                    album ?
+                      <AlbumTitleLink
+                        foreignAlbumId={album.foreignAlbumId}
+                        title={album.title}
+                        disambiguation={album.disambiguation}
+                      /> :
+                      '-'
+                  }
+                </TableRowCell>
+              );
+            }
+
+            if (name === 'album.releaseDate') {
+              if (album) {
+                return (
+                  <RelativeDateCellConnector
+                    key={name}
+                    date={album.releaseDate}
+                  />
+                );
+              }
+
+              return (
+                <TableRowCell key={name}>
+                  -
+                </TableRowCell>
+              );
+            }
+
+            if (name === 'quality') {
+              return (
+                <TableRowCell key={name}>
+                  <TrackQuality
+                    quality={quality}
+                  />
                 </TableRowCell>
               );
             }

@@ -8,7 +8,7 @@ import AppRoutes from './AppRoutes';
 
 function App({ store, history }) {
   return (
-    <DocumentTitle title="Gamearr">
+    <DocumentTitle title="Lidarr">
       <Provider store={store}>
         <ConnectedRouter history={history}>
           <PageConnector>

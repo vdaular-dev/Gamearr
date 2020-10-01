@@ -10,7 +10,8 @@ import TableRowCellButton from 'Components/Table/Cells/TableRowCellButton';
 import TableSelectCell from 'Components/Table/Cells/TableSelectCell';
 import Popover from 'Components/Tooltip/Popover';
 import Tooltip from 'Components/Tooltip/Tooltip';
-import SelectGameModal from 'InteractiveImport/Game/SelectGameModal';
+import TrackQuality from 'Album/TrackQuality';
+import SelectArtistModal from 'InteractiveImport/Artist/SelectArtistModal';
 import SelectAlbumModal from 'InteractiveImport/Album/SelectAlbumModal';
 import SelectTrackModal from 'InteractiveImport/Track/SelectTrackModal';
 import SelectQualityModal from 'InteractiveImport/Quality/SelectQualityModal';
@@ -27,7 +28,7 @@ class InteractiveImportRow extends Component {
     super(props, context);
 
     this.state = {
-      isSelectGameModalOpen: false,
+      isSelectArtistModalOpen: false,
       isSelectAlbumModalOpen: false,
       isSelectTrackModalOpen: false,
       isSelectQualityModalOpen: false
@@ -105,8 +106,8 @@ class InteractiveImportRow extends Component {
   //
   // Listeners
 
-  onSelectGamePress = () => {
-    this.setState({ isSelectGameModalOpen: true });
+  onSelectArtistPress = () => {
+    this.setState({ isSelectArtistModalOpen: true });
   }
 
   onSelectAlbumPress = () => {
@@ -121,8 +122,8 @@ class InteractiveImportRow extends Component {
     this.setState({ isSelectQualityModalOpen: true });
   }
 
-  onSelectGameModalClose = (changed) => {
-    this.setState({ isSelectGameModalOpen: false });
+  onSelectArtistModalClose = (changed) => {
+    this.setState({ isSelectArtistModalOpen: false });
     this.selectRowAfterChange(changed);
   }
 
@@ -164,7 +165,7 @@ class InteractiveImportRow extends Component {
     } = this.props;
 
     const {
-      isSelectGameModalOpen,
+      isSelectArtistModalOpen,
       isSelectAlbumModalOpen,
       isSelectTrackModalOpen,
       isSelectQualityModalOpen
@@ -221,7 +222,7 @@ class InteractiveImportRow extends Component {
         <TableRowCellButton
           isDisabled={!allowArtistChange}
           title={allowArtistChange ? 'Click to change artist' : undefined}
-          onPress={this.onSelectGamePress}
+          onPress={this.onSelectArtistPress}
         >
           {
             showArtistPlaceholder ? <InteractiveImportRowCellPlaceholder /> : artistName
@@ -304,10 +305,10 @@ class InteractiveImportRow extends Component {
           }
         </TableRowCell>
 
-        <SelectGameModal
-          isOpen={isSelectGameModalOpen}
+        <SelectArtistModal
+          isOpen={isSelectArtistModalOpen}
           ids={[id]}
-          onModalClose={this.onSelectGameModalClose}
+          onModalClose={this.onSelectArtistModalClose}
         />
 
         <SelectAlbumModal

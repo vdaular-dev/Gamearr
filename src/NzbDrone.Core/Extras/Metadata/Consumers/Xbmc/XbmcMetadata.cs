@@ -63,7 +63,7 @@ namespace NzbDrone.Core.Extras.Metadata.Consumers.Xbmc
 
             if (ArtistImagesRegex.IsMatch(filename))
             {
-                metadata.Type = MetadataType.GameImage;
+                metadata.Type = MetadataType.ArtistImage;
                 return metadata;
             }
 

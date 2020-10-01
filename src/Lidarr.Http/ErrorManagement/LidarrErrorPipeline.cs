@@ -1,12 +1,11 @@
-﻿using System;
+using System;
 using System.Data.SQLite;
 using FluentValidation;
-using Lidarr.Http.Exceptions;
-using Lidarr.Http.Extensions;
 using Nancy;
 using NLog;
-using NzbDrone.Core.Datastore;
 using NzbDrone.Core.Exceptions;
+using Lidarr.Http.Exceptions;
+using Lidarr.Http.Extensions;
 using HttpStatusCode = Nancy.HttpStatusCode;
 
 namespace Lidarr.Http.ErrorManagement
@@ -24,57 +23,45 @@ namespace Lidarr.Http.ErrorManagement
         {
             _logger.Trace("Handling Exception");
 
-            if (exception is ApiException apiException)
+            var apiException = exception as ApiException;
+
+            if (apiException != null)
             {
                 _logger.Warn(apiException, "API Error");
-                return apiException.ToErrorResponse(context);
+                return apiException.ToErrorResponse();
             }
 
-            if (exception is ValidationException validationException)
+            var validationException = exception as ValidationException;
+
+            if (validationException != null)
             {
                 _logger.Warn("Invalid request {0}", validationException.Message);
 
-                return validationException.Errors.AsResponse(context, HttpStatusCode.BadRequest);
+                return validationException.Errors.AsResponse(HttpStatusCode.BadRequest);
             }
 
-            if (exception is NzbDroneClientException clientException)
+            var clientException = exception as NzbDroneClientException;
+
+            if (clientException != null)
             {
                 return new ErrorModel
                 {
                     Message = exception.Message,
                     Description = exception.ToString()
-                }.AsResponse(context, (HttpStatusCode)clientException.StatusCode);
+                }.AsResponse((HttpStatusCode)clientException.StatusCode);
             }
 
-            if (exception is ModelNotFoundException notFoundException)
-            {
-                return new ErrorModel
-                {
-                    Message = exception.Message,
-                    Description = exception.ToString()
-                }.AsResponse(context, HttpStatusCode.NotFound);
-            }
+            var sqLiteException = exception as SQLiteException;
 
-            if (exception is ModelConflictException conflictException)
-            {
-                return new ErrorModel
-                {
-                    Message = exception.Message,
-                    Description = exception.ToString()
-                }.AsResponse(context, HttpStatusCode.Conflict);
-            }
-
-            if (exception is SQLiteException sqLiteException)
+            if (sqLiteException != null)
             {
                 if (context.Request.Method == "PUT" || context.Request.Method == "POST")
                 {
                     if (sqLiteException.Message.Contains("constraint failed"))
-                    {
                         return new ErrorModel
                         {
                             Message = exception.Message,
-                        }.AsResponse(context, HttpStatusCode.Conflict);
-                    }
+                        }.AsResponse(HttpStatusCode.Conflict);
                 }
 
                 _logger.Error(sqLiteException, "[{0} {1}]", context.Request.Method, context.Request.Path);
@@ -86,7 +73,7 @@ namespace Lidarr.Http.ErrorManagement
             {
                 Message = exception.Message,
                 Description = exception.ToString()
-            }.AsResponse(context, HttpStatusCode.InternalServerError);
+            }.AsResponse(HttpStatusCode.InternalServerError);
         }
     }
 }

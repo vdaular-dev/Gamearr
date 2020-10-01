@@ -29,6 +29,7 @@ namespace Lidarr.Api.V1.Profiles.Metadata
         }
     }
 
+
     public class PrimaryTypeValidator<T> : PropertyValidator
     {
         public PrimaryTypeValidator()

@@ -56,7 +56,7 @@ namespace NzbDrone.Core.Parser
 
             _customerRequestBuilder = new HttpRequestBuilder(_acoustIdUrl).CreateFactory();
 
-            // An exception here will cause Gamearr to fail to start, so catch any errors
+            // An exception here will cause Lidarr to fail to start, so catch any errors
             try
             {
                 _fpcalcPath = GetFpcalcPath();

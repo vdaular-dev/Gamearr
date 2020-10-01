@@ -168,14 +168,14 @@ namespace NzbDrone.Common.Test.Http
             }
 
             var request = new HttpRequestBuilder($"https://{_httpBinHost}/redirect-to")
-                .AddQueryParam("url", $"https://gamearr.game/")
+                .AddQueryParam("url", $"https://lidarr.audio/")
                 .Build();
             request.AllowAutoRedirect = true;
 
             var response = Subject.Get(request);
 
             response.StatusCode.Should().Be(HttpStatusCode.OK);
-            response.Content.Should().Contain("Gamearr");
+            response.Content.Should().Contain("Lidarr");
 
             ExceptionVerification.ExpectedErrors(0);
         }
@@ -202,7 +202,7 @@ namespace NzbDrone.Common.Test.Http
 
             var userAgent = response.Resource.Headers["User-Agent"].ToString();
 
-            userAgent.Should().Contain("Gamearr");
+            userAgent.Should().Contain("Lidarr");
         }
 
         [TestCase("Accept", "text/xml, text/rss+xml, application/rss+xml")]
@@ -221,7 +221,7 @@ namespace NzbDrone.Common.Test.Http
         {
             var file = GetTempFilePath();
 
-            Assert.Throws<WebException>(() => Subject.DownloadFile("https://download.gamearr.game/wrongpath", file));
+            Assert.Throws<WebException>(() => Subject.DownloadFile("https://download.lidarr.audio/wrongpath", file));
 
             File.Exists(file).Should().BeFalse();
 

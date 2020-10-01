@@ -1,8 +1,8 @@
 using System;
-using Lidarr.Http.ErrorManagement;
-using Lidarr.Http.Extensions;
 using Nancy;
 using Nancy.Responses;
+using Lidarr.Http.ErrorManagement;
+using Lidarr.Http.Extensions;
 
 namespace Lidarr.Http.Exceptions
 {
@@ -19,9 +19,9 @@ namespace Lidarr.Http.Exceptions
             Content = content;
         }
 
-        public JsonResponse<ErrorModel> ToErrorResponse(NancyContext context)
+        public JsonResponse<ErrorModel> ToErrorResponse()
         {
-            return new ErrorModel(this).AsResponse(context, StatusCode);
+            return new ErrorModel(this).AsResponse(StatusCode);
         }
 
         private static string GetMessage(HttpStatusCode statusCode, object content)

@@ -5,7 +5,9 @@ import IconButton from 'Components/Link/IconButton';
 import RelativeDateCellConnector from 'Components/Table/Cells/RelativeDateCellConnector';
 import TableRow from 'Components/Table/TableRow';
 import TableRowCell from 'Components/Table/Cells/TableRowCell';
-import GameNameLink from 'Game/GameNameLink';
+import AlbumTitleLink from 'Album/AlbumTitleLink';
+import TrackQuality from 'Album/TrackQuality';
+import ArtistNameLink from 'Artist/ArtistNameLink';
 import HistoryEventTypeCell from './HistoryEventTypeCell';
 import HistoryDetailsModal from './Details/HistoryDetailsModal';
 import styles from './HistoryRow.css';
@@ -95,9 +97,40 @@ class HistoryRow extends Component {
             if (name === 'artist.sortName') {
               return (
                 <TableRowCell key={name}>
-                  <GameNameLink
+                  <ArtistNameLink
                     foreignArtistId={artist.foreignArtistId}
                     artistName={artist.artistName}
+                  />
+                </TableRowCell>
+              );
+            }
+
+            if (name === 'album.title') {
+              return (
+                <TableRowCell key={name}>
+                  <AlbumTitleLink
+                    foreignAlbumId={album.foreignAlbumId}
+                    title={album.title}
+                    disambiguation={album.disambiguation}
+                  />
+                </TableRowCell>
+              );
+            }
+
+            if (name === 'trackTitle') {
+              return (
+                <TableRowCell key={name}>
+                  {track.title}
+                </TableRowCell>
+              );
+            }
+
+            if (name === 'quality') {
+              return (
+                <TableRowCell key={name}>
+                  <TrackQuality
+                    quality={quality}
+                    isCutoffMet={qualityCutoffNotMet}
                   />
                 </TableRowCell>
               );

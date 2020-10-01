@@ -1,7 +1,7 @@
 using NLog;
 using NzbDrone.Core.Indexers.Newznab;
 using NzbDrone.Test.Common;
-using Gamearr.Http.ClientSchema;
+using Lidarr.Http.ClientSchema;
 
 namespace NzbDrone.Integration.Test
 {
@@ -11,7 +11,7 @@ namespace NzbDrone.Integration.Test
 
         public override string ArtistRootFolder => GetTempDirectory("ArtistRootFolder");
 
-        protected override string RootUrl => "http://localhost:8383/";
+        protected override string RootUrl => "http://localhost:8686/";
 
         protected override string ApiKey => _runner.ApiKey;
 
@@ -25,7 +25,7 @@ namespace NzbDrone.Integration.Test
 
         protected override void InitializeTestTarget()
         {
-            Indexers.Post(new Gamearr.Api.V1.Indexers.IndexerResource
+            Indexers.Post(new Lidarr.Api.V1.Indexers.IndexerResource
             {
                 EnableRss = false,
                 EnableInteractiveSearch = false,

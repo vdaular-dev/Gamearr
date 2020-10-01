@@ -18,10 +18,7 @@ namespace Lidarr.Api.V1.Tracks
     {
         public static RenameTrackResource ToResource(this NzbDrone.Core.MediaFiles.RenameTrackFilePreview model)
         {
-            if (model == null)
-            {
-                return null;
-            }
+            if (model == null) return null;
 
             return new RenameTrackResource
             {

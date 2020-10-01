@@ -21,7 +21,7 @@ namespace NzbDrone.Automation.Test
         {
             page.LibraryNavIcon.Click();
             page.WaitForNoSpinner();
-            page.Find(By.CssSelector("div[class*='GameIndex']")).Should().NotBeNull();
+            page.Find(By.CssSelector("div[class*='ArtistIndex']")).Should().NotBeNull();
         }
 
         [Test]
@@ -73,7 +73,7 @@ namespace NzbDrone.Automation.Test
 
             page.WaitForNoSpinner();
 
-            page.Find(By.CssSelector("input[class*='AddNewGame-searchInput']")).Should().NotBeNull();
+            page.Find(By.CssSelector("input[class*='AddNewArtist-searchInput']")).Should().NotBeNull();
         }
     }
 }

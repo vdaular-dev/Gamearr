@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import { createSelector } from 'reselect';
+import albumEntities from 'Album/albumEntities';
 
 function createAlbumSelector() {
   return createSelector(

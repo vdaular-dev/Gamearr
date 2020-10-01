@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks>net462;netcoreapp3.1</TargetFrameworks>
+    <TargetFramework>net462</TargetFramework>
+    <Platforms>x86</Platforms>
   </PropertyGroup>
 </Project>

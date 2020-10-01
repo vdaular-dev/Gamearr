@@ -35,8 +35,8 @@ namespace NzbDrone.Core.Organizer
             {
                 Metadata = new ArtistMetadata
                 {
-                    Name = "The Game Name",
-                    Disambiguation = "Final Fantasy XV"
+                    Name = "The Artist Name",
+                    Disambiguation = "US Rock Band"
                     
                 }
             };

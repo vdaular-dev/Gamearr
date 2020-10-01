@@ -17,7 +17,7 @@ namespace NzbDrone.Update
         {
             var assemblies = new List<string>
                              {
-                                 "Gamearr.Update"
+                                 "Lidarr.Update"
                              };
 
             return new UpdateContainerBuilder(startupContext, assemblies).Container;

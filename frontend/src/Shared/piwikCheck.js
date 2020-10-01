@@ -1,4 +1,4 @@
-if (window.Gamearr.analytics) {
+if (window.Lidarr.analytics) {
   const d = document;
   const g = d.createElement('script');
   const s = d.getElementsByTagName('script')[0];

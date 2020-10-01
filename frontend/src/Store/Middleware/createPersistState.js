@@ -88,7 +88,7 @@ const config = {
   slicer,
   serialize,
   merge,
-  key: 'gamearr'
+  key: 'lidarr'
 };
 
 export default function createPersistState() {

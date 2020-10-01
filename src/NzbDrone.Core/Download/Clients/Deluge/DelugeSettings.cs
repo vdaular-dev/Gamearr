@@ -25,7 +25,7 @@ namespace NzbDrone.Core.Download.Clients.Deluge
             Host = "localhost";
             Port = 8112;
             Password = "deluge";
-            MusicCategory = "gamearr";
+            MusicCategory = "lidarr";
         }
 
         [FieldDefinition(0, Label = "Host", Type = FieldType.Textbox)]
@@ -40,7 +40,7 @@ namespace NzbDrone.Core.Download.Clients.Deluge
         [FieldDefinition(3, Label = "Password", Type = FieldType.Password)]
         public string Password { get; set; }
 
-        [FieldDefinition(4, Label = "Category", Type = FieldType.Textbox, HelpText = "Adding a category specific to Gamearr avoids conflicts with unrelated downloads, but it's optional")]
+        [FieldDefinition(4, Label = "Category", Type = FieldType.Textbox, HelpText = "Adding a category specific to Lidarr avoids conflicts with unrelated downloads, but it's optional")]
         public string MusicCategory { get; set; }
 
         [FieldDefinition(5, Label = "Recent Priority", Type = FieldType.Select, SelectOptions = typeof(DelugePriority), HelpText = "Priority to use when grabbing albums released within the last 14 days")]

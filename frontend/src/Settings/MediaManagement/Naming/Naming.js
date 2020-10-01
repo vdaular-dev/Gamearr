@@ -133,7 +133,7 @@ class Naming extends Component {
     }
 
     return (
-      <FieldSet legend="Game Naming">
+      <FieldSet legend="Track Naming">
         {
           isFetching &&
             <LoadingIndicator />
@@ -148,12 +148,12 @@ class Naming extends Component {
           hasSettings && !isFetching && !error &&
             <Form>
               <FormGroup size={sizes.MEDIUM}>
-                <FormLabel>Rename Games</FormLabel>
+                <FormLabel>Rename Tracks</FormLabel>
 
                 <FormInputGroup
                   type={inputTypes.CHECK}
                   name="renameTracks"
-                  helpText="Gamearr will use the existing file name if renaming is disabled"
+                  helpText="Lidarr will use the existing file name if renaming is disabled"
                   onChange={onInputChange}
                   {...settings.renameTracks}
                 />
@@ -211,7 +211,7 @@ class Naming extends Component {
                 advancedSettings={advancedSettings}
                 isAdvanced={true}
               >
-                <FormLabel>Game Folder Format</FormLabel>
+                <FormLabel>Artist Folder Format</FormLabel>
 
                 <FormInputGroup
                   inputClassName={styles.namingInput}
@@ -220,8 +220,23 @@ class Naming extends Component {
                   buttons={<FormInputButton onPress={this.onArtistFolderNamingModalOpenClick}>?</FormInputButton>}
                   onChange={onInputChange}
                   {...settings.artistFolderFormat}
-                  helpTexts={['Used when adding a new game or moving an game via the game editor', ...artistFolderFormatHelpTexts]}
+                  helpTexts={['Used when adding a new artist or moving an artist via the artist editor', ...artistFolderFormatHelpTexts]}
                   errors={[...artistFolderFormatErrors, ...settings.artistFolderFormat.errors]}
+                />
+              </FormGroup>
+
+              <FormGroup>
+                <FormLabel>Album Folder Format</FormLabel>
+
+                <FormInputGroup
+                  inputClassName={styles.namingInput}
+                  type={inputTypes.TEXT}
+                  name="albumFolderFormat"
+                  buttons={<FormInputButton onPress={this.onAlbumFolderNamingModalOpenClick}>?</FormInputButton>}
+                  onChange={onInputChange}
+                  {...settings.albumFolderFormat}
+                  helpTexts={albumFolderFormatHelpTexts}
+                  errors={[...albumFolderFormatErrors, ...settings.albumFolderFormat.errors]}
                 />
               </FormGroup>
 

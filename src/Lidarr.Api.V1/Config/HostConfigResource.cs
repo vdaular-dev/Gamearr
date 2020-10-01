@@ -1,9 +1,8 @@
-using Lidarr.Http.REST;
 using NzbDrone.Common.Http.Proxy;
 using NzbDrone.Core.Authentication;
 using NzbDrone.Core.Configuration;
-using NzbDrone.Core.Security;
 using NzbDrone.Core.Update;
+using Lidarr.Http.REST;
 
 namespace Lidarr.Api.V1.Config
 {
@@ -22,8 +21,7 @@ namespace Lidarr.Api.V1.Config
         public string ConsoleLogLevel { get; set; }
         public string Branch { get; set; }
         public string ApiKey { get; set; }
-        public string SslCertPath { get; set; }
-        public string SslCertPassword { get; set; }
+        public string SslCertHash { get; set; }
         public string UrlBase { get; set; }
         public bool UpdateAutomatically { get; set; }
         public UpdateMechanism UpdateMechanism { get; set; }
@@ -36,7 +34,6 @@ namespace Lidarr.Api.V1.Config
         public string ProxyPassword { get; set; }
         public string ProxyBypassFilter { get; set; }
         public bool ProxyBypassLocalAddresses { get; set; }
-        public CertificateValidationType CertificateValidation { get; set; }
         public string BackupFolder { get; set; }
         public int BackupInterval { get; set; }
         public int BackupRetention { get; set; }
@@ -56,15 +53,13 @@ namespace Lidarr.Api.V1.Config
                 LaunchBrowser = model.LaunchBrowser,
                 AuthenticationMethod = model.AuthenticationMethod,
                 AnalyticsEnabled = model.AnalyticsEnabled,
-
                 //Username
                 //Password
                 LogLevel = model.LogLevel,
                 ConsoleLogLevel = model.ConsoleLogLevel,
                 Branch = model.Branch,
                 ApiKey = model.ApiKey,
-                SslCertPath = model.SslCertPath,
-                SslCertPassword = model.SslCertPassword,
+                SslCertHash = model.SslCertHash,
                 UrlBase = model.UrlBase,
                 UpdateAutomatically = model.UpdateAutomatically,
                 UpdateMechanism = model.UpdateMechanism,
@@ -77,7 +72,6 @@ namespace Lidarr.Api.V1.Config
                 ProxyPassword = configService.ProxyPassword,
                 ProxyBypassFilter = configService.ProxyBypassFilter,
                 ProxyBypassLocalAddresses = configService.ProxyBypassLocalAddresses,
-                CertificateValidation = configService.CertificateValidation,
                 BackupFolder = configService.BackupFolder,
                 BackupInterval = configService.BackupInterval,
                 BackupRetention = configService.BackupRetention

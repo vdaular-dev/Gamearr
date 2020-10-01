@@ -102,7 +102,7 @@ namespace NzbDrone.Core.Test.MediaFiles.TrackImport.Identification
 
         private Artist GivenArtist(string foreignArtistId, int metadataProfileId)
         {
-            var artist = _addArtistService.AddGame(new Artist {
+            var artist = _addArtistService.AddArtist(new Artist {
                     Metadata = new ArtistMetadata {
                         ForeignArtistId = foreignArtistId
                     },

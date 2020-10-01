@@ -2,17 +2,19 @@ using System.Collections.Generic;
 using System.Linq;
 using FluentValidation;
 using FluentValidation.Results;
+using Nancy;
 using NLog;
-using NzbDrone.Common.Extensions;
-using NzbDrone.Core.Datastore;
 using NzbDrone.Core.DecisionEngine;
 using NzbDrone.Core.Download;
-using NzbDrone.Core.Indexers;
 using NzbDrone.Core.Parser.Model;
+using Lidarr.Http.Extensions;
+using NzbDrone.Common.Extensions;
+using NzbDrone.Core.Datastore;
+using NzbDrone.Core.Indexers;
 
 namespace Lidarr.Api.V1.Indexers
 {
-    internal class ReleasePushModule : ReleaseModuleBase
+    class ReleasePushModule : ReleaseModuleBase
     {
         private readonly IMakeDownloadDecision _downloadDecisionMaker;
         private readonly IProcessDownloadDecisions _downloadDecisionProcessor;
@@ -29,7 +31,7 @@ namespace Lidarr.Api.V1.Indexers
             _indexerFactory = indexerFactory;
             _logger = logger;
 
-            Post("/push", x => ProcessRelease(ReadResourceFromRequest()));
+            Post["/push"] = x => ProcessRelease(ReadResourceFromRequest());
 
             PostValidator.RuleFor(s => s.Title).NotEmpty();
             PostValidator.RuleFor(s => s.DownloadUrl).NotEmpty();
@@ -37,7 +39,7 @@ namespace Lidarr.Api.V1.Indexers
             PostValidator.RuleFor(s => s.PublishDate).NotEmpty();
         }
 
-        private object ProcessRelease(ReleaseResource release)
+        private Response ProcessRelease(ReleaseResource release)
         {
             _logger.Info("Release pushed: {0} - {1}", release.Title, release.DownloadUrl);
 
@@ -57,7 +59,7 @@ namespace Lidarr.Api.V1.Indexers
                 throw new ValidationException(new List<ValidationFailure> { new ValidationFailure("Title", "Unable to parse", release.Title) });
             }
 
-            return MapDecisions(new[] { firstDecision }).First();
+            return MapDecisions(new[] { firstDecision }).First().AsResponse();
         }
 
         private void ResolveIndexer(ReleaseInfo release)
@@ -85,7 +87,7 @@ namespace Lidarr.Api.V1.Indexers
                 }
                 catch (ModelNotFoundException)
                 {
-                    _logger.Debug("Push Release {0} not associated with unknown indexer {1}.", release.Title, release.IndexerId);
+                    _logger.Debug("Push Release {0} not associated with unknown indexer {0}.", release.Title, release.IndexerId);
                     release.IndexerId = 0;
                 }
             }

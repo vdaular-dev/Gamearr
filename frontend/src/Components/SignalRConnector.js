@@ -96,9 +96,9 @@ class SignalRConnector extends Component {
   componentDidMount() {
     console.log('Starting signalR');
 
-    const url = `${window.Gamearr.urlBase}/signalr`;
+    const url = `${window.Lidarr.urlBase}/signalr`;
 
-    this.signalRconnection = $.connection(url, { apiKey: window.Gamearr.apiKey });
+    this.signalRconnection = $.connection(url, { apiKey: window.Lidarr.apiKey });
 
     this.signalRconnection.stateChanged(this.onStateChanged);
     this.signalRconnection.received(this.onReceived);
@@ -335,7 +335,7 @@ class SignalRConnector extends Component {
   }
 
   onReconnecting = () => {
-    if (window.Gamearr.unloading) {
+    if (window.Lidarr.unloading) {
       return;
     }
 
@@ -349,7 +349,7 @@ class SignalRConnector extends Component {
   }
 
   onDisconnected = () => {
-    if (window.Gamearr.unloading) {
+    if (window.Lidarr.unloading) {
       return;
     }
 

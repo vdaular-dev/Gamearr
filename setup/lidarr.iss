@@ -26,7 +26,7 @@ DefaultDirName={commonappdata}\Lidarr\bin
 DisableDirPage=yes
 DefaultGroupName={#AppName}
 DisableProgramGroupPage=yes
-OutputBaseFilename=Lidarr.{#BranchName}.{#BuildVersion}.windows.{#Framework}
+OutputBaseFilename=Lidarr.{#BranchName}.{#BuildVersion}.windows
 SolidCompression=yes
 AppCopyright=Creative Commons 3.0 License
 AllowUNCPath=False
@@ -36,20 +36,19 @@ CompressionThreads=2
 Compression=lzma2/normal
 AppContact={#ForumsURL}
 VersionInfoVersion={#BaseVersion}.{#BuildNumber}
-SetupLogging=yes
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"
-Name: "windowsService"; Description: "Install Windows Service (Starts when the computer starts)"; GroupDescription: "Start automatically"; Flags: exclusive unchecked
-Name: "startupShortcut"; Description: "Create shortcut in Startup folder (Starts when you log into Windows)"; GroupDescription: "Start automatically"; Flags: exclusive
+Name: "windowsService"; Description: "Install Windows Service (Starts when the computer starts)"; GroupDescription: "Start automatically"; Flags: exclusive
+Name: "startupShortcut"; Description: "Create shortcut in Startup folder (Starts when you log into Windows)"; GroupDescription: "Start automatically"; Flags: exclusive unchecked
 Name: "none"; Description: "Do not start automatically"; GroupDescription: "Start automatically"; Flags: exclusive unchecked
 
 [Files]
-Source: "..\_artifacts\windows\{#Framework}\Lidarr\Lidarr.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\_artifacts\windows\{#Framework}\Lidarr\*"; Excludes: "Lidarr.Update"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\_output\Lidarr.exe"; DestDir: "{app}"; Flags: ignoreversion  
+Source: "..\_output\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]

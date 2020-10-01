@@ -1,8 +1,8 @@
 using System.Collections.Generic;
-using Lidarr.Http.ClientSchema;
-using Lidarr.Http.REST;
 using NzbDrone.Common.Reflection;
 using NzbDrone.Core.ThingiProvider;
+using Lidarr.Http.ClientSchema;
+using Lidarr.Http.REST;
 
 namespace Lidarr.Api.V1
 {
@@ -25,6 +25,7 @@ namespace Lidarr.Api.V1
         where TProviderDefinition : ProviderDefinition, new()
     {
         public virtual TProviderResource ToResource(TProviderDefinition definition)
+            
         {
             return new TProviderResource
             {
@@ -46,10 +47,7 @@ namespace Lidarr.Api.V1
 
         public virtual TProviderDefinition ToModel(TProviderResource resource)
         {
-            if (resource == null)
-            {
-                return default(TProviderDefinition);
-            }
+            if (resource == null) return default(TProviderDefinition);
 
             var definition = new TProviderDefinition
             {

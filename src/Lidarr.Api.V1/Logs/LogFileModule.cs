@@ -38,5 +38,6 @@ namespace Lidarr.Api.V1.Logs
                 return "logfile";
             }
         }
+
     }
 }

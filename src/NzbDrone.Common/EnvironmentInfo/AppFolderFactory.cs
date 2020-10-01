@@ -39,7 +39,7 @@ namespace NzbDrone.Common.EnvironmentInfo
             }
             catch (UnauthorizedAccessException)
             {
-                throw new GamearrStartupException("Cannot create AppFolder, Access to the path {0} is denied", _appFolderInfo.AppDataFolder);
+                throw new LidarrStartupException("Cannot create AppFolder, Access to the path {0} is denied", _appFolderInfo.AppDataFolder);
             }
             
 
@@ -50,7 +50,7 @@ namespace NzbDrone.Common.EnvironmentInfo
 
             if (!_diskProvider.FolderWritable(_appFolderInfo.AppDataFolder))
             {
-                throw new GamearrStartupException("AppFolder {0} is not writable", _appFolderInfo.AppDataFolder);
+                throw new LidarrStartupException("AppFolder {0} is not writable", _appFolderInfo.AppDataFolder);
             }
 
             InitializeMonoApplicationData();

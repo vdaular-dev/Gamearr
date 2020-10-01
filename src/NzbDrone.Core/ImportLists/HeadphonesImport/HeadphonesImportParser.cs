@@ -23,7 +23,7 @@ namespace NzbDrone.Core.ImportLists.HeadphonesImport
                 return items;
             }
 
-            var jsonResponse = JsonConvert.DeserializeObject<List<HeadphonesImportGame>>(_importListResponse.Content);
+            var jsonResponse = JsonConvert.DeserializeObject<List<HeadphonesImportArtist>>(_importListResponse.Content);
 
             // no albums were return
             if (jsonResponse == null)

@@ -1,6 +1,10 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import GameNameLink from 'Game/GameNameLink';
+import albumEntities from 'Album/albumEntities';
+import AlbumTitleLink from 'Album/AlbumTitleLink';
+import EpisodeStatusConnector from 'Album/EpisodeStatusConnector';
+import AlbumSearchCellConnector from 'Album/AlbumSearchCellConnector';
+import ArtistNameLink from 'Artist/ArtistNameLink';
 import RelativeDateCellConnector from 'Components/Table/Cells/RelativeDateCellConnector';
 import TableRow from 'Components/Table/TableRow';
 import TableRowCell from 'Components/Table/Cells/TableRowCell';
@@ -48,10 +52,30 @@ function CutoffUnmetRow(props) {
           if (name === 'artist.sortName') {
             return (
               <TableRowCell key={name}>
-                <GameNameLink
+                <ArtistNameLink
                   foreignArtistId={artist.foreignArtistId}
                   artistName={artist.artistName}
                 />
+              </TableRowCell>
+            );
+          }
+
+          if (name === 'albumTitle') {
+            return (
+              <TableRowCell key={name}>
+                <AlbumTitleLink
+                  foreignAlbumId={foreignAlbumId}
+                  title={title}
+                  disambiguation={disambiguation}
+                />
+              </TableRowCell>
+            );
+          }
+
+          if (name === 'albumType') {
+            return (
+              <TableRowCell key={name}>
+                {albumType}
               </TableRowCell>
             );
           }

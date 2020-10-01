@@ -46,7 +46,7 @@ namespace NzbDrone.Core.Notifications.Telegram
             try
             {
                 const string title = "Test Notification";
-                const string body = "This is a test message from Gamearr";
+                const string body = "This is a test message from Lidarr";
 
                 SendNotification(title, body, settings);
             }

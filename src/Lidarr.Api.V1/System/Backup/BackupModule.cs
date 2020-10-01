@@ -1,13 +1,15 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Lidarr.Http;
-using Lidarr.Http.REST;
+using Nancy;
 using NzbDrone.Common.Crypto;
 using NzbDrone.Common.Disk;
 using NzbDrone.Common.EnvironmentInfo;
 using NzbDrone.Common.Extensions;
 using NzbDrone.Core.Backup;
+using Lidarr.Http;
+using Lidarr.Http.Extensions;
+using Lidarr.Http.REST;
 
 namespace Lidarr.Api.V1.System.Backup
 {
@@ -30,8 +32,8 @@ namespace Lidarr.Api.V1.System.Backup
             GetResourceAll = GetBackupFiles;
             DeleteResource = DeleteBackup;
 
-            Post(@"/restore/(?<id>[\d]{1,10})", x => Restore((int)x.Id));
-            Post("/restore/upload", x => UploadAndRestore());
+            Post[@"/restore/(?<id>[\d]{1,10})"] = x => Restore((int)x.Id);
+            Post["/restore/upload"] = x => UploadAndRestore();
         }
 
         public List<BackupResource> GetBackupFiles()
@@ -63,7 +65,7 @@ namespace Lidarr.Api.V1.System.Backup
             _diskProvider.DeleteFile(path);
         }
 
-        public object Restore(int id)
+        public Response Restore(int id)
         {
             var backup = GetBackup(id);
 
@@ -79,10 +81,10 @@ namespace Lidarr.Api.V1.System.Backup
             return new
             {
                 RestartRequired = true
-            };
+            }.AsResponse();
         }
 
-        public object UploadAndRestore()
+        public Response UploadAndRestore()
         {
             var files = Context.Request.Files.ToList();
 
@@ -110,12 +112,13 @@ namespace Lidarr.Api.V1.System.Backup
             return new
             {
                 RestartRequired = true
-            };
+            }.AsResponse();
         }
 
         private string GetBackupPath(NzbDrone.Core.Backup.Backup backup)
         {
             return Path.Combine(_backupService.GetBackupFolder(backup.Type), backup.Name);
+
         }
 
         private int GetBackupId(NzbDrone.Core.Backup.Backup backup)

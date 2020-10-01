@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
-using Lidarr.Http.REST;
 using NzbDrone.Core.ImportLists.Exclusions;
+using Lidarr.Http.REST;
 
 namespace Lidarr.Api.V1.ImportLists
 {
@@ -15,10 +15,7 @@ namespace Lidarr.Api.V1.ImportLists
     {
         public static ImportListExclusionResource ToResource(this ImportListExclusion model)
         {
-            if (model == null)
-            {
-                return null;
-            }
+            if (model == null) return null;
 
             return new ImportListExclusionResource
             {
@@ -30,10 +27,7 @@ namespace Lidarr.Api.V1.ImportLists
 
         public static ImportListExclusion ToModel(this ImportListExclusionResource resource)
         {
-            if (resource == null)
-            {
-                return null;
-            }
+            if (resource == null) return null;
 
             return new ImportListExclusion
             {

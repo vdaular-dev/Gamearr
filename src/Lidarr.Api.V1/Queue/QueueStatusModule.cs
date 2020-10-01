@@ -1,13 +1,14 @@
 using System;
 using System.Linq;
-using Lidarr.Http;
+using Nancy.Responses;
 using NzbDrone.Common.TPL;
 using NzbDrone.Core.Datastore.Events;
 using NzbDrone.Core.Download.Pending;
-using NzbDrone.Core.Download.TrackedDownloads;
 using NzbDrone.Core.Messaging.Events;
 using NzbDrone.Core.Queue;
 using NzbDrone.SignalR;
+using Lidarr.Http;
+using Lidarr.Http.Extensions;
 
 namespace Lidarr.Api.V1.Queue
 {
@@ -18,6 +19,7 @@ namespace Lidarr.Api.V1.Queue
         private readonly IPendingReleaseService _pendingReleaseService;
         private readonly Debouncer _broadcastDebounce;
 
+
         public QueueStatusModule(IBroadcastSignalRMessage broadcastSignalRMessage, IQueueService queueService, IPendingReleaseService pendingReleaseService)
             : base(broadcastSignalRMessage, "queue/status")
         {
@@ -26,12 +28,13 @@ namespace Lidarr.Api.V1.Queue
 
             _broadcastDebounce = new Debouncer(BroadcastChange, TimeSpan.FromSeconds(5));
 
-            Get("/", x => GetQueueStatusResponse());
+
+            Get["/"] = x => GetQueueStatusResponse();
         }
 
-        private object GetQueueStatusResponse()
+        private JsonResponse<QueueStatusResource> GetQueueStatusResponse()
         {
-            return GetQueueStatus();
+            return GetQueueStatus().AsResponse();
         }
 
         private QueueStatusResource GetQueueStatus()
@@ -46,10 +49,10 @@ namespace Lidarr.Api.V1.Queue
                 TotalCount = queue.Count + pending.Count,
                 Count = queue.Count(q => q.Artist != null) + pending.Count,
                 UnknownCount = queue.Count(q => q.Artist == null),
-                Errors = queue.Any(q => q.Artist != null && q.TrackedDownloadStatus == TrackedDownloadStatus.Error),
-                Warnings = queue.Any(q => q.Artist != null && q.TrackedDownloadStatus == TrackedDownloadStatus.Warning),
-                UnknownErrors = queue.Any(q => q.Artist == null && q.TrackedDownloadStatus == TrackedDownloadStatus.Error),
-                UnknownWarnings = queue.Any(q => q.Artist == null && q.TrackedDownloadStatus == TrackedDownloadStatus.Warning)
+                Errors = queue.Any(q => q.Artist != null && q.TrackedDownloadStatus.Equals("Error", StringComparison.InvariantCultureIgnoreCase)),
+                Warnings = queue.Any(q => q.Artist != null && q.TrackedDownloadStatus.Equals("Warning", StringComparison.InvariantCultureIgnoreCase)),
+                UnknownErrors = queue.Any(q => q.Artist == null && q.TrackedDownloadStatus.Equals("Error", StringComparison.InvariantCultureIgnoreCase)),
+                UnknownWarnings = queue.Any(q => q.Artist == null && q.TrackedDownloadStatus.Equals("Warning", StringComparison.InvariantCultureIgnoreCase))
             };
 
             _broadcastDebounce.Resume();
@@ -66,10 +69,12 @@ namespace Lidarr.Api.V1.Queue
         {
             _broadcastDebounce.Execute();
         }
-
+        
         public void Handle(PendingReleasesUpdatedEvent message)
         {
             _broadcastDebounce.Execute();
         }
+
+
     }
 }

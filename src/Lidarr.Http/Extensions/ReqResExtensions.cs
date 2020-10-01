@@ -14,8 +14,7 @@ namespace Lidarr.Http.Extensions
 
         public static readonly string LastModified = BuildInfo.BuildDateTime.ToString("r");
 
-        public static T FromJson<T>(this Stream body)
-            where T : class, new()
+        public static T FromJson<T>(this Stream body) where T : class, new()
         {
             return FromJson<T>(body, typeof(T));
         }
@@ -33,9 +32,9 @@ namespace Lidarr.Http.Extensions
             return Json.Deserialize(value, type);
         }
 
-        public static JsonResponse<TModel> AsResponse<TModel>(this TModel model, NancyContext context, HttpStatusCode statusCode = HttpStatusCode.OK)
+        public static JsonResponse<TModel> AsResponse<TModel>(this TModel model, HttpStatusCode statusCode = HttpStatusCode.OK)
         {
-            var response = new JsonResponse<TModel>(model, NancySerializer, context.Environment) { StatusCode = statusCode };
+            var response = new JsonResponse<TModel>(model, NancySerializer) { StatusCode = statusCode };
             response.Headers.DisableCache();
 
             return response;

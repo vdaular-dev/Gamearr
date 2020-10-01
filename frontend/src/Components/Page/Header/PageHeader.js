@@ -53,11 +53,11 @@ class PageHeader extends Component {
         <div className={styles.logoContainer}>
           <Link
             className={styles.logoLink}
-            to={`${window.Gamearr.urlBase}/`}
+            to={`${window.Lidarr.urlBase}/`}
           >
             <img
               className={styles.logo}
-              src={`${window.Gamearr.urlBase}/Content/Images/logo.svg`}
+              src={`${window.Lidarr.urlBase}/Content/Images/logo.svg`}
             />
           </Link>
         </div>
@@ -76,7 +76,7 @@ class PageHeader extends Component {
           <IconButton
             className={styles.donate}
             name={icons.HEART}
-            to="https://opencollective.com/gamearr"
+            to="https://opencollective.com/lidarr"
             size={14}
           />
           <PageHeaderActionsMenuConnector

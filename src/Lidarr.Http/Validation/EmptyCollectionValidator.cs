@@ -13,10 +13,7 @@ namespace Lidarr.Http.Validation
 
         protected override bool IsValid(PropertyValidatorContext context)
         {
-            if (context.PropertyValue == null)
-            {
-                return true;
-            }
+            if (context.PropertyValue == null) return true;
 
             var collection = context.PropertyValue as IEnumerable<T>;
 

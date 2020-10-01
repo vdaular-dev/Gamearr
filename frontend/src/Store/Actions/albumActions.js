@@ -8,6 +8,7 @@ import createSetClientSideCollectionSortReducer from './Creators/Reducers/create
 import createSetSettingValueReducer from './Creators/Reducers/createSetSettingValueReducer';
 import createSetTableOptionReducer from './Creators/Reducers/createSetTableOptionReducer';
 import createSaveProviderHandler from './Creators/createSaveProviderHandler';
+import albumEntities from 'Album/albumEntities';
 import createFetchHandler from './Creators/createFetchHandler';
 import createHandleActions from './Creators/createHandleActions';
 import { updateItem } from './baseActions';

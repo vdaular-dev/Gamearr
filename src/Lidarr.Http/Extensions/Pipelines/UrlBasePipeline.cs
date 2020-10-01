@@ -1,3 +1,4 @@
+using System;
 using Nancy;
 using Nancy.Bootstrapper;
 using Nancy.Responses;
@@ -21,7 +22,7 @@ namespace Lidarr.Http.Extensions.Pipelines
         {
             if (_urlBase.IsNotNullOrWhiteSpace())
             {
-                pipelines.BeforeRequest.AddItemToStartOfPipeline(Handle);
+                pipelines.BeforeRequest.AddItemToStartOfPipeline((Func<NancyContext, Response>) Handle);
             }
         }
 

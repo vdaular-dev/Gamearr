@@ -11,18 +11,18 @@ using NLog;
 using NLog.Config;
 using NLog.Targets;
 using NUnit.Framework;
-using Gamearr.Api.V1.Blacklist;
-using Gamearr.Api.V1.Commands;
-using Gamearr.Api.V1.Config;
-using Gamearr.Api.V1.DownloadClient;
-using Gamearr.Api.V1.TrackFiles;
-using Gamearr.Api.V1.History;
-using Gamearr.Api.V1.Profiles.Quality;
-using Gamearr.Api.V1.RootFolders;
-using Gamearr.Api.V1.Artist;
-using Gamearr.Api.V1.Albums;
-using Gamearr.Api.V1.Tracks;
-using Gamearr.Api.V1.Tags;
+using Lidarr.Api.V1.Blacklist;
+using Lidarr.Api.V1.Commands;
+using Lidarr.Api.V1.Config;
+using Lidarr.Api.V1.DownloadClient;
+using Lidarr.Api.V1.TrackFiles;
+using Lidarr.Api.V1.History;
+using Lidarr.Api.V1.Profiles.Quality;
+using Lidarr.Api.V1.RootFolders;
+using Lidarr.Api.V1.Artist;
+using Lidarr.Api.V1.Albums;
+using Lidarr.Api.V1.Tracks;
+using Lidarr.Api.V1.Tags;
 using NzbDrone.Common.EnvironmentInfo;
 using NzbDrone.Common.Serializer;
 using NzbDrone.Core.Qualities;
@@ -183,7 +183,7 @@ namespace NzbDrone.Integration.Test
         protected void ConnectSignalR()
         {
             _signalRReceived = new List<SignalRMessage>();
-            _signalrConnection = new Connection("http://localhost:8383/signalr");
+            _signalrConnection = new Connection("http://localhost:8686/signalr");
             _signalrConnection.Start(new LongPollingTransport()).ContinueWith(task =>
             {
                 if (task.IsFaulted)
@@ -226,13 +226,13 @@ namespace NzbDrone.Integration.Test
             Assert.Fail("Timed on wait");
         }
 
-        public ArtistResource EnsureArtist(string gamearrId, string artistName, bool? monitored = null)
+        public ArtistResource EnsureArtist(string lidarrId, string artistName, bool? monitored = null)
         {
-            var result = Artist.All().FirstOrDefault(v => v.ForeignArtistId == gamearrId);
+            var result = Artist.All().FirstOrDefault(v => v.ForeignArtistId == lidarrId);
 
             if (result == null)
             {
-                var lookup = Artist.Lookup("gamearr:" + gamearrId);
+                var lookup = Artist.Lookup("lidarr:" + lidarrId);
                 var artist = lookup.First();
                 artist.QualityProfileId = 1;
                 artist.MetadataProfileId = 1;
@@ -273,9 +273,9 @@ namespace NzbDrone.Integration.Test
         }
 
 
-        public void EnsureNoArtist(string gamearrId, string artistTitle)
+        public void EnsureNoArtist(string lidarrId, string artistTitle)
         {
-            var result = Artist.All().FirstOrDefault(v => v.ForeignArtistId == gamearrId);
+            var result = Artist.All().FirstOrDefault(v => v.ForeignArtistId == lidarrId);
 
             if (result != null)
             {

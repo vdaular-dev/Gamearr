@@ -96,7 +96,7 @@ class BackupRow extends Component {
 
         <TableRowCell>
           <Link
-            to={`${window.Gamearr.urlBase}${path}`}
+            to={`${window.Lidarr.urlBase}${path}`}
             noRouter={true}
           >
             {name}

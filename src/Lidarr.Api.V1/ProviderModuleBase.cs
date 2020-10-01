@@ -2,11 +2,13 @@ using System.Collections.Generic;
 using System.Linq;
 using FluentValidation;
 using FluentValidation.Results;
-using Lidarr.Http;
 using Nancy;
+using Newtonsoft.Json;
 using NzbDrone.Common.Serializer;
 using NzbDrone.Core.ThingiProvider;
 using NzbDrone.Core.Validation;
+using Lidarr.Http;
+using Lidarr.Http.Extensions;
 
 namespace Lidarr.Api.V1
 {
@@ -24,10 +26,10 @@ namespace Lidarr.Api.V1
             _providerFactory = providerFactory;
             _resourceMapper = resourceMapper;
 
-            Get("schema", x => GetTemplates());
-            Post("test", x => Test(ReadResourceFromRequest(true)));
-            Post("testall", x => TestAll());
-            Post("action/{action}", x => RequestAction(x.action, ReadResourceFromRequest(true)));
+            Get["schema"] = x => GetTemplates();
+            Post["test"] = x => Test(ReadResourceFromRequest(true));
+            Post["testall"] = x => TestAll();
+            Post["action/{action}"] = x => RequestAction(x.action, ReadResourceFromRequest(true));
 
             GetResourceAll = GetAll;
             GetResourceById = GetProviderById;
@@ -36,7 +38,7 @@ namespace Lidarr.Api.V1
             DeleteResource = DeleteProvider;
 
             SharedValidator.RuleFor(c => c.Name).NotEmpty();
-            SharedValidator.RuleFor(c => c.Name).Must((v, c) => !_providerFactory.All().Any(p => p.Name == c && p.Id != v.Id)).WithMessage("Should be unique");
+            SharedValidator.RuleFor(c => c.Name).Must((v,c) => !_providerFactory.All().Any(p => p.Name == c && p.Id != v.Id)).WithMessage("Should be unique");
             SharedValidator.RuleFor(c => c.Implementation).NotEmpty();
             SharedValidator.RuleFor(c => c.ConfigContract).NotEmpty();
 
@@ -84,10 +86,8 @@ namespace Lidarr.Api.V1
         private void UpdateProvider(TProviderResource providerResource)
         {
             var providerDefinition = GetDefinition(providerResource, false);
-            var existingDefinition = _providerFactory.Get(providerDefinition.Id);
 
-            // Only test existing definitions if it was previously disabled
-            if (providerDefinition.Enable && !existingDefinition.Enable)
+            if (providerDefinition.Enable)
             {
                 Test(providerDefinition, false);
             }
@@ -112,7 +112,7 @@ namespace Lidarr.Api.V1
             _providerFactory.Delete(id);
         }
 
-        private object GetTemplates()
+        private Response GetTemplates()
         {
             var defaultDefinitions = _providerFactory.GetDefaultDefinitions().OrderBy(p => p.ImplementationName).ToList();
 
@@ -133,10 +133,10 @@ namespace Lidarr.Api.V1
                 result.Add(providerResource);
             }
 
-            return result;
+            return result.AsResponse();
         }
 
-        private object Test(TProviderResource providerResource)
+        private Response Test(TProviderResource providerResource)
         {
             var providerDefinition = GetDefinition(providerResource, true);
 
@@ -145,7 +145,7 @@ namespace Lidarr.Api.V1
             return "{}";
         }
 
-        private object TestAll()
+        private Response TestAll()
         {
             var providerDefinitions = _providerFactory.All()
                 .Where(c => c.Settings.Validate().IsValid && c.Enable)
@@ -163,10 +163,10 @@ namespace Lidarr.Api.V1
                 });
             }
 
-            return ResponseWithCode(result, result.Any(c => !c.IsValid) ? HttpStatusCode.BadRequest : HttpStatusCode.OK);
+            return result.AsResponse(result.Any(c => !c.IsValid) ? HttpStatusCode.BadRequest : HttpStatusCode.OK);
         }
 
-        private object RequestAction(string action, TProviderResource providerResource)
+        private Response RequestAction(string action, TProviderResource providerResource)
         {
             var providerDefinition = GetDefinition(providerResource, true, false);
 

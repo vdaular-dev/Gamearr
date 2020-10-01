@@ -318,7 +318,7 @@ namespace NzbDrone.Core.Organizer
         {
             tokenHandlers["{Original Title}"] = m => GetOriginalTitle(trackFile);
             tokenHandlers["{Original Filename}"] = m => GetOriginalFileName(trackFile);
-            tokenHandlers["{Release Group}"] = m => trackFile.ReleaseGroup ?? m.DefaultValue("Gamearr");
+            tokenHandlers["{Release Group}"] = m => trackFile.ReleaseGroup ?? m.DefaultValue("Lidarr");
         }
 
         private void AddQualityTokens(Dictionary<string, Func<TokenMatch, string>> tokenHandlers, Artist artist, TrackFile trackFile)

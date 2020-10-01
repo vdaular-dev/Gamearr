@@ -174,6 +174,51 @@ class UISettings extends Component {
                       {...settings.enableColorImpairedMode}
                     />
                   </FormGroup>
+
+                  <FormGroup>
+                    <FormLabel>Expand Items by Default</FormLabel>
+                    <div className={styles.columnGroup}>
+                      <FormInputGroup
+                        type={inputTypes.CHECK}
+                        name="expandAlbumByDefault"
+                        helpText="Albums"
+                        onChange={onInputChange}
+                        {...settings.expandAlbumByDefault}
+                      />
+
+                      <FormInputGroup
+                        type={inputTypes.CHECK}
+                        name="expandEPByDefault"
+                        helpText="EPs"
+                        onChange={onInputChange}
+                        {...settings.expandEPByDefault}
+                      />
+
+                      <FormInputGroup
+                        type={inputTypes.CHECK}
+                        name="expandSingleByDefault"
+                        helpText="Singles"
+                        onChange={onInputChange}
+                        {...settings.expandSingleByDefault}
+                      />
+
+                      <FormInputGroup
+                        type={inputTypes.CHECK}
+                        name="expandBroadcastByDefault"
+                        helpText="Broadcast"
+                        onChange={onInputChange}
+                        {...settings.expandBroadcastByDefault}
+                      />
+
+                      <FormInputGroup
+                        type={inputTypes.CHECK}
+                        name="expandOtherByDefault"
+                        helpText="Other"
+                        onChange={onInputChange}
+                        {...settings.expandOtherByDefault}
+                      />
+                    </div>
+                  </FormGroup>
                 </FieldSet>
               </Form>
           }

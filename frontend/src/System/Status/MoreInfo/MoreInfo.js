@@ -16,27 +16,27 @@ class MoreInfo extends Component {
         <DescriptionList>
           <DescriptionListItemTitle>Home page</DescriptionListItemTitle>
           <DescriptionListItemDescription>
-            <Link to="https://gamearr.game/">gamearr.game</Link>
+            <Link to="https://lidarr.audio/">lidarr.audio</Link>
           </DescriptionListItemDescription>
 
           <DescriptionListItemTitle>Wiki</DescriptionListItemTitle>
           <DescriptionListItemDescription>
-            <Link to="https://github.com/gamearr/Gamearr/wiki">wiki.gamearr.game</Link>
+            <Link to="https://github.com/lidarr/Lidarr/wiki">wiki.lidarr.audio</Link>
           </DescriptionListItemDescription>
 
           <DescriptionListItemTitle>Reddit</DescriptionListItemTitle>
           <DescriptionListItemDescription>
-            <Link to="https://www.reddit.com/r/Gamearr/">Gamearr</Link>
+            <Link to="https://www.reddit.com/r/Lidarr/">Lidarr</Link>
           </DescriptionListItemDescription>
 
           <DescriptionListItemTitle>Discord</DescriptionListItemTitle>
           <DescriptionListItemDescription>
-            <Link to="https://discord.gg/VUzFAqF">#gamearr on Discord</Link>
+            <Link to="https://discord.gg/8Y7rDc9">#lidarr on Discord</Link>
           </DescriptionListItemDescription>
 
           <DescriptionListItemTitle>Donations</DescriptionListItemTitle>
           <DescriptionListItemDescription>
-            <Link to="https://opencollective.com/gamearr">Donate to Gamearr</Link>
+            <Link to="https://opencollective.com/lidarr">Donate to Lidarr</Link>
           </DescriptionListItemDescription>
 
           <DescriptionListItemTitle>Sonarr Donations</DescriptionListItemTitle>
@@ -46,12 +46,12 @@ class MoreInfo extends Component {
 
           <DescriptionListItemTitle>Source</DescriptionListItemTitle>
           <DescriptionListItemDescription>
-            <Link to="https://github.com/gamearr/Gamearr/">github.com/Gamearr/Gamearr</Link>
+            <Link to="https://github.com/lidarr/Lidarr/">github.com/Lidarr/Lidarr</Link>
           </DescriptionListItemDescription>
 
           <DescriptionListItemTitle>Feature Requests</DescriptionListItemTitle>
           <DescriptionListItemDescription>
-            <Link to="https://github.com/gamearr/Gamearr/issues">github.com/Gamearr/Gamearr/issues</Link>
+            <Link to="https://github.com/lidarr/Lidarr/issues">github.com/Lidarr/Lidarr/issues</Link>
           </DescriptionListItemDescription>
 
         </DescriptionList>

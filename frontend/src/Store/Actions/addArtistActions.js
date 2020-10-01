@@ -1,11 +1,11 @@
 import _ from 'lodash';
 import { createAction } from 'redux-actions';
 import { batchActions } from 'redux-batched-actions';
-import monitorOptions from 'Utilities/Game/monitorOptions';
+import monitorOptions from 'Utilities/Artist/monitorOptions';
 import getSectionState from 'Utilities/State/getSectionState';
 import updateSectionState from 'Utilities/State/updateSectionState';
 import createAjaxRequest from 'Utilities/createAjaxRequest';
-import getNewGame from 'Utilities/Game/getNewGame';
+import getNewArtist from 'Utilities/Artist/getNewArtist';
 import { createThunk, handleThunks } from 'Store/thunks';
 import createSetSettingValueReducer from './Creators/Reducers/createSetSettingValueReducer';
 import createHandleActions from './Creators/createHandleActions';
@@ -116,7 +116,7 @@ export const actionHandlers = handleThunks({
 
     const foreignArtistId = payload.foreignArtistId;
     const items = getState().addArtist.items;
-    const newArtist = getNewGame(_.cloneDeep(_.find(items, { foreignArtistId })), payload);
+    const newArtist = getNewArtist(_.cloneDeep(_.find(items, { foreignArtistId })), payload);
 
     const promise = createAjaxRequest({
       url: '/artist',

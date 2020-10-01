@@ -49,12 +49,14 @@ namespace Lidarr.Http.ClientSchema
             }
 
             return target;
+
         }
 
         public static T ReadFromSchema<T>(List<Field> fields)
         {
             return (T)ReadFromSchema(fields, typeof(T));
         }
+
 
         // Ideally this function should begin a System.Linq.Expression expression tree since it's faster.
         // But it's probably not needed till performance issues pop up.
@@ -75,7 +77,6 @@ namespace Lidarr.Http.ClientSchema
 
                     _mappings[type] = result;
                 }
-
                 return result;
             }
         }
@@ -154,26 +155,32 @@ namespace Lidarr.Http.ClientSchema
             {
                 return fieldValue => fieldValue?.ToString().ParseInt32() ?? 0;
             }
+
             else if (propertyType == typeof(long))
             {
                 return fieldValue => fieldValue?.ToString().ParseInt64() ?? 0;
             }
+
             else if (propertyType == typeof(double))
             {
                 return fieldValue => fieldValue?.ToString().ParseDouble() ?? 0.0;
             }
+
             else if (propertyType == typeof(int?))
             {
                 return fieldValue => fieldValue?.ToString().ParseInt32();
             }
-            else if (propertyType == typeof(long?))
+
+            else if (propertyType == typeof(Int64?))
             {
                 return fieldValue => fieldValue?.ToString().ParseInt64();
             }
+
             else if (propertyType == typeof(double?))
             {
                 return fieldValue => fieldValue?.ToString().ParseDouble();
             }
+
             else if (propertyType == typeof(IEnumerable<int>))
             {
                 return fieldValue =>
@@ -188,6 +195,7 @@ namespace Lidarr.Http.ClientSchema
                     }
                 };
             }
+
             else if (propertyType == typeof(IEnumerable<string>))
             {
                 return fieldValue =>
@@ -202,6 +210,7 @@ namespace Lidarr.Http.ClientSchema
                     }
                 };
             }
+
             else
             {
                 return fieldValue => fieldValue;
@@ -210,7 +219,7 @@ namespace Lidarr.Http.ClientSchema
 
         private static string GetCamelCaseName(string name)
         {
-            return char.ToLowerInvariant(name[0]) + name.Substring(1);
+            return Char.ToLowerInvariant(name[0]) + name.Substring(1);
         }
     }
 }

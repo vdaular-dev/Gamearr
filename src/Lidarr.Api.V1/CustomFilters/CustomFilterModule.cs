@@ -1,6 +1,6 @@
 using System.Collections.Generic;
-using Lidarr.Http;
 using NzbDrone.Core.CustomFilters;
+using Lidarr.Http;
 
 namespace Lidarr.Api.V1.CustomFilters
 {

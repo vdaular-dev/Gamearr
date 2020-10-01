@@ -15,7 +15,7 @@ namespace NzbDrone.Core.Music
 {
     public interface IAddArtistService
     {
-        Artist AddGame(Artist newArtist);
+        Artist AddArtist(Artist newArtist);
         List<Artist> AddArtists(List<Artist> newArtists);
     }
 
@@ -43,7 +43,7 @@ namespace NzbDrone.Core.Music
             _logger = logger;
         }
 
-        public Artist AddGame(Artist newArtist)
+        public Artist AddArtist(Artist newArtist)
         {
             Ensure.That(newArtist, () => newArtist).IsNotNull();
 
@@ -57,7 +57,7 @@ namespace NzbDrone.Core.Music
             newArtist.ArtistMetadataId = newArtist.Metadata.Value.Id;
 
             // add the artist itself
-            _artistService.AddGame(newArtist);
+            _artistService.AddArtist(newArtist);
 
             return newArtist;
         }
@@ -102,7 +102,7 @@ namespace NzbDrone.Core.Music
             }
             catch (ArtistNotFoundException)
             {
-                _logger.Error("GamearrId {0} was not found, it may have been removed from Gamearr.", newArtist.Metadata.Value.ForeignArtistId);
+                _logger.Error("LidarrId {0} was not found, it may have been removed from Lidarr.", newArtist.Metadata.Value.ForeignArtistId);
 
                 throw new ValidationException(new List<ValidationFailure>
                                               {

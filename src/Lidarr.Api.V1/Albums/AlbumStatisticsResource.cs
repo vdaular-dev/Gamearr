@@ -1,3 +1,4 @@
+using System;
 using NzbDrone.Core.ArtistStats;
 
 namespace Lidarr.Api.V1.Albums
@@ -13,12 +14,9 @@ namespace Lidarr.Api.V1.Albums
         {
             get
             {
-                if (TrackCount == 0)
-                {
-                    return 0;
-                }
+                if (TrackCount == 0) return 0;
 
-                return TrackFileCount / (decimal)TrackCount * 100;
+                return (decimal)TrackFileCount / (decimal)TrackCount * 100;
             }
         }
     }
@@ -27,10 +25,7 @@ namespace Lidarr.Api.V1.Albums
     {
         public static AlbumStatisticsResource ToResource(this AlbumStatistics model)
         {
-            if (model == null)
-            {
-                return null;
-            }
+            if (model == null) return null;
 
             return new AlbumStatisticsResource
             {

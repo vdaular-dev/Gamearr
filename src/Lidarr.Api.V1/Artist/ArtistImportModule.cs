@@ -1,8 +1,8 @@
 using System.Collections.Generic;
-using Lidarr.Http;
-using Lidarr.Http.Extensions;
 using Nancy;
 using NzbDrone.Core.Music;
+using Lidarr.Http;
+using Lidarr.Http.Extensions;
 
 namespace Lidarr.Api.V1.Artist
 {
@@ -14,15 +14,16 @@ namespace Lidarr.Api.V1.Artist
             : base("/artist/import")
         {
             _addArtistService = addArtistService;
-            Post("/", x => Import());
+            Post["/"] = x => Import();
         }
 
-        private object Import()
+
+        private Response Import()
         {
             var resource = Request.Body.FromJson<List<ArtistResource>>();
             var newArtists = resource.ToModel();
 
-            return _addArtistService.AddArtists(newArtists).ToResource();
+            return _addArtistService.AddArtists(newArtists).ToResource().AsResponse();
         }
     }
 }

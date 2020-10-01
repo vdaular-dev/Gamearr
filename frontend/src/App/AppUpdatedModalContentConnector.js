@@ -33,7 +33,7 @@ function createMapDispatchToProps(dispatch, props) {
     },
 
     onSeeChangesPress() {
-      window.location = `${window.Gamearr.urlBase}/system/updates`;
+      window.location = `${window.Lidarr.urlBase}/system/updates`;
     }
   };
 }

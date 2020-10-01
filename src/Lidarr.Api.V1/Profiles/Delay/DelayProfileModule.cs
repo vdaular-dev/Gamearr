@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using FluentValidation;
-using Lidarr.Http;
-using Lidarr.Http.REST;
-using Lidarr.Http.Validation;
+using FluentValidation.Results;
 using Nancy;
 using NzbDrone.Core.Profiles.Delay;
+using Lidarr.Http;
+using Lidarr.Http.Extensions;
+using Lidarr.Http.REST;
+using Lidarr.Http.Validation;
 
 namespace Lidarr.Api.V1.Profiles.Delay
 {
@@ -22,7 +24,7 @@ namespace Lidarr.Api.V1.Profiles.Delay
             UpdateResource = Update;
             CreateResource = Create;
             DeleteResource = DeleteProfile;
-            Put(@"/reorder/(?<id>[\d]{1,10})", options => Reorder(options.Id));
+            Put[@"/reorder/(?<id>[\d]{1,10})"] = options => Reorder(options.Id);
 
             SharedValidator.RuleFor(d => d.Tags).NotEmpty().When(d => d.Id != 1);
             SharedValidator.RuleFor(d => d.Tags).EmptyCollection<DelayProfileResource, int>().When(d => d.Id == 1);
@@ -30,12 +32,14 @@ namespace Lidarr.Api.V1.Profiles.Delay
             SharedValidator.RuleFor(d => d.UsenetDelay).GreaterThanOrEqualTo(0);
             SharedValidator.RuleFor(d => d.TorrentDelay).GreaterThanOrEqualTo(0);
 
-            SharedValidator.RuleFor(d => d).Custom((delayProfile, context) =>
+            SharedValidator.Custom(delayProfile =>
             {
                 if (!delayProfile.EnableUsenet && !delayProfile.EnableTorrent)
                 {
-                    context.AddFailure("Either Usenet or Torrent should be enabled");
+                    return new ValidationFailure("", "Either Usenet or Torrent should be enabled");
                 }
+
+                return null;
             });
         }
 
@@ -73,14 +77,14 @@ namespace Lidarr.Api.V1.Profiles.Delay
             return _delayProfileService.All().ToResource();
         }
 
-        private object Reorder(int id)
+        private Response Reorder(int id)
         {
             ValidateId(id);
 
             var afterIdQuery = Request.Query.After;
             int? afterId = afterIdQuery.HasValue ? Convert.ToInt32(afterIdQuery.Value) : null;
 
-            return _delayProfileService.Reorder(id, afterId).ToResource();
+            return _delayProfileService.Reorder(id, afterId).ToResource().AsResponse();
         }
     }
 }

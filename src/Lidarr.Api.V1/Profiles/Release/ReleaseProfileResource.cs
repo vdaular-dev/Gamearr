@@ -1,18 +1,16 @@
 using System.Collections.Generic;
 using System.Linq;
-using Lidarr.Http.REST;
 using NzbDrone.Core.Profiles.Releases;
+using Lidarr.Http.REST;
 
 namespace Lidarr.Api.V1.Profiles.Release
 {
     public class ReleaseProfileResource : RestResource
     {
-        public bool Enabled { get; set; }
         public string Required { get; set; }
         public string Ignored { get; set; }
         public List<KeyValuePair<string, int>> Preferred { get; set; }
         public bool IncludePreferredWhenRenaming { get; set; }
-        public int IndexerId { get; set; }
         public HashSet<int> Tags { get; set; }
 
         public ReleaseProfileResource()
@@ -25,42 +23,32 @@ namespace Lidarr.Api.V1.Profiles.Release
     {
         public static ReleaseProfileResource ToResource(this ReleaseProfile model)
         {
-            if (model == null)
-            {
-                return null;
-            }
+            if (model == null) return null;
 
             return new ReleaseProfileResource
             {
                 Id = model.Id,
 
-                Enabled = model.Enabled,
                 Required = model.Required,
                 Ignored = model.Ignored,
                 Preferred = model.Preferred,
                 IncludePreferredWhenRenaming = model.IncludePreferredWhenRenaming,
-                IndexerId = model.IndexerId,
                 Tags = new HashSet<int>(model.Tags)
             };
         }
 
         public static ReleaseProfile ToModel(this ReleaseProfileResource resource)
         {
-            if (resource == null)
-            {
-                return null;
-            }
+            if (resource == null) return null;
 
             return new ReleaseProfile
             {
                 Id = resource.Id,
 
-                Enabled = resource.Enabled,
                 Required = resource.Required,
                 Ignored = resource.Ignored,
                 Preferred = resource.Preferred,
                 IncludePreferredWhenRenaming = resource.IncludePreferredWhenRenaming,
-                IndexerId = resource.IndexerId,
                 Tags = new HashSet<int>(resource.Tags)
             };
         }

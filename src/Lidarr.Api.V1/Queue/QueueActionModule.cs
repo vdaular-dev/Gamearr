@@ -1,12 +1,13 @@
+using System;
 using System.Collections.Generic;
-using Lidarr.Http;
-using Lidarr.Http.Extensions;
-using Lidarr.Http.REST;
 using Nancy;
 using NzbDrone.Core.Download;
 using NzbDrone.Core.Download.Pending;
 using NzbDrone.Core.Download.TrackedDownloads;
 using NzbDrone.Core.Queue;
+using Lidarr.Http;
+using Lidarr.Http.Extensions;
+using Lidarr.Http.REST;
 
 namespace Lidarr.Api.V1.Queue
 {
@@ -15,7 +16,6 @@ namespace Lidarr.Api.V1.Queue
         private readonly IQueueService _queueService;
         private readonly ITrackedDownloadService _trackedDownloadService;
         private readonly IFailedDownloadService _failedDownloadService;
-        private readonly IIgnoredDownloadService _ignoredDownloadService;
         private readonly IProvideDownloadClient _downloadClientProvider;
         private readonly IPendingReleaseService _pendingReleaseService;
         private readonly IDownloadService _downloadService;
@@ -23,7 +23,6 @@ namespace Lidarr.Api.V1.Queue
         public QueueActionModule(IQueueService queueService,
                                  ITrackedDownloadService trackedDownloadService,
                                  IFailedDownloadService failedDownloadService,
-                                 IIgnoredDownloadService ignoredDownloadService,
                                  IProvideDownloadClient downloadClientProvider,
                                  IPendingReleaseService pendingReleaseService,
                                  IDownloadService downloadService)
@@ -31,19 +30,18 @@ namespace Lidarr.Api.V1.Queue
             _queueService = queueService;
             _trackedDownloadService = trackedDownloadService;
             _failedDownloadService = failedDownloadService;
-            _ignoredDownloadService = ignoredDownloadService;
             _downloadClientProvider = downloadClientProvider;
             _pendingReleaseService = pendingReleaseService;
             _downloadService = downloadService;
 
-            Post(@"/grab/(?<id>[\d]{1,10})", x => Grab((int)x.Id));
-            Post("/grab/bulk", x => Grab());
+            Post[@"/grab/(?<id>[\d]{1,10})"] = x => Grab((int)x.Id);
+            Post["/grab/bulk"] = x => Grab();
 
-            Delete(@"/(?<id>[\d]{1,10})", x => Remove((int)x.Id));
-            Delete("/bulk", x => Remove());
+            Delete[@"/(?<id>[\d]{1,10})"] = x => Remove((int)x.Id);
+            Delete["/bulk"] = x => Remove();
         }
 
-        private object Grab(int id)
+        private Response Grab(int id)
         {
             var pendingRelease = _pendingReleaseService.FindPendingQueueItem(id);
 
@@ -54,10 +52,10 @@ namespace Lidarr.Api.V1.Queue
 
             _downloadService.DownloadReport(pendingRelease.RemoteAlbum);
 
-            return new object();
+            return new object().AsResponse();
         }
 
-        private object Grab()
+        private Response Grab()
         {
             var resource = Request.Body.FromJson<QueueBulkResource>();
 
@@ -73,28 +71,26 @@ namespace Lidarr.Api.V1.Queue
                 _downloadService.DownloadReport(pendingRelease.RemoteAlbum);
             }
 
-            return new object();
+            return new object().AsResponse();
         }
 
-        private object Remove(int id)
+        private Response Remove(int id)
         {
-            var removeFromClient = Request.GetBooleanQueryParameter("removeFromClient", true);
             var blacklist = Request.GetBooleanQueryParameter("blacklist");
             var skipReDownload = Request.GetBooleanQueryParameter("skipredownload");
 
-            var trackedDownload = Remove(id, removeFromClient, blacklist, skipReDownload);
+            var trackedDownload = Remove(id, blacklist, skipReDownload);
 
             if (trackedDownload != null)
             {
                 _trackedDownloadService.StopTracking(trackedDownload.DownloadItem.DownloadId);
             }
 
-            return new object();
+            return new object().AsResponse();
         }
 
-        private object Remove()
+        private Response Remove()
         {
-            var removeFromClient = Request.GetBooleanQueryParameter("removeFromClient", true);
             var blacklist = Request.GetBooleanQueryParameter("blacklist");
             var skipReDownload = Request.GetBooleanQueryParameter("skipredownload");
 
@@ -103,7 +99,7 @@ namespace Lidarr.Api.V1.Queue
 
             foreach (var id in resource.Ids)
             {
-                var trackedDownload = Remove(id, removeFromClient, blacklist, skipReDownload);
+                var trackedDownload = Remove(id, blacklist, skipReDownload);
 
                 if (trackedDownload != null)
                 {
@@ -113,10 +109,10 @@ namespace Lidarr.Api.V1.Queue
 
             _trackedDownloadService.StopTracking(trackedDownloadIds);
 
-            return new object();
+            return new object().AsResponse();
         }
 
-        private TrackedDownload Remove(int id, bool removeFromClient, bool blacklist, bool skipReDownload)
+        private TrackedDownload Remove(int id, bool blacklist, bool skipReDownload)
         {
             var pendingRelease = _pendingReleaseService.FindPendingQueueItem(id);
 
@@ -134,29 +130,18 @@ namespace Lidarr.Api.V1.Queue
                 throw new NotFoundException();
             }
 
-            if (removeFromClient)
+            var downloadClient = _downloadClientProvider.Get(trackedDownload.DownloadClient);
+
+            if (downloadClient == null)
             {
-                var downloadClient = _downloadClientProvider.Get(trackedDownload.DownloadClient);
-
-                if (downloadClient == null)
-                {
-                    throw new BadRequestException();
-                }
-
-                downloadClient.RemoveItem(trackedDownload.DownloadItem.DownloadId, true);
+                throw new BadRequestException();
             }
+
+            downloadClient.RemoveItem(trackedDownload.DownloadItem.DownloadId, true);
 
             if (blacklist)
             {
                 _failedDownloadService.MarkAsFailed(trackedDownload.DownloadItem.DownloadId, skipReDownload);
-            }
-
-            if (!removeFromClient && !blacklist)
-            {
-                if (!_ignoredDownloadService.IgnoreDownload(trackedDownload))
-                {
-                    return null;
-                }
             }
 
             return trackedDownload;

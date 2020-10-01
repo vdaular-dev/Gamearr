@@ -5,7 +5,8 @@ import IconButton from 'Components/Link/IconButton';
 import RelativeDateCellConnector from 'Components/Table/Cells/RelativeDateCellConnector';
 import TableRow from 'Components/Table/TableRow';
 import TableRowCell from 'Components/Table/Cells/TableRowCell';
-import GameNameLink from 'Game/GameNameLink';
+import TrackQuality from 'Album/TrackQuality';
+import ArtistNameLink from 'Artist/ArtistNameLink';
 import BlacklistDetailsModal from './BlacklistDetailsModal';
 import styles from './BlacklistRow.css';
 
@@ -69,7 +70,7 @@ class BlacklistRow extends Component {
             if (name === 'artist.sortName') {
               return (
                 <TableRowCell key={name}>
-                  <GameNameLink
+                  <ArtistNameLink
                     foreignArtistId={artist.foreignArtistId}
                     artistName={artist.artistName}
                   />
@@ -81,6 +82,19 @@ class BlacklistRow extends Component {
               return (
                 <TableRowCell key={name}>
                   {sourceTitle}
+                </TableRowCell>
+              );
+            }
+
+            if (name === 'quality') {
+              return (
+                <TableRowCell
+                  key={name}
+                  className={styles.quality}
+                >
+                  <TrackQuality
+                    quality={quality}
+                  />
                 </TableRowCell>
               );
             }

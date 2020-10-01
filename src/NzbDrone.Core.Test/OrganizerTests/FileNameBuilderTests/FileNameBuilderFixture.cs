@@ -71,7 +71,7 @@ namespace NzbDrone.Core.Test.OrganizerTests.FileNameBuilderTests
 
             _trackFile = Builder<TrackFile>.CreateNew()
                 .With(e => e.Quality = new QualityModel(Quality.MP3_256))
-                .With(e => e.ReleaseGroup = "GamearrTest")
+                .With(e => e.ReleaseGroup = "LidarrTest")
                 .With(e => e.MediaInfo = new Parser.Model.MediaInfoModel {
                     AudioBitrate = 320,
                     AudioBits = 16,
@@ -618,19 +618,19 @@ namespace NzbDrone.Core.Test.OrganizerTests.FileNameBuilderTests
         }
 
         [Test]
-        public void should_use_Gamearr_as_release_group_when_not_available()
+        public void should_use_Lidarr_as_release_group_when_not_available()
         {
             _trackFile.ReleaseGroup = null;
             _namingConfig.StandardTrackFormat = "{Release Group}";
 
             Subject.BuildTrackFileName(new List<Track> { _track1 }, _artist, _album, _trackFile)
-                   .Should().Be("Gamearr");
+                   .Should().Be("Lidarr");
         }
 
         [TestCase("{Track Title}{-Release Group}", "City Sushi")]
         [TestCase("{Track Title}{ Release Group}", "City Sushi")]
         [TestCase("{Track Title}{ [Release Group]}", "City Sushi")]
-        public void should_not_use_Gamearr_as_release_group_if_pattern_has_separator(string pattern, string expectedFileName)
+        public void should_not_use_Lidarr_as_release_group_if_pattern_has_separator(string pattern, string expectedFileName)
         {
             _trackFile.ReleaseGroup = null;
             _namingConfig.StandardTrackFormat = pattern;

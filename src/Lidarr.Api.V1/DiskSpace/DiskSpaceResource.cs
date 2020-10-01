@@ -14,10 +14,7 @@ namespace Lidarr.Api.V1.DiskSpace
     {
         public static DiskSpaceResource MapToResource(this NzbDrone.Core.DiskSpace.DiskSpace model)
         {
-            if (model == null)
-            {
-                return null;
-            }
+            if (model == null) return null;
 
             return new DiskSpaceResource
             {

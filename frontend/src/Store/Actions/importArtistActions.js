@@ -4,7 +4,7 @@ import { batchActions } from 'redux-batched-actions';
 import createAjaxRequest from 'Utilities/createAjaxRequest';
 import getSectionState from 'Utilities/State/getSectionState';
 import updateSectionState from 'Utilities/State/updateSectionState';
-import getNewGame from 'Utilities/Game/getNewGame';
+import getNewArtist from 'Utilities/Artist/getNewArtist';
 import { createThunk, handleThunks } from 'Store/thunks';
 import createHandleActions from './Creators/createHandleActions';
 import { set, removeItem, updateItem } from './baseActions';
@@ -36,8 +36,8 @@ export const QUEUE_LOOKUP_ARTIST = 'importArtist/queueLookupArtist';
 export const START_LOOKUP_ARTIST = 'importArtist/startLookupArtist';
 export const CANCEL_LOOKUP_ARTIST = 'importArtist/cancelLookupArtist';
 export const LOOKUP_UNSEARCHED_ARTIST = 'importArtist/lookupUnsearchedArtist';
-export const CLEAR_IMPORT_ARTIST = 'importArtist/clearImportGame';
-export const SET_IMPORT_ARTIST_VALUE = 'importArtist/setImportGameValue';
+export const CLEAR_IMPORT_ARTIST = 'importArtist/clearImportArtist';
+export const SET_IMPORT_ARTIST_VALUE = 'importArtist/setImportArtistValue';
 export const IMPORT_ARTIST = 'importArtist/importArtist';
 
 //
@@ -47,10 +47,10 @@ export const queueLookupArtist = createThunk(QUEUE_LOOKUP_ARTIST);
 export const startLookupArtist = createThunk(START_LOOKUP_ARTIST);
 export const importArtist = createThunk(IMPORT_ARTIST);
 export const lookupUnsearchedArtist = createThunk(LOOKUP_UNSEARCHED_ARTIST);
-export const clearImportGame = createAction(CLEAR_IMPORT_ARTIST);
+export const clearImportArtist = createAction(CLEAR_IMPORT_ARTIST);
 export const cancelLookupArtist = createAction(CANCEL_LOOKUP_ARTIST);
 
-export const setImportGameValue = createAction(SET_IMPORT_ARTIST_VALUE, (payload) => {
+export const setImportArtistValue = createAction(SET_IMPORT_ARTIST_VALUE, (payload) => {
   return {
     section,
     ...payload
@@ -218,7 +218,7 @@ export const actionHandlers = handleThunks({
       // Make sure we have a selected artist and
       // the same artist hasn't been added yet.
       if (selectedArtist && !_.some(acc, { foreignArtistId: selectedArtist.foreignArtistId })) {
-        const newArtist = getNewGame(_.cloneDeep(selectedArtist), item);
+        const newArtist = getNewArtist(_.cloneDeep(selectedArtist), item);
         newArtist.path = item.path;
 
         addedIds.push(id);

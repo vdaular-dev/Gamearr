@@ -18,16 +18,16 @@ namespace NzbDrone.Core.Test.MetadataSource
                 .Setup(s => s.MetadataSource)
                 .Returns("");
 
-            Mocker.GetMock<IGamearrCloudRequestBuilder>()
+            Mocker.GetMock<ILidarrCloudRequestBuilder>()
                 .Setup(s => s.Search)
-                .Returns(new HttpRequestBuilder("https://api.gamearr.game/api/v0.4/{route}").CreateFactory());
+                .Returns(new HttpRequestBuilder("https://api.lidarr.audio/api/v0.4/{route}").CreateFactory());
         }
 
         private void WithCustomProvider()
         {
             Mocker.GetMock<IConfigService>()
                 .Setup(s => s.MetadataSource)
-                .Returns("http://api.gamearr.game/api/testing/");
+                .Returns("http://api.lidarr.audio/api/testing/");
         }
 
         [TestCase]

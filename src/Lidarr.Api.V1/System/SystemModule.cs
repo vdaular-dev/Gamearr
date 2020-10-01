@@ -1,10 +1,12 @@
 using System.Threading.Tasks;
+using Nancy;
 using Nancy.Routing;
 using NzbDrone.Common.EnvironmentInfo;
 using NzbDrone.Common.Extensions;
 using NzbDrone.Core.Configuration;
 using NzbDrone.Core.Datastore;
 using NzbDrone.Core.Lifecycle;
+using Lidarr.Http.Extensions;
 
 namespace Lidarr.Api.V1.System
 {
@@ -18,7 +20,6 @@ namespace Lidarr.Api.V1.System
         private readonly IConfigFileProvider _configFileProvider;
         private readonly IMainDatabase _database;
         private readonly ILifecycleService _lifecycleService;
-        private readonly IDeploymentInfoProvider _deploymentInfoProvider;
 
         public SystemModule(IAppFolderInfo appFolderInfo,
                             IRuntimeInfo runtimeInfo,
@@ -27,8 +28,7 @@ namespace Lidarr.Api.V1.System
                             IRouteCacheProvider routeCacheProvider,
                             IConfigFileProvider configFileProvider,
                             IMainDatabase database,
-                            ILifecycleService lifecycleService,
-                            IDeploymentInfoProvider deploymentInfoProvider)
+                            ILifecycleService lifecycleService)
             : base("system")
         {
             _appFolderInfo = appFolderInfo;
@@ -39,14 +39,13 @@ namespace Lidarr.Api.V1.System
             _configFileProvider = configFileProvider;
             _database = database;
             _lifecycleService = lifecycleService;
-            _deploymentInfoProvider = deploymentInfoProvider;
-            Get("/status", x => GetStatus());
-            Get("/routes", x => GetRoutes());
-            Post("/shutdown", x => Shutdown());
-            Post("/restart", x => Restart());
+            Get["/status"] = x => GetStatus();
+            Get["/routes"] = x => GetRoutes();
+            Post["/shutdown"] = x => Shutdown();
+            Post["/restart"] = x => Restart();
         }
 
-        private object GetStatus()
+        private Response GetStatus()
         {
             return new
             {
@@ -60,7 +59,7 @@ namespace Lidarr.Api.V1.System
                 AppData = _appFolderInfo.GetAppDataPath(),
                 OsName = _osInfo.Name,
                 OsVersion = _osInfo.Version,
-                IsNetCore = PlatformInfo.IsNetCore,
+                IsMonoRuntime = PlatformInfo.IsMono,
                 IsMono = PlatformInfo.IsMono,
                 IsLinux = OsInfo.IsLinux,
                 IsOsx = OsInfo.IsOsx,
@@ -74,29 +73,25 @@ namespace Lidarr.Api.V1.System
                 UrlBase = _configFileProvider.UrlBase,
                 RuntimeVersion = _platformInfo.Version,
                 RuntimeName = PlatformInfo.Platform,
-                StartTime = _runtimeInfo.StartTime,
-                PackageVersion = _deploymentInfoProvider.PackageVersion,
-                PackageAuthor = _deploymentInfoProvider.PackageAuthor,
-                PackageUpdateMechanism = _deploymentInfoProvider.PackageUpdateMechanism,
-                PackageUpdateMechanismMessage = _deploymentInfoProvider.PackageUpdateMechanismMessage
-            };
+                StartTime = _runtimeInfo.StartTime
+            }.AsResponse();
         }
 
-        private object GetRoutes()
+        private Response GetRoutes()
         {
-            return _routeCacheProvider.GetCache().Values;
+            return _routeCacheProvider.GetCache().Values.AsResponse();
         }
 
-        private object Shutdown()
+        private Response Shutdown()
         {
             Task.Factory.StartNew(() => _lifecycleService.Shutdown());
-            return new { ShuttingDown = true };
+            return new { ShuttingDown = true }.AsResponse();
         }
 
-        private object Restart()
+        private Response Restart()
         {
             Task.Factory.StartNew(() => _lifecycleService.Restart());
-            return new { Restarting = true };
+            return new { Restarting = true }.AsResponse();
         }
     }
 }

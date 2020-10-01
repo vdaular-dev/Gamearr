@@ -84,7 +84,7 @@ namespace NzbDrone.Core.Extras.Metadata.Consumers.Roksbox
                     return metadata;
                 }
 
-                metadata.Type = MetadataType.GameImage;
+                metadata.Type = MetadataType.ArtistImage;
                 return metadata;
             }
 

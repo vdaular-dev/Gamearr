@@ -1,6 +1,7 @@
-using Lidarr.Http.Frontend;
+using System;
 using Nancy;
 using Nancy.Bootstrapper;
+using Lidarr.Http.Frontend;
 
 namespace Lidarr.Http.Extensions.Pipelines
 {
@@ -17,15 +18,12 @@ namespace Lidarr.Http.Extensions.Pipelines
 
         public void Register(IPipelines pipelines)
         {
-            pipelines.AfterRequest.AddItemToStartOfPipeline(Handle);
+            pipelines.AfterRequest.AddItemToStartOfPipeline((Action<NancyContext>) Handle);
         }
 
         private void Handle(NancyContext context)
         {
-            if (context.Request.Method == "OPTIONS")
-            {
-                return;
-            }
+            if (context.Request.Method == "OPTIONS") return;
 
             if (_cacheableSpecification.IsCacheable(context))
             {

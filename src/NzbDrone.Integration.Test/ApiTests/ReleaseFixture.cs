@@ -1,6 +1,6 @@
 using FluentAssertions;
 using NUnit.Framework;
-using Gamearr.Api.V1.Indexers;
+using Lidarr.Api.V1.Indexers;
 using System.Linq;
 using System.Net;
 

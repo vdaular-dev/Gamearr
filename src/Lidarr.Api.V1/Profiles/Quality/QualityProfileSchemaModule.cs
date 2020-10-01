@@ -1,5 +1,5 @@
-using Lidarr.Http;
 using NzbDrone.Core.Profiles.Qualities;
+using Lidarr.Http;
 
 namespace Lidarr.Api.V1.Profiles.Quality
 {
@@ -17,6 +17,7 @@ namespace Lidarr.Api.V1.Profiles.Quality
         private QualityProfileResource GetSchema()
         {
             QualityProfile qualityProfile = _profileService.GetDefaultProfile(string.Empty);
+
 
             return qualityProfile.ToResource();
         }

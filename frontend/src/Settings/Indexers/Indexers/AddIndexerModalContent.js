@@ -50,7 +50,7 @@ class AddIndexerModalContent extends Component {
               <div>
 
                 <Alert kind={kinds.INFO}>
-                  <div>Gamearr supports any indexer that uses the Newznab standard, as well as other indexers listed below.</div>
+                  <div>Lidarr supports any indexer that uses the Newznab standard, as well as other indexers listed below.</div>
                   <div>For more information on the individual indexers, click on the info buttons.</div>
                 </Alert>
 

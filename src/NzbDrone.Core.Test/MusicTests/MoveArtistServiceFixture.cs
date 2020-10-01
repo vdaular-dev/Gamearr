@@ -14,11 +14,11 @@ using NzbDrone.Test.Common;
 namespace NzbDrone.Core.Test.MusicTests
 {
     [TestFixture]
-    public class MoveGameServiceFixture : CoreTest<MoveGameService>
+    public class MoveArtistServiceFixture : CoreTest<MoveArtistService>
     {
         private Artist _artist;
-        private MoveGameCommand _command;
-        private BulkMoveGameCommand _bulkCommand;
+        private MoveArtistCommand _command;
+        private BulkMoveArtistCommand _bulkCommand;
 
         [SetUp]
         public void Setup()
@@ -27,18 +27,18 @@ namespace NzbDrone.Core.Test.MusicTests
                 .CreateNew()
                 .Build();
 
-            _command = new MoveGameCommand
+            _command = new MoveArtistCommand
             {
                 ArtistId = 1,
                 SourcePath = @"C:\Test\Music\Artist".AsOsAgnostic(),
                 DestinationPath = @"C:\Test\Music2\Artist".AsOsAgnostic()
             };
 
-            _bulkCommand = new BulkMoveGameCommand
+            _bulkCommand = new BulkMoveArtistCommand
             {
-                Artist = new List<BulkMoveGame>
+                Artist = new List<BulkMoveArtist>
                 {
-                    new BulkMoveGame
+                    new BulkMoveArtist
                     {
                         ArtistId = 1,
                         SourcePath = @"C:\Test\Music\Artist".AsOsAgnostic()

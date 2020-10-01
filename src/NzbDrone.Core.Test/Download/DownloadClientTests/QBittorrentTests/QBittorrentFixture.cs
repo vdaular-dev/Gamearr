@@ -59,7 +59,7 @@ namespace NzbDrone.Core.Test.Download.DownloadClientTests.QBittorrentTests
         protected void GivenRedirectToTorrent()
         {
             var httpHeader = new HttpHeader();
-            httpHeader["Location"] = "http://test.gamearr.game/not-a-real-torrent.torrent";
+            httpHeader["Location"] = "http://test.lidarr.audio/not-a-real-torrent.torrent";
 
             Mocker.GetMock<IHttpClient>()
                   .Setup(s => s.Get(It.Is<HttpRequest>(h => h.Url.FullUri == _downloadUrl)))
@@ -561,7 +561,7 @@ namespace NzbDrone.Core.Test.Download.DownloadClientTests.QBittorrentTests
         [Test]
         public void should_get_category_from_the_category_if_set()
         {
-            const string category = "music-gamearr";
+            const string category = "music-lidarr";
             GivenGlobalSeedLimits(1.0f);
 
             var torrent = new QBittorrentTorrent
@@ -586,7 +586,7 @@ namespace NzbDrone.Core.Test.Download.DownloadClientTests.QBittorrentTests
         [Test]
         public void should_get_category_from_the_label_if_the_category_is_not_available()
         {
-            const string category = "music-gamearr";
+            const string category = "music-lidarr";
             GivenGlobalSeedLimits(1.0f);
 
             var torrent = new QBittorrentTorrent
