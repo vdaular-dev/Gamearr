@@ -76,7 +76,7 @@ class PageHeader extends Component {
           <IconButton
             className={styles.donate}
             name={icons.HEART}
-            to="https://opencollective.com/lidarr"
+            to="https://opencollective.com/gamearr"
             size={14}
           />
           <PageHeaderActionsMenuConnector

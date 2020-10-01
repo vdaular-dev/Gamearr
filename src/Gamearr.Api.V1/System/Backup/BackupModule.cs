@@ -101,7 +101,7 @@ namespace Gamearr.Api.V1.System.Backup
                 throw new UnsupportedMediaTypeException($"Invalid extension, must be one of: {ValidExtensions.Join(", ")}");
             }
 
-            var path = Path.Combine(_appFolderInfo.TempFolder, $"lidarr_backup_restore{extension}");
+            var path = Path.Combine(_appFolderInfo.TempFolder, $"gamearr_backup_restore{extension}");
 
             _diskProvider.SaveStream(file.Value, path);
             _backupService.Restore(path);

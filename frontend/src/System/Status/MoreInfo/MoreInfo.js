@@ -16,12 +16,12 @@ class MoreInfo extends Component {
         <DescriptionList>
           <DescriptionListItemTitle>Home page</DescriptionListItemTitle>
           <DescriptionListItemDescription>
-            <Link to="https://lidarr.audio/">lidarr.audio</Link>
+            <Link to="https://gamearr.audio/">gamearr.audio</Link>
           </DescriptionListItemDescription>
 
           <DescriptionListItemTitle>Wiki</DescriptionListItemTitle>
           <DescriptionListItemDescription>
-            <Link to="https://github.com/lidarr/Gamearr/wiki">wiki.lidarr.audio</Link>
+            <Link to="https://github.com/gamearr/Gamearr/wiki">wiki.gamearr.audio</Link>
           </DescriptionListItemDescription>
 
           <DescriptionListItemTitle>Reddit</DescriptionListItemTitle>
@@ -31,12 +31,12 @@ class MoreInfo extends Component {
 
           <DescriptionListItemTitle>Discord</DescriptionListItemTitle>
           <DescriptionListItemDescription>
-            <Link to="https://discord.gg/8Y7rDc9">#lidarr on Discord</Link>
+            <Link to="https://discord.gg/8Y7rDc9">#gamearr on Discord</Link>
           </DescriptionListItemDescription>
 
           <DescriptionListItemTitle>Donations</DescriptionListItemTitle>
           <DescriptionListItemDescription>
-            <Link to="https://opencollective.com/lidarr">Donate to Gamearr</Link>
+            <Link to="https://opencollective.com/gamearr">Donate to Gamearr</Link>
           </DescriptionListItemDescription>
 
           <DescriptionListItemTitle>Sonarr Donations</DescriptionListItemTitle>
@@ -46,12 +46,12 @@ class MoreInfo extends Component {
 
           <DescriptionListItemTitle>Source</DescriptionListItemTitle>
           <DescriptionListItemDescription>
-            <Link to="https://github.com/lidarr/Gamearr/">github.com/Gamearr/Gamearr</Link>
+            <Link to="https://github.com/gamearr/Gamearr/">github.com/Gamearr/Gamearr</Link>
           </DescriptionListItemDescription>
 
           <DescriptionListItemTitle>Feature Requests</DescriptionListItemTitle>
           <DescriptionListItemDescription>
-            <Link to="https://github.com/lidarr/Gamearr/issues">github.com/Gamearr/Gamearr/issues</Link>
+            <Link to="https://github.com/gamearr/Gamearr/issues">github.com/Gamearr/Gamearr/issues</Link>
           </DescriptionListItemDescription>
 
         </DescriptionList>

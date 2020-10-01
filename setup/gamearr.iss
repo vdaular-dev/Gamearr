@@ -3,8 +3,8 @@
 
 #define AppName "Gamearr"
 #define AppPublisher "Team Gamearr"
-#define AppURL "https://lidarr.audio/"
-#define ForumsURL "https://forums.lidarr.audio/"
+#define AppURL "https://gamearr.audio/"
+#define ForumsURL "https://forums.gamearr.audio/"
 #define AppExeName "Gamearr.exe"
 #define BaseVersion GetEnv('MAJORVERSION')
 #define BuildNumber GetEnv('MINORVERSION')
@@ -64,7 +64,7 @@ Filename: "{app}\Gamearr.exe"; Description: "Open Gamearr Web UI"; Flags: postin
 Filename: "{app}\Gamearr.exe"; Description: "Start Gamearr"; Flags: postinstall skipifsilent nowait; Tasks: startupShortcut none;
 
 [UninstallRun]
-Filename: "{app}\lidarr.console.exe"; Parameters: "/u"; Flags: waituntilterminated skipifdoesntexist
+Filename: "{app}\gamearr.console.exe"; Parameters: "/u"; Flags: waituntilterminated skipifdoesntexist
 
 [Code]
 function PrepareToInstall(var NeedsRestart: Boolean): String;

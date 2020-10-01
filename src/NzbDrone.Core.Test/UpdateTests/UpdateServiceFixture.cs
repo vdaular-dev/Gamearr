@@ -36,7 +36,7 @@ namespace NzbDrone.Core.Test.UpdateTests
                 _updatePackage = new UpdatePackage
                 {
                     FileName = "Gamearr.develop.0.6.2.883.tar.gz",
-                    Url = "https://github.com/lidarr/Gamearr/releases/download/v0.6.2.883/Gamearr.develop.0.6.2.883.linux.tar.gz",
+                    Url = "https://github.com/gamearr/Gamearr/releases/download/v0.6.2.883/Gamearr.develop.0.6.2.883.linux.tar.gz",
                     Version = new Version("0.6.2.883")
                 };
             }
@@ -46,7 +46,7 @@ namespace NzbDrone.Core.Test.UpdateTests
                 _updatePackage = new UpdatePackage
                 {
                     FileName = "Gamearr.develop.0.6.2.883.zip",
-                    Url = "https://github.com/lidarr/Gamearr/releases/download/v0.6.2.883/Gamearr.develop.0.6.2.883.windows.zip",
+                    Url = "https://github.com/gamearr/Gamearr/releases/download/v0.6.2.883/Gamearr.develop.0.6.2.883.windows.zip",
                     Version = new Version("0.6.2.883")
                 };
             }
@@ -184,7 +184,7 @@ namespace NzbDrone.Core.Test.UpdateTests
         [Platform("Mono")]
         public void should_run_script_if_configured()
         {
-            const string scriptPath = "/tmp/lidarr/update.sh";
+            const string scriptPath = "/tmp/gamearr/update.sh";
 
             GivenInstallScript(scriptPath);
 
@@ -197,7 +197,7 @@ namespace NzbDrone.Core.Test.UpdateTests
         [Platform("Mono")]
         public void should_throw_if_script_is_not_set()
         {
-            const string scriptPath = "/tmp/lidarr/update.sh";
+            const string scriptPath = "/tmp/gamearr/update.sh";
 
             GivenInstallScript("");
 
@@ -211,7 +211,7 @@ namespace NzbDrone.Core.Test.UpdateTests
         [Platform("Mono")]
         public void should_throw_if_script_is_null()
         {
-            const string scriptPath = "/tmp/lidarr/update.sh";
+            const string scriptPath = "/tmp/gamearr/update.sh";
 
             GivenInstallScript(null);
 
@@ -225,7 +225,7 @@ namespace NzbDrone.Core.Test.UpdateTests
         [Platform("Mono")]
         public void should_throw_if_script_path_does_not_exist()
         {
-            const string scriptPath = "/tmp/lidarr/update.sh";
+            const string scriptPath = "/tmp/gamearr/update.sh";
 
             GivenInstallScript(scriptPath);
 

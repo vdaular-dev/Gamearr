@@ -31,7 +31,7 @@ namespace NzbDrone.Common.Processes
                 return;
             }
 
-            var filename = Path.Combine(_appFolderInfo.AppDataFolder, "lidarr.pid");
+            var filename = Path.Combine(_appFolderInfo.AppDataFolder, "gamearr.pid");
             try
             {
                 File.WriteAllText(filename, _processProvider.GetCurrentProcessId().ToString());

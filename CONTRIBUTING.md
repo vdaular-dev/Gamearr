@@ -27,7 +27,7 @@ Setup guides, FAQ, the more information we have on the wiki the better.
 8. Open http://localhost:8686
 
 ### Contributing Code ###
-- If you're adding a new, already requested feature, please comment on [Github Issues](https://github.com/lidarr/Gamearr/issues "Github Issues") so work is not duplicated (If you want to add something not already on there, please talk to us first)
+- If you're adding a new, already requested feature, please comment on [Github Issues](https://github.com/gamearr/Gamearr/issues "Github Issues") so work is not duplicated (If you want to add something not already on there, please talk to us first)
 - Rebase from Gamearr's develop branch, don't merge
 - Make meaningful commits, or squash them
 - Feel free to make a pull request before work is complete, this will let us see where its at and make comments/suggest improvements

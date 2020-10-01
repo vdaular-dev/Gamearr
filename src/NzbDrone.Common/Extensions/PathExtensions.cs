@@ -11,16 +11,16 @@ namespace NzbDrone.Common.Extensions
     public static class PathExtensions
     {
         private const string APP_CONFIG_FILE = "config.xml";
-        private const string DB = "lidarr.db";
-        private const string DB_RESTORE = "lidarr.restore";
+        private const string DB = "gamearr.db";
+        private const string DB_RESTORE = "gamearr.restore";
         private const string LOG_DB = "logs.db";
         private const string NLOG_CONFIG_FILE = "nlog.config";
         private const string UPDATE_CLIENT_EXE = "Gamearr.Update.exe";
 
-        private static readonly string UPDATE_SANDBOX_FOLDER_NAME = "lidarr_update" + Path.DirectorySeparatorChar;
+        private static readonly string UPDATE_SANDBOX_FOLDER_NAME = "gamearr_update" + Path.DirectorySeparatorChar;
         private static readonly string UPDATE_PACKAGE_FOLDER_NAME = "Gamearr" + Path.DirectorySeparatorChar;
-        private static readonly string UPDATE_BACKUP_FOLDER_NAME = "lidarr_backup" + Path.DirectorySeparatorChar;
-        private static readonly string UPDATE_BACKUP_APPDATA_FOLDER_NAME = "lidarr_appdata_backup" + Path.DirectorySeparatorChar;
+        private static readonly string UPDATE_BACKUP_FOLDER_NAME = "gamearr_backup" + Path.DirectorySeparatorChar;
+        private static readonly string UPDATE_BACKUP_APPDATA_FOLDER_NAME = "gamearr_appdata_backup" + Path.DirectorySeparatorChar;
         private static readonly string UPDATE_CLIENT_FOLDER_NAME = "Gamearr.Update" + Path.DirectorySeparatorChar;
         private static readonly string UPDATE_LOG_FOLDER_NAME = "UpdateLogs" + Path.DirectorySeparatorChar;
 

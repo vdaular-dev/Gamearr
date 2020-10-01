@@ -7,4 +7,4 @@ https://dev.azure.com/Gamearr/Gamearr/_build?definitionId=4&_a=summary
 System.Data.SQLite netstandard2.0 dll compiled in same pipeline with:
 /p:Configuration=ReleaseManagedOnly /p:UseInteropDll=false /p:UseSqliteStandard=true
 
-Both MacOS and System.Data.SQLite from revision 40e714a of https://github.com/lidarr/SQLite.Build
+Both MacOS and System.Data.SQLite from revision 40e714a of https://github.com/gamearr/SQLite.Build

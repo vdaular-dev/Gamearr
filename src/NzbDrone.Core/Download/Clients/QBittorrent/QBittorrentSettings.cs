@@ -22,7 +22,7 @@ namespace NzbDrone.Core.Download.Clients.QBittorrent
         {
             Host = "localhost";
             Port = 8080;
-            MusicCategory = "lidarr";
+            MusicCategory = "gamearr";
         }
 
         [FieldDefinition(0, Label = "Host", Type = FieldType.Textbox)]

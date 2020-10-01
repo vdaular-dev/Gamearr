@@ -168,7 +168,7 @@ namespace NzbDrone.Common.Test.Http
             }
 
             var request = new HttpRequestBuilder($"https://{_httpBinHost}/redirect-to")
-                .AddQueryParam("url", $"https://lidarr.audio/")
+                .AddQueryParam("url", $"https://gamearr.audio/")
                 .Build();
             request.AllowAutoRedirect = true;
 
@@ -221,7 +221,7 @@ namespace NzbDrone.Common.Test.Http
         {
             var file = GetTempFilePath();
 
-            Assert.Throws<WebException>(() => Subject.DownloadFile("https://download.lidarr.audio/wrongpath", file));
+            Assert.Throws<WebException>(() => Subject.DownloadFile("https://download.gamearr.audio/wrongpath", file));
 
             File.Exists(file).Should().BeFalse();
 

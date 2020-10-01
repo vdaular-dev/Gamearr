@@ -9,14 +9,14 @@ variables:
   testsFolder: './_tests'
   majorVersion: '0.7.1'
   minorVersion: $[counter('minorVersion', 1076)]
-  lidarrVersion: '$(majorVersion).$(minorVersion)'
-  buildName: '$(Build.SourceBranchName).$(lidarrVersion)'
+  gamearrVersion: '$(majorVersion).$(minorVersion)'
+  buildName: '$(Build.SourceBranchName).$(gamearrVersion)'
   windowsInstaller: 'Gamearr.$(buildName).windows-installer.exe'
   windowsZip: 'Gamearr.$(buildName).windows.zip'
   macOsApp: 'Gamearr.$(buildName).osx-app.zip'
   macOsTar: 'Gamearr.$(buildName).osx.tar.gz'
   linuxTar: 'Gamearr.$(buildName).linux.tar.gz'
-  sentryOrg: 'lidarr'
+  sentryOrg: 'gamearr'
 
 trigger:
   branches:
@@ -128,7 +128,7 @@ stages:
       - bash: ./build.sh --packages
         displayName: Create Packages
       - bash: |
-          ./setup/inno/ISCC.exe "./setup/lidarr.iss"
+          ./setup/inno/ISCC.exe "./setup/gamearr.iss"
           cp ./setup/output/Gamearr.*windows.exe ${BUILD_ARTIFACTSTAGINGDIRECTORY}/${WINDOWSINSTALLER}
         displayName: Create Windows installer
       - publish: $(Build.ArtifactStagingDirectory)
@@ -204,8 +204,8 @@ stages:
           echo "Uploading source maps to sentry"
           curl -sL https://sentry.io/get-cli/ | bash
           RELEASENAME="${GAMEARRVERSION}-${BUILD_SOURCEBRANCHNAME}"
-          sentry-cli releases new --finalize -p lidarr -p lidarr-ui -p lidarr-update "${RELEASENAME}"
-          sentry-cli releases -p lidarr-ui files "${RELEASENAME}" upload-sourcemaps _output/UI/ --rewrite
+          sentry-cli releases new --finalize -p gamearr -p gamearr-ui -p gamearr-update "${RELEASENAME}"
+          sentry-cli releases -p gamearr-ui files "${RELEASENAME}" upload-sourcemaps _output/UI/ --rewrite
           sentry-cli releases set-commits --auto "${RELEASENAME}"
           if [[ ${BUILD_SOURCEBRANCHNAME} == "refs/heads/develop" ]]; then
           sentry-cli releases deploys "${RELEASENAME}" new -e nightly
@@ -621,12 +621,12 @@ stages:
           SONAR_SCANNER_OPTS: ''
         inputs:
           SonarCloud: 'SonarCloud'
-          organization: 'lidarr'
+          organization: 'gamearr'
           scannerMode: 'CLI'
           configMode: 'manual'
-          cliProjectKey: 'lidarr_Gamearr.UI'
+          cliProjectKey: 'gamearr_Gamearr.UI'
           cliProjectName: 'GamearrUI'
-          cliProjectVersion: '$(lidarrVersion)'
+          cliProjectVersion: '$(gamearrVersion)'
           cliSources: './frontend'
       - task: SonarCloudAnalyze@1
 
@@ -640,11 +640,11 @@ stages:
       - task: SonarCloudPrepare@1
         inputs:
           SonarCloud: 'SonarCloud'
-          organization: 'lidarr'
+          organization: 'gamearr'
           scannerMode: 'MSBuild'
-          projectKey: 'lidarr_Gamearr'
+          projectKey: 'gamearr_Gamearr'
           projectName: 'Gamearr'
-          projectVersion: '$(lidarrVersion)'
+          projectVersion: '$(gamearrVersion)'
           extraProperties: |
             sonar.exclusions=**/obj/**,**/*.dll,**/NzbDrone.Core.Test/Files/**/*,./frontend/**,**/ExternalModules/**,./src/Libraries/**
             sonar.coverage.exclusions=**/Gamearr.Api.V1/**/*,**/MonoTorrent/**/*,**/Marr.Data/**/*

@@ -13,10 +13,10 @@ namespace NzbDrone.Common.Cloud
     {
         public GamearrCloudRequestBuilder()
         {
-            Services = new HttpRequestBuilder("https://services.lidarr.audio/v1/")
+            Services = new HttpRequestBuilder("https://services.gamearr.audio/v1/")
                 .CreateFactory();
 
-            Search = new HttpRequestBuilder("https://api.lidarr.audio/api/v0.4/{route}")
+            Search = new HttpRequestBuilder("https://api.gamearr.audio/api/v0.4/{route}")
                 .KeepAlive()
                 .CreateFactory();
         }

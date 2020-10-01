@@ -77,7 +77,7 @@ namespace NzbDrone.Core.Notifications.Boxcar
                 request.AddParameter("notification[title]", title);
                 request.AddParameter("notification[long_message]", message);
                 request.AddParameter("notification[source_name]", BuildInfo.AppName);
-                request.AddParameter("notification[icon_url]", "https://github.com/lidarr/Gamearr/raw/develop/Logo/64.png");
+                request.AddParameter("notification[icon_url]", "https://github.com/gamearr/Gamearr/raw/develop/Logo/64.png");
 
                 client.ExecuteAndValidate(request);
             }

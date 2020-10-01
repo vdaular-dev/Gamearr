@@ -66,7 +66,7 @@ namespace Gamearr.Api.V1.Calendar
             var albums = _albumService.AlbumsBetweenDates(start, end, unmonitored);
             var calendar = new Ical.Net.Calendar
             {
-                ProductId = "-//lidarr.audio//Gamearr//EN"
+                ProductId = "-//gamearr.audio//Gamearr//EN"
             };
 
             var calendarName = "Gamearr Music Schedule";

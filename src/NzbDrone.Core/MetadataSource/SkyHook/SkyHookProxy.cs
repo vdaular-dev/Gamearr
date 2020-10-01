@@ -144,7 +144,7 @@ namespace NzbDrone.Core.MetadataSource.SkyHook
             {
                 var lowerTitle = title.ToLowerInvariant();
 
-                if (lowerTitle.StartsWith("lidarr:") || lowerTitle.StartsWith("lidarrid:") || lowerTitle.StartsWith("mbid:"))
+                if (lowerTitle.StartsWith("gamearr:") || lowerTitle.StartsWith("gamearrid:") || lowerTitle.StartsWith("mbid:"))
                 {
                     var slug = lowerTitle.Split(':')[1].Trim();
 
@@ -204,7 +204,7 @@ namespace NzbDrone.Core.MetadataSource.SkyHook
             {
                 var lowerTitle = title.ToLowerInvariant();
 
-                if (lowerTitle.StartsWith("lidarr:") || lowerTitle.StartsWith("lidarrid:") || lowerTitle.StartsWith("mbid:"))
+                if (lowerTitle.StartsWith("gamearr:") || lowerTitle.StartsWith("gamearrid:") || lowerTitle.StartsWith("mbid:"))
                 {
                     var slug = lowerTitle.Split(':')[1].Trim();
 

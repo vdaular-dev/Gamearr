@@ -1,4 +1,4 @@
-const lidarrGreen = '#00A65B';
+const gamearrGreen = '#00A65B';
 
 module.exports = {
   defaultColor: '#333',
@@ -14,10 +14,10 @@ module.exports = {
   successColor: '#27c24c',
   dangerColor: '#f05050',
   warningColor: '#ffa500',
-  infoColor: lidarrGreen,
+  infoColor: gamearrGreen,
   purple: '#7a43b6',
   pink: '#ff69b4',
-  lidarrGreen,
+  gamearrGreen,
   helpTextColor: '#909293',
   darkGray: '#888',
   gray: '#adadad',
@@ -26,7 +26,7 @@ module.exports = {
 
   // Theme Colors
 
-  themeBlue: lidarrGreen,
+  themeBlue: gamearrGreen,
   themeAlternateBlue: '#00a65b',
   themeRed: '#c4273c',
   themeDarkColor: '#353535',

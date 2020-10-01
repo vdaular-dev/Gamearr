@@ -13,9 +13,9 @@
 	<key>CFBundleExecutable</key>
 	<string>Gamearr</string>
 	<key>CFBundleIconFile</key>
-	<string>lidarr.icns</string>
+	<string>gamearr.icns</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.osx.lidarr.audio</string>
+	<string>com.osx.gamearr.audio</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>

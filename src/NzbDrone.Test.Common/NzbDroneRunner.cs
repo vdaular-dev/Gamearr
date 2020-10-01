@@ -34,7 +34,7 @@ namespace NzbDrone.Test.Common
 
             GenerateConfigFile();
             
-            var lidarrConsoleExe = OsInfo.IsWindows ? "Gamearr.Console.exe" : "Gamearr.exe";
+            var gamearrConsoleExe = OsInfo.IsWindows ? "Gamearr.Console.exe" : "Gamearr.exe";
 
             if (BuildInfo.IsDebug)
             {
@@ -42,7 +42,7 @@ namespace NzbDrone.Test.Common
             }
             else
             {
-                Start(Path.Combine("bin", lidarrConsoleExe));
+                Start(Path.Combine("bin", gamearrConsoleExe));
             }
 
             while (true)

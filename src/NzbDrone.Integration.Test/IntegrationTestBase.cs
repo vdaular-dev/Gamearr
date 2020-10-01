@@ -226,13 +226,13 @@ namespace NzbDrone.Integration.Test
             Assert.Fail("Timed on wait");
         }
 
-        public ArtistResource EnsureArtist(string lidarrId, string artistName, bool? monitored = null)
+        public ArtistResource EnsureArtist(string gamearrId, string artistName, bool? monitored = null)
         {
-            var result = Artist.All().FirstOrDefault(v => v.ForeignArtistId == lidarrId);
+            var result = Artist.All().FirstOrDefault(v => v.ForeignArtistId == gamearrId);
 
             if (result == null)
             {
-                var lookup = Artist.Lookup("lidarr:" + lidarrId);
+                var lookup = Artist.Lookup("gamearr:" + gamearrId);
                 var artist = lookup.First();
                 artist.QualityProfileId = 1;
                 artist.MetadataProfileId = 1;
@@ -273,9 +273,9 @@ namespace NzbDrone.Integration.Test
         }
 
 
-        public void EnsureNoArtist(string lidarrId, string artistTitle)
+        public void EnsureNoArtist(string gamearrId, string artistTitle)
         {
-            var result = Artist.All().FirstOrDefault(v => v.ForeignArtistId == lidarrId);
+            var result = Artist.All().FirstOrDefault(v => v.ForeignArtistId == gamearrId);
 
             if (result != null)
             {

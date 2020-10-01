@@ -39,7 +39,7 @@ function NotificationEventItems(props) {
       <div>
         <FormInputHelpText
           text="Select which events should trigger this notification"
-          link="https://github.com/lidarr/Gamearr/wiki/Connections"
+          link="https://github.com/gamearr/Gamearr/wiki/Connections"
         />
         <div className={styles.events}>
           <div>
