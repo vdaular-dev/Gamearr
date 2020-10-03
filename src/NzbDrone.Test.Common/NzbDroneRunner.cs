@@ -21,10 +21,10 @@ namespace NzbDrone.Test.Common
         public string AppData { get; private set; }
         public string ApiKey { get; private set; }
 
-        public NzbDroneRunner(Logger logger, int port = 8686)
+        public NzbDroneRunner(Logger logger, int port = 8383)
         {
             _processProvider = new ProcessProvider(logger);
-            _restClient = new RestClient("http://localhost:8686/api");
+            _restClient = new RestClient("http://localhost:8383/api");
         }
 
         public void Start()
