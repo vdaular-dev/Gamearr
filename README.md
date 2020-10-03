@@ -1,5 +1,7 @@
 # <img width="24px" src="./Logo/256.png" alt="gamearr"></img> Gamearr
 
+## NOT WORKING - STILL IN DEVELOPMENT
+
 - [Download](https://gamearr.game/#download) (Linux, MacOS, Windows, Docker, etc.)
 - [Installation](https://github.com/Gamearr/Gamearr/wiki/Installation)
 - [FAQ](https://github.com/Gamearr/Gamearr/wiki/FAQ)
@@ -8,7 +10,7 @@
 
 ## Getting Started
 
-Gamearr is a Game collection manager for Usenet and BitTorrent users. It can monitor multiple RSS feeds for new games as there being released and when they have been cracked automatically download them. 
+Gamearr is a Game collection manager forked from lidarr for Usenet and BitTorrent users. It can monitor multiple RSS feeds for new games as there being released and when they have been cracked.
 
 ## Major Features Include:
 
@@ -51,6 +53,13 @@ Support this project by becoming a sponsor. Your logo will show up here with a l
 ## Graphics
 
 https://www.instagram.com/crushingtokyo/ Give him a like and buy his stuff.
+
+## Check out 
+
+ * Lidarr @ http://lidarr.audio/
+ * Radarr @ http://radarr.video/
+ * Sonarr @ http://sonarr.tv/
+ * Readarr @ http://readarr.com/
 
 ### License
 
