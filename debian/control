@@ -2,7 +2,7 @@ Section: web
 Priority: optional
 Maintainer: Sonarr <contact@nzbdrone.com>
 Source: nzbdrone
-Homepage: https://gamearr.audio
+Homepage: https://gamearr.games
 Vcs-Git: git@github.com:gamearr/Gamearr.git
 Vcs-Browser: https://github.com/gamearr/Gamearr
 

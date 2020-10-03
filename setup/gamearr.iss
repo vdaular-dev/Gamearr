@@ -3,8 +3,8 @@
 
 #define AppName "Gamearr"
 #define AppPublisher "Team Gamearr"
-#define AppURL "https://gamearr.audio/"
-#define ForumsURL "https://forums.gamearr.audio/"
+#define AppURL "https://gamearr.games/"
+#define ForumsURL "https://forums.gamearr.games/"
 #define AppExeName "Gamearr.exe"
 #define BaseVersion GetEnv('MAJORVERSION')
 #define BuildNumber GetEnv('MINORVERSION')

@@ -20,14 +20,14 @@ namespace NzbDrone.Core.Test.MetadataSource
 
             Mocker.GetMock<IGamearrCloudRequestBuilder>()
                 .Setup(s => s.Search)
-                .Returns(new HttpRequestBuilder("https://api.gamearr.audio/api/v0.4/{route}").CreateFactory());
+                .Returns(new HttpRequestBuilder("https://api.gamearr.games/api/v0.4/{route}").CreateFactory());
         }
 
         private void WithCustomProvider()
         {
             Mocker.GetMock<IConfigService>()
                 .Setup(s => s.MetadataSource)
-                .Returns("http://api.gamearr.audio/api/testing/");
+                .Returns("http://api.gamearr.games/api/testing/");
         }
 
         [TestCase]

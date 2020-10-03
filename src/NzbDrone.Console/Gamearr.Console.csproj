@@ -4,7 +4,7 @@
     <TargetFramework>net462</TargetFramework>
     <Platforms>x86</Platforms>
 
-    <ApplicationIcon>..\NzbDrone.Host\NzbDrone.ico</ApplicationIcon>
+    <ApplicationIcon>NzbDrone.ico</ApplicationIcon>
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>

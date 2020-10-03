@@ -50,8 +50,8 @@
   <!-- Set the Product and Version info for our own projects -->
   <PropertyGroup Condition="'$(GamearrProject)'=='true'">
     <Product>Gamearr</Product>
-    <Company>gamearr.audio</Company>
-    <Copyright>Copyright 2017-$([System.DateTime]::Now.ToString('yyyy')) gamearr.audio (GNU General Public v3)</Copyright>
+    <Company>gamearr.games</Company>
+    <Copyright>Copyright 2017-$([System.DateTime]::Now.ToString('yyyy')) gamearr.games (GNU General Public v3)</Copyright>
     
     <!-- Should be replaced by CI -->
     <AssemblyVersion>10.0.0.*</AssemblyVersion>

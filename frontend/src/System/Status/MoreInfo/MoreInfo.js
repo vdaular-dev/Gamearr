@@ -16,12 +16,12 @@ class MoreInfo extends Component {
         <DescriptionList>
           <DescriptionListItemTitle>Home page</DescriptionListItemTitle>
           <DescriptionListItemDescription>
-            <Link to="https://gamearr.audio/">gamearr.audio</Link>
+            <Link to="https://gamearr.games/">gamearr.games</Link>
           </DescriptionListItemDescription>
 
           <DescriptionListItemTitle>Wiki</DescriptionListItemTitle>
           <DescriptionListItemDescription>
-            <Link to="https://github.com/gamearr/Gamearr/wiki">wiki.gamearr.audio</Link>
+            <Link to="https://github.com/gamearr/Gamearr/wiki">wiki.gamearr.games</Link>
           </DescriptionListItemDescription>
 
           <DescriptionListItemTitle>Reddit</DescriptionListItemTitle>
