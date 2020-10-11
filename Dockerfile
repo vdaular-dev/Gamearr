@@ -4,7 +4,7 @@ FROM lsiobase/mono:LTS
 LABEL maintainer="Aquilla"
 
 RUN apt-get update && \
-	apt-get -y install --no-install-recommends mediainfo libicu63 && \
+	apt-get -y install --no-install-recommends mediainfo libchromaprint-tools jq && \
 	rm -rf /var/lib/apt/lists/*
 
 ENV DATA_DIR="/gamearr"
