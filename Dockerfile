@@ -16,26 +16,8 @@ RUN \
  apt-get install --no-install-recommends -y \
 	libchromaprint-tools \
 	jq && \
-RUN \
  echo "**** install gamearr ****" && \
- if [ -z ${GAMNEARR_RELEASE+x} ]; then \
-	GAMEARR_RELEASE=$(curl -sX GET "https://github.com/Gamearr/Gamearr/releases/" \
-	| jq -r '.[0] | .tag_name'); \
- fi && \
- gamearr_url=$(curl -s https://github.com/Gamearr/Gamearr/releases/tag/0.0.1"$GAMEARR_RELEASE}" \
-	|jq -r '.assets[].browser_download_url' |grep linux) && \
-RUN \
- mkdir -p \
-	/app/Gamearr/bin && \
-RUN \
- curl -o \
- /tmp/Gamearr.tar.gz -L \
-	"${gamearr_url}" && \
-RUN \
- tar ixzf \
- /tmp/Gamearr.tar.gz -C \
-	/app/Gamearr/bin --strip-components=1 && \
-RUN \
+ wget https://github.com/Gamearr/Gamearr/releases/download/0.0.1/Gamearr.develop.0.0.1.linux.tar.gz
  echo "**** cleanup ****" && \
  rm -rf \
 	/tmp/* \
