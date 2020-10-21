@@ -3,7 +3,7 @@ FROM lsiobase/mono:LTS
 # set version label
 ARG BUILD_DATE
 ARG VERSION
-ARG LIDARR_RELEASE
+ARG GAMEARR_RELEASE
 LABEL build_version="Linuxserver.io version:- ${VERSION} Build-date:- ${BUILD_DATE}"
 LABEL maintainer="Aquilla"
 
@@ -18,27 +18,24 @@ RUN \
  apt-get install --no-install-recommends -y \
 	libchromaprint-tools \
 	jq && \
- echo "**** install lidarr ****" && \
- mkdir -p /app/lidarr/bin && \
- if [ -z ${LIDARR_RELEASE+x} ]; then \
-	LIDARR_RELEASE=$(curl -sL "https://services.lidarr.audio/v1/update/${LIDARR_BRANCH}/changes?os=linux" \
-	| jq -r '.[0].version'); \
+ echo "**** install gamearr ****" && \
+ mkdir -p 
+ 	/app/gamearr/bin && \
+ if [ -z ${GAMEARR_RELEASE+x} ]; then \
+	GAMEARR_RELEASE=$(curl -sX GET "https://api.github.com/repos/Gamearr/Gamearr/releases/latest" \
+	| jq -r .tag_name); \
  fi && \
- lidarr_url=$(curl -sL "https://services.lidarr.audio/v1/update/${LIDARR_BRANCH}/changes?os=linux" \
-	| jq -r "first(.[] | select(.version == \"${LIDARR_RELEASE}\")) | .url") && \
  curl -o \
- /tmp/lidarr.tar.gz -L \
-	"${lidarr_url}" && \
+ /tmp/gamearr.tar.gz -L \
+	"https://github.com/Gamearr/Gamearr/releases/download/0.0.1/Gamearr.develop.0.0.1.linux.tar.gz" && \
  tar ixzf \
- /tmp/lidarr.tar.gz -C \
-	/app/lidarr/bin --strip-components=1 && \
- echo "UpdateMethod=docker\nBranch=${LIDARR_BRANCH}\nPackageVersion=${VERSION}\nPackageAuthor=linuxserver.io" > /app/lidarr/package_info && \
+ /tmp/gamearr.tar.gz -C \
+	/app/gamearr/bin --strip-components=1 && \
  echo "**** cleanup ****" && \
  rm -rf \
 	/tmp/* \
 	/var/lib/apt/lists/* \
 	/var/tmp/*
-
 # copy local files
 COPY root/ /
 
