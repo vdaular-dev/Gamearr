@@ -40,5 +40,5 @@ RUN \
 COPY root/ /
 
 # ports and volumes
-EXPOSE 8686
+EXPOSE 8383
 VOLUME /config
