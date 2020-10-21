@@ -28,16 +28,6 @@ Gamearr is a Game collection manager forked from lidarr for Usenet and BitTorren
 
 ## Support
 
-- [Donate](https://gamearr.game/donate)
-- [![Discord](https://img.shields.io/badge/discord-chat-7289DA.svg?maxAge=60&style=flat-square)](https://discord.gg/VUzFAqF)
-- [Reddit]
-
-
-## Contributors
-
-This project exists thanks to all the people who contribute. [[Contribute](CONTRIBUTING.md)].
-<a href="https://github.com/gamearr/gamearr/graphs/contributors"><img src="https://opencollective.com/gamearr/contributors.svg?width=890&button=false" /></a>
-
 
 ## Backers
 
