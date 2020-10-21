@@ -18,7 +18,7 @@ RUN \
 	jq && \
  echo "**** install gamearr ****" && \
  mkdir -p /app/gamearr/bin && \
- wget https://github.com/Gamearr/Gamearr/releases/download/0.0.1/Gamearr.develop.0.0.1.linux.tar.gz \
+ curl https://github.com/Gamearr/Gamearr/releases/download/0.0.1/Gamearr.develop.0.0.1.linux.tar.gz \
  tar -xvzf Gamearr.*.linux.tar.gz \
 	/app/Gamearr/bin --strip-components=1 && \
  /tmp/Gamearr.tar.gz -L \
