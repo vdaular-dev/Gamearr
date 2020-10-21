@@ -19,8 +19,8 @@ RUN \
 	libchromaprint-tools \
 	jq && \
  echo "**** install gamearr ****" && \
- mkdir -p 
- 	/app/gamearr/bin && \
+ mkdir -p \
+	/app/gamearr/bin && \
  if [ -z ${GAMEARR_RELEASE+x} ]; then \
 	GAMEARR_RELEASE=$(curl -sX GET "https://api.github.com/repos/Gamearr/Gamearr/releases/latest" \
 	| jq -r .tag_name); \
